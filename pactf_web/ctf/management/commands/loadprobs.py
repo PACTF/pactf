@@ -17,4 +17,6 @@ class Command(BaseCommand):
             if 'problem.json' in files:
                 data = json.load(open(os.path.join(root, 'problem.json')))
                 p = Problem(**data)
+                # TODO - copy all the static files into django's static dir
+                # TODO - do something with a potential validation error
                 p.save()
