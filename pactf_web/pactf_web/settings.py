@@ -55,7 +55,9 @@ ROOT_URLCONF = 'pactf_web.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR + '/templates/'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,6 +79,11 @@ WSGI_APPLICATION = 'pactf_web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'NAME' : 'ctf',
+        'USER' : 'postgres',
+        'PASSWORD' : 'ctf-test',
+        'HOST' : '',
+        'PORT' : '',
     }
 }
 

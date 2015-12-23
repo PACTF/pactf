@@ -18,4 +18,4 @@ class Problem(models.Model):
 class Team(models.Model):
     t_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20)
-    score = models.IntegerField()
+    score = models.IntegerField(default=0)
