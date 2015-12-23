@@ -1,0 +1,11 @@
+{
+    "autogen" : false,
+    "score" : 20,
+    "category" : "Misc",
+    "description" : "<p>The number 0x5f3759df is very special: it is the magic behind an otherwise rather-annoying mathematical operation. What is the result of that operation applied to 0.25?</p>",
+    "name" : "0x5F3759DF",
+    "grader" : "misc/fisr/grader.py",
+    "hint" : "<p>LMGTFY</p>",
+    "threshold" : 0,
+    "weightmap" : {}
+}
