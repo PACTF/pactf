@@ -1,0 +1,14 @@
+<a href="/team/1">Team view</a>
+
+{% for prob in prob_list %}
+  <form action="/submit_flag/{{ prob.p_id }}/" method="post">
+    {{ prob.name }}: {{ prob.points }}
+    <br />
+    {{ prob.desc }}
+
+    <label for="problem-submit{{ prob.p_id }}">Flag: </label>
+    <input id="problem-submit{{ prob.p_id }}" type="text" name="problem-submit{{ prob.p_id }}">
+    <input type="submit" value="Submit!">
+  </form>
+<br /> <br />
+{% endfor %}
