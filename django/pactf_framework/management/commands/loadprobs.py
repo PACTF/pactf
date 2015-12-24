@@ -3,7 +3,7 @@ import os, json
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from ctf.models import Problem
+from pactf_framework.models import Problem
 
 class Command(BaseCommand):
     help = (

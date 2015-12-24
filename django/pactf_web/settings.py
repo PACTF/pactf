@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'markdown2',
-    'ctf',
+    'pactf_framework',
 )
 
 MIDDLEWARE_CLASSES = (
