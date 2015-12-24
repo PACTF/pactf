@@ -8,7 +8,7 @@ import markdown2
 
 # TODO - make a JSONField or something similar to store the threshold dict
 class CTFProblem(models.Model):
-    p_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     points = models.IntegerField()
     name = models.CharField(unique=True, max_length=20)
     desc = models.TextField()
@@ -39,6 +39,7 @@ class CTFProblem(models.Model):
 
 
 class Team(models.Model):
-    t_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+
     name = models.CharField(max_length=20)
     score = models.IntegerField(default=0)
