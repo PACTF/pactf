@@ -5,7 +5,8 @@ from . import views
 
 app_name = 'ctf'
 
-urlpatterns = (
+urlpatterns = [
     url('^$', views.index, name='index'),
+    url(r'^game$', views.game, name='game'),
     url(r'^team/(?P<pk>\d+)$', views.TeamDetailView.as_view(), name='team'),
-)
+]
