@@ -1,31 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-    <title>PROJECT CRAPPY ALPHA</title>
+    <title>
+        {% block title %}
+            PACTF
+        {% endblock %}
+    </title>
 
 
-    <!-- External CSS -->
+    <!-- CSS -->
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
 
+    <link href="{% static "ctf/css/main.css" %}" rel="stylesheet">
 
-    <!-- Project CSS -->
-
-    <link href="/css/main.css" rel="stylesheet">
-
+    {% block css %}{% endblock %}
 
 
-    <!-- External JS -->
+    <!-- JavaScript -->
 
     {% if production %}
         {% include "analytics.html" %}
     {% else %}
-        <script language="javascript">var ga = function (a,b,c,d) {}</script>
+        <script language="javascript">
+            var ga = function (a, b, c, d) {
+            }
+        </script>
     {% endif %}
-
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
@@ -41,6 +49,14 @@
     <script src="{% static "js/dependencies.js" %}"></script>
     <script src="{% static "js/navbar.js" %}"></script>
 
-    <!-- Project JS -->
+    {% block js %}{% endblock %}
 
 </head>
+<body>
+
+    <!-- TODO(yatharth): header structure -->
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>
