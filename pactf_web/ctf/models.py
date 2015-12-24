@@ -7,7 +7,7 @@ import markdown2
 
 
 # TODO - make a JSONField or something similar to store the threshold dict
-class Problem(models.Model):
+class CTFProblem(models.Model):
     p_id = models.AutoField(primary_key=True)
     points = models.IntegerField()
     name = models.CharField(unique=True, max_length=20)
@@ -35,7 +35,7 @@ class Problem(models.Model):
             self.hint, extras=['fenced-code-blocks']
         )
         self.full_clean()
-        super(Problem, self).save()
+        super(CTFProblem, self).save(**kwargs)
 
 
 class Team(models.Model):
