@@ -11,11 +11,13 @@ import os
 from . import local_settings
 
 
+# Directories
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # The absolute path of the problems directory.
-# XXX - change this
+# FIXME: change this
 PROBLEMS_DIR = os.path.join(BASE_DIR, '..', 'test_problems')
 
 
