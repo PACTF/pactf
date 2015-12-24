@@ -19,7 +19,7 @@ class Problem(models.Model):
     )
 
     def grade(self, flag):
-        spec = importlib.util.spec_from_file_location('grader.py', grader)
+        spec = importlib.util.spec_from_file_location('grader.py', self.grader)
         grader = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(grader)
         return grader.grade(flag)
