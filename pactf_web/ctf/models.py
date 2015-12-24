@@ -1,8 +1,10 @@
-import importlib.util, markdown2
-
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+
+import importlib.util
+import markdown2
+
 
 # TODO - make a JSONField or something similar to store the threshold dict
 class Problem(models.Model):
@@ -19,10 +21,11 @@ class Problem(models.Model):
     )
 
     def grade(self, flag):
-        spec = importlib.util.spec_from_file_location('grader.py', grader)
-        grader = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(grader)
-        return grader.grade(flag)
+        # spec = importlib.util.spec_from_file_location('grader.py', grader)
+        # grader = importlib.util.module_from_spec(spec)
+        # spec.loader.exec_module(grader)
+        # return grader.grade(flag)
+        pass
 
     def save(self):
         self.desc_html = markdown2.markdown(
@@ -33,6 +36,7 @@ class Problem(models.Model):
         )
         self.full_clean()
         super(Problem, self).save()
+
 
 class Team(models.Model):
     t_id = models.AutoField(primary_key=True)

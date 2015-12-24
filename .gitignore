@@ -1,2 +1,6 @@
+# Local configuration
+pactf_web/pactf_web/local_settings.py
+
+# Python
 *.pyc
 __pycache__/
