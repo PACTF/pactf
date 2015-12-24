@@ -18,8 +18,10 @@ from django.contrib import admin
 
 from ctf import views
 
-urlpatterns = [
+# TODO: hand off the work to the app?
+
+urlpatterns = (
+    url(r'^admin/', include(admin.site.urls), name='admin'),
     url(r'^team/(?P<pk>[0-9]+)$',
         views.TeamDetailView.as_view(), name='team_view'),
-    url(r'^admin/', include(admin.site.urls), name='admin'),
-]
+)
