@@ -3,7 +3,7 @@ import os, json
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from framework.models import Problem
+from ctf.models import CTFProblem
 
 class Command(BaseCommand):
     help = (
@@ -16,7 +16,7 @@ class Command(BaseCommand):
         for root, dirs, files in os.walk(settings.PROBLEMS_DIR):
             if 'problem.json' in files:
                 data = json.load(open(os.path.join(root, 'problem.json')))
-                p = Problem(**data)
+                p = CTFProblem(**data)
                 # TODO - copy all the static files into django's static dir
                 # TODO - do something with a potential validation error
                 p.save()
