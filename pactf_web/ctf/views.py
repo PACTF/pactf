@@ -12,7 +12,7 @@ def get_default_dict(request):
 def index(request):
     params = get_default_dict(request)
     # TODO - Make sure teams can view X problem before it gets put into dict
-    params['prob_list'] = models.Problem.objects.all()
+    params['prob_list'] = models.CTFProblem.objects.all()
     return render(request, 'game.html', params)
 
 class TeamDetailView(generic.DetailView):
