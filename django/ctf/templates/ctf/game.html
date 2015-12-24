@@ -1,0 +1,31 @@
+{% extends 'ctf/base.html' %}
+
+{% load ctf_debug %}
+
+
+{% block content %}
+    <p>
+        <a href="/team/{{ team.id }}">Team view</a>
+    </p>
+    <p>
+
+
+        {% for prob in prob_list %}
+            <p>
+            <form action="/submit_flag/{{ prob.p_id }}/" method="post">
+                {{ prob.name }}: {{ prob.points }}
+                <br/>
+                {{ prob.desc }}
+
+                <label for="problem-submit{{ prob.p_id }}">Flag: </label>
+                <input id="problem-submit{{ prob.p_id }}" type="text" name="problem-submit{{ prob.p_id }}">
+                <input type="submit" value="Submit!">
+            </form>
+            </p>
+        {% endfor %}
+
+    </p>
+{% endblock %}
+
+
+

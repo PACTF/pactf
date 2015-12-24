@@ -1,0 +1,14 @@
+{% extends 'ctf/base.html' %}
+
+{% block title %}
+    {{ block.super }} - Welcome!
+{% endblock %}
+
+{% block content %}
+    <p>
+        Welcome to PACTF!
+    </p>
+    <p>
+        Go to the <a href="{% url 'ctf:game' %}">Game</a>.
+    </p>
+{% endblock %}

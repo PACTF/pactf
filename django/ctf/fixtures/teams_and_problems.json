@@ -1,0 +1,43 @@
+[
+  {
+    "model": "ctf.Team",
+    "pk": 1,
+    "fields": {
+      "name": "testTeam1",
+      "score": 100
+    }
+  },
+  {
+    "model": "ctf.Team",
+    "pk": 2,
+    "fields": {
+      "name": "testTeam2"
+    }
+  },
+  {
+    "model": "ctf.CtfProblem",
+    "pk": 1,
+    "fields": {
+      "name": "problem1",
+      "points": 10,
+      "description": "desc1",
+      "description_html": "desc1_html",
+      "hint": "hint1",
+      "hint_html": "hint1_html",
+      "grader": "path1"
+    }
+  },
+  {
+    "model": "ctf.CtfProblem",
+    "pk": 2,
+    "fields": {
+      "name": "problem2",
+      "points": 20,
+      "description": "desc2",
+      "description_html": "desc2_html",
+      "hint": "hint2",
+      "hint_html": "hint2_html",
+      "grader": "path2"
+    }
+  }
+]
