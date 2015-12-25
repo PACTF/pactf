@@ -21,9 +21,7 @@
       "name": "problem1",
       "points": 10,
       "description": "desc1",
-      "description_html": "desc1_html",
       "hint": "hint1",
-      "hint_html": "hint1_html",
       "grader": "path1"
     }
   },
@@ -34,9 +32,7 @@
       "name": "problem2",
       "points": 20,
       "description": "desc2",
-      "description_html": "desc2_html",
       "hint": "hint2",
-      "hint_html": "hint2_html",
       "grader": "path2"
     }
   }
