@@ -22,8 +22,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, **options):
-        # TODO(Yatharth): update if problem already in database
-        # TODO(Yatharth): ask for confirmation if updating
         # TODO(Cam): Copy static files
 
         BASEDIR = settings.PROBLEMS_DIR

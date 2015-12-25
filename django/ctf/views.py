@@ -13,6 +13,7 @@ from ctf import models
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
+    # TODO(Yatharth): Add current team ID so can link to team detail view
     return result
 
 
@@ -70,6 +71,7 @@ def game(request):
     return render(request, 'ctf/game.html', params)
 
 
+# TODO: should it just be '/team' to go to logged in one and disallow viewing other teams' pages?
 @http_method('GET')
 class TeamDetailView(DetailView):
     model = models.Team
@@ -88,6 +90,8 @@ class TeamDetailView(DetailView):
 
 @http_method('POST')
 def grade(request, problem_id):
+    # TODO(Yatharth): Run grader
+    # TODO(Yatharth): Record in db
     # TODO(Yatharth): Implement flashing
     print("{} {}".format(problem_id, request.POST.get('flag', '')))
     return redirect('ctf:game')
