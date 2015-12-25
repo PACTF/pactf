@@ -11,6 +11,8 @@ from . import models
 
 # region Helpers
 
+# region Helpers
+
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
