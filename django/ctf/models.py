@@ -12,16 +12,14 @@ class CtfProblem(models.Model):
     points = models.IntegerField()
     name = models.CharField(unique=True, max_length=20)
     description = models.TextField()
-    description_html = models.TextField(editable=False, blank=True, null=True)
     hint = models.TextField(default='')
-    hint_html = models.TextField(editable=False, blank=True, null=True)
     grader = models.FilePathField(
         help_text='Path to the grading script',
         path=settings.PROBLEMS_DIR, recursive=True, match='*.py'
     )
 
     def grade(self, flag):
-        spec = importlib.util.spec_from_file_location('grader.py', grader)
+        spec = importlib.util.spec_from_file_location('grader.py', self.grader)
         grader = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(grader)
         return grader.grade(flag)
@@ -34,7 +32,7 @@ class CtfProblem(models.Model):
             self.hint, extras=['fenced-code-blocks']
         )
         self.full_clean()
-        super(CTFProblem, self).save(**kwargs)
+        super().save(**kwargs)
 
 
 class Team(models.Model):
