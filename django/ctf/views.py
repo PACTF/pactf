@@ -1,7 +1,7 @@
 import inspect
 
-from django.http.response import HttpResponseNotAllowed
-from django.shortcuts import render, render_to_response
+from django.http.response import HttpResponseNotAllowed, HttpResponse
+from django.shortcuts import render, render_to_response, redirect
 from django.views.generic import DetailView
 from django.conf import settings
 
@@ -38,10 +38,10 @@ def http_method(method):
 
         # if view is a function
         else:
-            def decorated(request):
+            def decorated(request, *args, **kwargs):
                 if request.method != method:
                     return error
-                return view(request)
+                return view(request, *args, **kwargs)
 
             return decorated
 
@@ -83,3 +83,13 @@ class TeamDetailView(DetailView):
 
 # endregion
 
+
+# region POSTs
+
+@http_method('POST')
+def grade(request, problem_id):
+    # TODO(Yatharth): Implement flashing
+    print("{} {}".format(problem_id, request.POST.get('flag', '')))
+    return redirect('ctf:game')
+
+# endregion

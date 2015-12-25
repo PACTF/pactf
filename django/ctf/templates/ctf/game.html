@@ -14,7 +14,7 @@
   </p>
   <div id="problems">
     {% for prob in prob_list %}
-      <form action="{% url 'ctf:submit_flag' pk=prob.id %}" method="post">
+      <form action="{% url 'ctf:submit_flag' prob.id %}" method="post">
         {{ prob.name }}
         <span class="points">{{ prob.points }}</span>
         <br/>
@@ -22,8 +22,9 @@
         <br/>
 
         <label for="flag-{{ prob.id }}">Flag: </label>
-        <input id="flag-{{ prob.id }}" type="text" name="flag-{{ prob.id }}"/>
+        <input id="flag-{{ prob.id }}" type="text" name="flag"/>
         <input type="submit" value="Submit!"/>
+        {% csrf_token %}
       </form>
       <br/>
     {% endfor %}
