@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'markdown2',
     'debug_toolbar',
+    'yaml',
 
     'ctf',
 ]

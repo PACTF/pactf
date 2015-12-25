@@ -1,0 +1,17 @@
+[
+  {
+    "model": "ctf.Team",
+    "pk": 1,
+    "fields": {
+      "name": "testTeam1",
+      "score": 100
+    }
+  },
+  {
+    "model": "ctf.Team",
+    "pk": 2,
+    "fields": {
+      "name": "testTeam2"
+    }
+  },
+]
