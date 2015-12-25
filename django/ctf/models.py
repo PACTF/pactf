@@ -23,6 +23,8 @@ class CtfProblem(models.Model):
         path=settings.PROBLEMS_DIR, recursive=True, match=r'.*\.py'
     )
 
+    def __str__(self):
+        return "<Problem #{} {!r}>".format(self.id, self.name)
 
     def grade(self, flag):
         spec = importlib.util.spec_from_file_location('grader.py', self.grader)
@@ -49,3 +51,6 @@ class Team(models.Model):
 
     name = models.CharField(max_length=20)
     score = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "<Team #{} {!r}>".format(self.id, self.name)
