@@ -56,21 +56,30 @@ class Command(BaseCommand):
                 write("Skipping '{}': No problems file found".format(root))
                 errors.append(sys.exc_info())
                 continue
+            else:
+                data['grader'] = join(root, GRADER_BASENAME)
 
-            # Prepare problem dict
-            data['grader'] = join(root, GRADER_BASENAME)
-            problem = CtfProblem(**data)
-
-            # Save problem
+            # Check it problem already exists
+            problem_id = data.get(PK_FIELD, '')
+            query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
             try:
-                problem.save()
+                if PK_FIELD in data and query.exists():
+                    write("Trying to update problem for '{}'".format(root))
+                    query.update(**data)
+
+                # Otherwise, create a new one
+                else:
+                    write("Trying to create problem for '{}'".format(root))
+                    problem = CtfProblem(**data)
+                    problem.save()
+
+            # Output success or failure
             except ValidationError:
-                write("Skipping '{}': Problem was invalid".format(root))
+                write("Validation failed for '{}'".format(root))
                 errors.append(sys.exc_info())
                 continue
-
-            # We made it!
-            write("Imported problem from '{}'".format(root))
+            else:
+                write("Successfully imported problem for '{}'".format(root))
 
         # Print stacktraces from before
         if errors:
