@@ -58,13 +58,13 @@ class Command(BaseCommand):
                 continue
 
             # Prepare problem dict
-            data['grader'] = join(root + GRADER_BASENAME)
+            data['grader'] = join(root, GRADER_BASENAME)
             problem = CtfProblem(**data)
 
             # Save problem
             try:
                 problem.save()
-            except ValidationError as err:
+            except ValidationError:
                 write("Skipping '{}': Problem was invalid".format(root))
                 errors.append(sys.exc_info())
                 continue
