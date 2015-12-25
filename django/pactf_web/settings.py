@@ -13,12 +13,11 @@ from . import local_settings
 
 # Directories
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# Root to join other paths too
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# The absolute path of the problems directory.
-# FIXME: change this
-PROBLEMS_DIR = os.path.join(BASE_DIR, '..', 'test_problems')
+# Used to import problems
+PROBLEMS_DIR = os.path.join(BASE_DIR, 'ctfproblems')
 
 
 # Security
@@ -65,9 +64,6 @@ WSGI_APPLICATION = 'pactf_web.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
