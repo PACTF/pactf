@@ -1,30 +1,33 @@
 {% extends 'ctf/base.html' %}
 
+{% load static %}
 {% load ctf_debug %}
 
 
+{% block css %}
+  <link href="{% static "ctf/css/game.css" %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-    <p>
-        <a href="/team/{{ team.id }}">Team view</a>
-    </p>
-    <p>
+  <p>
+    <a href="{% url 'ctf:team' pk=team.id %}">Team view</a>
+  </p>
+  <div id="problems">
+    {% for prob in prob_list %}
+      <form action="{% url 'ctf:submit_flag' pk=prob.id %}" method="post">
+        {{ prob.name }}
+        <span class="points">{{ prob.points }}</span>
+        <br/>
+        {{ prob.description }}
+        <br/>
 
-
-        {% for prob in prob_list %}
-            <p>
-            <form action="/submit_flag/{{ prob.p_id }}/" method="post">
-                {{ prob.name }}: {{ prob.points }}
-                <br/>
-                {{ prob.desc }}
-
-                <label for="problem-submit{{ prob.p_id }}">Flag: </label>
-                <input id="problem-submit{{ prob.p_id }}" type="text" name="problem-submit{{ prob.p_id }}">
-                <input type="submit" value="Submit!">
-            </form>
-            </p>
-        {% endfor %}
-
-    </p>
+        <label for="flag-{{ prob.id }}">Flag: </label>
+        <input id="flag-{{ prob.id }}" type="text" name="flag-{{ prob.id }}"/>
+        <input type="submit" value="Submit!"/>
+      </form>
+      <br/>
+    {% endfor %}
+  </div>
 {% endblock %}
 
 
