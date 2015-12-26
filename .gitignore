@@ -2,6 +2,7 @@
 .env
 django/pactf_web/local_settings.py
 pactf_nginx.conf
+static/
 
 # Python
 *.pyc
