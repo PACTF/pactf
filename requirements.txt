@@ -2,6 +2,7 @@ appnope==0.1.0
 decorator==4.0.6
 Django==1.9
 django-debug-toolbar==1.4
+django-extensions==1.6.1
 django-jinja==2.1.1
 gnureadline==6.3.3
 ipython==4.0.1
@@ -16,6 +17,8 @@ psycopg2==2.6.1
 ptyprocess==0.5
 PyYAML==3.11
 simplegeneric==0.8.1
+six==1.10.0
 sqlparse==0.1.18
 traitlets==4.0.0
+Werkzeug==0.11.3
 wheel==0.24.0

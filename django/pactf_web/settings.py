@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 # Django App Config
 
 INSTALLED_APPS = [
+    # Default Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,9 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3-rd party Django
+    'django_extensions',
     'debug_toolbar',
+
+    # 3rd-party Python
     'yaml',
 
+    # Ours
     'ctf',
 ]
 
