@@ -64,6 +64,8 @@ class Command(BaseCommand):
                 if PK_FIELD in data and query.exists():
                     write("Trying to update problem for '{}'".format(root))
                     query.update(**data)
+                    for problem in query:
+                        problem.save()
 
                 # Otherwise, create a new one
                 else:
