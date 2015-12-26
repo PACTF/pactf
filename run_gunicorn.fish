@@ -1,7 +1,14 @@
 #!/usr/bin/env fish
 
-# Configure environment
+# Configure directories
+set -l PACTF_ROOT (cd (dirname (status -f)); and pwd)
+set -l PACTF_DJANGO_DIR "$PACTF_ROOT/django"
+set -l PACTF_DJANGO_SETTINGS_MODULE pactf_web.settings
+set -l PACTF_DJANGO_WSGI_MODULE pactf_web.wsgi
+set -l PACTF_NAME pactf_web
+
 sed -nE 's/^([^=]+)=(.*)/set -x \1 \2/p' $PACTF_ROOT/.env | source -
+or exit 1
 set -x PYTHONPATH "$PACTF_DJANGO_DIR" $PYTHONPATH
 
 echo "Starting $PACTF_NAME from user "(whoami)
