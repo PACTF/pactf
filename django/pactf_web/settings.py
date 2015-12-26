@@ -110,4 +110,4 @@ USE_TZ = True
 
 # Local settings
 
-from local_settings import *
+from .local_settings import *
