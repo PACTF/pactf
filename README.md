@@ -5,8 +5,10 @@
 - Activate a virtual environment with Python 3.5+
 - `pip install -r requirements.txt`
 - Create pactf_web/local_settings.py and .env
-- Directly run using `run_gunicorn.fish` (TODO: support bash)
-- (Optional:) Configure nginx to reverse proxy gunicorn via a sockfile
+- `manage.py prep`
+- Directly run using `run_gunicorn.fish` (TODO(Yatharth): support bash)
+- (Optional:) Configure, validate and restart nginx to reverse proxy gunicorn via a sockfile
+- (Optional:) Install and configure supervior to keep gunicorn running (reread, update)
 
 
 ## Updating remote servers

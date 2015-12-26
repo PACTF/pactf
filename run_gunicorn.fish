@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
 
 # Configure environment
-sed -nE 's/^([^=]+)=(.*)/set -x \1 \2/p' .env | source -
+sed -nE 's/^([^=]+)=(.*)/set -x \1 \2/p' $PACTF_ROOT/.env | source -
 set -x PYTHONPATH "$PACTF_DJANGO_DIR" $PYTHONPATH
 
 echo "Starting $PACTF_NAME from user "(whoami)
