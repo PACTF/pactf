@@ -1,3 +1,7 @@
+# Local config
+.env
+django/pactf_web/local_settings.py
+
 # Python
 *.pyc
 __pycache__/
