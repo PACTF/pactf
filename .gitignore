@@ -4,6 +4,10 @@ django/pactf_web/local_settings.py
 pactf_nginx.conf
 static/
 
+# Migrations
+*migrations*
+*.sqlite3
+
 # Python
 *.pyc
 __pycache__/

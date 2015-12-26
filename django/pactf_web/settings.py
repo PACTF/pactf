@@ -8,7 +8,7 @@ See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 from os.path import abspath, dirname, join
 
-from . import local_settings
+from .local_settings import *
 
 
 # Directories
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 3-rd party Django
+    # 3rd-party Django
     'django_extensions',
     'debug_toolbar',
 
@@ -104,8 +104,3 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-
-# Local settings
-
-from .local_settings import *
