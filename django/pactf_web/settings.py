@@ -6,7 +6,7 @@ Quick-start development settings - unsuitable for production
 See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 """
 
-import os
+from os.path import abspath, dirname, join
 
 from . import local_settings
 
@@ -14,10 +14,10 @@ from . import local_settings
 # Directories
 
 # Root to join other paths too
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DJANGO_DIR = dirname(dirname(abspath(__file__)))
 
 # Used to import problems
-PROBLEMS_DIR = os.path.join(BASE_DIR, 'ctfproblems')
+PROBLEMS_DIR = join(dirname(DJANGO_DIR), 'ctfproblems')
 
 
 # Security
@@ -89,7 +89,7 @@ STATIC_URL = '/static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': join(DJANGO_DIR, 'db.sqlite3'),
     }
 }
 
