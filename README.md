@@ -11,7 +11,7 @@
 
 ## Updating remote servers
 
-Run the folllowing commands in a `manage.py` shell:
+Run `manage.py prep`. Alternatively and equivalent, run the following commands in a `manage.py` shell:
 
     makemigrations
     migrate
