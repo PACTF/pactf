@@ -1,11 +1,12 @@
 import inspect
 
-from django.http.response import HttpResponseNotAllowed, HttpResponse
+from django.http.response import HttpResponseNotAllowed, HttpResponse, Http404, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
+from django.contrib import messages
 from django.views.generic import DetailView
 from django.conf import settings
 
-from ctf import models
+from . import models
 
 
 # region Helpers
@@ -20,6 +21,7 @@ def get_default_dict(request):
 def http_method(method):
     """Decorates views to check for HTTP method"""
     assert method in ('GET', 'POST', 'PUT', 'DELETE')
+    # TODO(Yatharth): Show custom page per http://stackoverflow.com/questions/4614294
     error = HttpResponseNotAllowed('Only {} requests allowed here'.format(method))
 
     def decorator(view):
@@ -89,11 +91,18 @@ class TeamDetailView(DetailView):
 # region POSTs
 
 @http_method('POST')
-def grade(request, problem_id):
-    # TODO(Yatharth): Run grader
+def submit_flag(request, problem_id):
     # TODO(Yatharth): Record in db
-    # TODO(Yatharth): Implement flashing
-    print("{} {}".format(problem_id, request.POST.get('flag', '')))
-    return redirect('ctf:game')
+    flag = request.POST.get('flag', '')
+
+    try:
+        problem = models.CtfProblem.objects.get(id=problem_id)
+    except models.CtfProblem.DoesNotExist:
+        return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
+    else:
+        correct, message = problem.grade(flag)
+        messager = messages.success if correct else messages.error
+        messager(request, message)
+        return redirect('ctf:game')
 
 # endregion

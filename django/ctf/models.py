@@ -1,8 +1,10 @@
+from os.path import join
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-import importlib.util
+import importlib.machinery
 import markdown2
 
 
@@ -18,7 +20,7 @@ class CtfProblem(models.Model):
     hint_html = models.TextField(editable=False, blank=True, null=True)
 
     grader = models.FilePathField(
-        help_text='Path to the grading script',
+        help_text='Basename of the grading script from PROBLEM_DIR',
         path=settings.PROBLEMS_DIR, recursive=True, match=r'.*\.py'
     )
 
@@ -26,10 +28,14 @@ class CtfProblem(models.Model):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
     def grade(self, flag):
-        spec = importlib.util.spec_from_file_location('grader.py', self.grader)
-        grader = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(grader)
-        return grader.grade(flag)
+        # TODO(Yatharth): Have real team id forwarded
+        if not flag:
+            return False, "Empty flag"
+
+        grader_path = join(settings.PROBLEMS_DIR, self.grader)
+        grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
+        correct, message = grader.grade(1, flag)
+        return correct, message
 
     def save(self, **kwargs):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')

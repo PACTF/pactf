@@ -1,4 +1,22 @@
+/* TODO(Yatharth): Write in LESS and make it compile automatically */
+
 body {
     background-color: lightblue;
     padding: 10px;
+}
+
+.messages .success {
+    background-color: green;
+}
+
+.messages .success:before {
+    content: "Success!"
+}
+
+.messages .error {
+    background-color: red;
+}
+
+.messages .error:before {
+    content: "Error!"
 }
