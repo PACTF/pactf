@@ -3,7 +3,9 @@
 django/pactf_web/local_settings.py
 pactf_nginx.conf
 static/
+logs/
 
 # Python
 *.pyc
 __pycache__/
+.venv
