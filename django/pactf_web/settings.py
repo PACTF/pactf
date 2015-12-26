@@ -43,9 +43,6 @@ INSTALLED_APPS = [
     # 3rd-party Python
     'yaml',
 
-    # 3rd-party Python
-    'yaml',
-
     # Ours
     'ctf',
 ]
