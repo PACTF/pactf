@@ -89,7 +89,10 @@ STATIC_URL = '/static/'
 # Database
 
 DATABASES = {
-    'default': local_settings.TEST_DATABASE
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
 # Make connections persistent
@@ -103,3 +106,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+
+# Local settings
+
+from local_settings import *

@@ -1,12 +1,10 @@
 """Git-ignored file for local settings
 """
 
+import os.path
 
-TEST_DATABASE = {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': '',
-    'USER': '',
-    'PASSWORD': '',
-    'HOST': '',
-    'PORT': '',
-}
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# DATABASES = {}
+
+# STATIC_ROOT = ''
