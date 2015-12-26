@@ -4,16 +4,16 @@ Make a copy of this without the `example` in the filename, and set the variables
 Commented out variables are optional.
 """
 
-from os.path import dirname, join
+from os.path import abspath, dirname, join
 
 
-BASE_DIR = dirname(dirname(os.path.abspath(__file__)))
+BASE_DIR = dirname(dirname(abspath(__file__)))
 
 # Postgres is recommended
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
