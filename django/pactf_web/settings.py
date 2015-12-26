@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     # 3-rd party Django
     'django_extensions',
     'debug_toolbar',
+
+    # 3rd-party Python
     'yaml',
 
     # 3rd-party Python
