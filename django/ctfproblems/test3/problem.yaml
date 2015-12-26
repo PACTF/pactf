@@ -2,7 +2,7 @@ id: 3
 name: 'problem3'
 points: 10
 description: |
-  ### this is desc3
+  #### this is desc3
 
   do we have **markdown** _working_?
 hint: |

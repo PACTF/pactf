@@ -20,7 +20,7 @@ class CtfProblem(models.Model):
     hint_html = models.TextField(editable=False, blank=True, null=True)
 
     grader = models.FilePathField(
-        help_text='Basename of the grading script from PROBLEM_DIR',
+        help_text="Basename of the grading script from PROBLEM_DIR",
         path=settings.PROBLEMS_DIR, recursive=True, match=r'.*\.py'
     )
 
