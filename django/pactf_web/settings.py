@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-# Static files
+# URL to serve static files at
 STATIC_URL = '/static/'
 
 
