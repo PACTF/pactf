@@ -1,4 +1,9 @@
-.points {
+.problem-points {
     font-weight: bold;
     float: right;
+}
+
+.problem-header {
+    background-color: darkblue;
+    color: white;
 }

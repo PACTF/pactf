@@ -15,11 +15,13 @@
   <div id="problems">
     {% for prob in prob_list %}
       <form action="{% url 'ctf:submit_flag' prob.id %}" method="post">
-        {{ prob.name }}
-        <span class="points">{{ prob.points }}</span>
-        <br/>
-        {{ prob.description }}
-        <br/>
+        <div class="problem-header">
+          <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
+        </div>
+
+        <div class="problem-description">
+          {{ prob.description_html|safe }}
+        </div>
 
         <label for="flag-{{ prob.id }}">Flag: </label>
         <input id="flag-{{ prob.id }}" type="text" name="flag"/>

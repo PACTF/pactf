@@ -41,10 +41,10 @@ class CtfProblem(models.Model):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
 
         self.description_html = markdown2.markdown(
-            self.description, extras=EXTRAS
+            self.description, extras=EXTRAS, safe_mode=True
         )
         self.hint_html = markdown2.markdown(
-            self.hint, extras=EXTRAS
+            self.hint, extras=EXTRAS, safe_mode=True
         )
 
         self.full_clean()
