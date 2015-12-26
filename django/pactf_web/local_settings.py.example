@@ -1,0 +1,21 @@
+"""Local configuration file
+
+Make a copy of this without the `example` in the filename, and set the variables appropriately.
+Commented out variables are optional.
+"""
+
+import os.path
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Postgres is recommended
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+# Set this if you will not be using the Django server and will run `manage.py collectstatic`
+# STATIC_ROOT = ''
