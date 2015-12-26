@@ -22,8 +22,6 @@ PROBLEMS_DIR = os.path.join(BASE_DIR, 'ctfproblems')
 
 # Security
 
-SECRET_KEY = '#051k601ed-6#vrbfow8tcjr=32fuffy-!nugv2k16%fv8&ipn'
-DEBUG = True
 ALLOWED_HOSTS = []
 
 

@@ -19,3 +19,7 @@ DATABASES = {
 
 # Set this if you will not be using the Django server and will run `manage.py collectstatic`
 # STATIC_ROOT = ''
+
+# Security settings
+SECRET_KEY = ''
+DEBUG = True
