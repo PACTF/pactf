@@ -7,3 +7,15 @@
 - Create pactf_web/local_settings.py and .env
 - Directly run using `run_gunicorn.fish` (TODO: support bash)
 - (Optional:) Configure nginx to reverse proxy gunicorn via a sockfile
+
+
+## Updating remote servers
+
+Run the folllowing commands in a `manage.py` shell:
+
+    makemigrations
+    migrate
+    loadprobs
+    collectstatic
+    
+Restart Gunicorn, and new files should begin to be served.
