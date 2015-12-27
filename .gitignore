@@ -1,8 +1,10 @@
 # Local config
 .env
 django/pactf_web/local_settings.py
-pactf_nginx.conf
 static/
+logs/
+pactf_nginx.conf
+pactf_supervisor.conf
 
 # Migrations
 *migrations*
@@ -11,3 +13,4 @@ static/
 # Python
 *.pyc
 __pycache__/
+.venv
