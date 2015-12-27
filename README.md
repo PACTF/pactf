@@ -13,11 +13,19 @@
 
 ## Updating remote servers
 
-Run `manage.py prep`. Alternatively and equivalent, run the following commands in a `manage.py` shell:
+Run the following command to update from the repo:
+
+    git pull; and django/manage.py prep; and sudo supervisorctl restart pactf 
+
+`manage.py prep` runs the following commands:
 
     makemigrations
     migrate
     loadprobs
     collectstatic
     
-Restart Gunicorn, and new files should begin to be served.
+If you are not using superisor, restart Gunicorn yourself.
+
+For updating ngxinx configs, run the following command:
+
+    sudo nginx -t; and sudo service nginx restart
