@@ -8,8 +8,6 @@ See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 from os.path import abspath, dirname, join
 
-from .local_settings import *
-
 
 # Directories
 
@@ -28,7 +26,7 @@ ALLOWED_HOSTS = []
 # Django App Config
 
 INSTALLED_APPS = [
-    # Default Django
+    # Django Defaults
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -97,3 +95,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+
+# Local config
+
+# This import comes in last because local settings have priority.
+from .local_settings import *
