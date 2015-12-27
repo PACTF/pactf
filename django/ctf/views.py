@@ -98,6 +98,7 @@ def submit_flag(request, problem_id):
     # TODO(Cam): Calculate team from session
     team = models.Team.objects.get(id=1)
 
+    # TODO(Cam): Should it react if the team has already solved the problem?
     try:
         problem = models.CtfProblem.objects.get(id=problem_id)
     except models.CtfProblem.DoesNotExist:
