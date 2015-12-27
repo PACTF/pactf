@@ -74,6 +74,7 @@ def game(request):
 
 
 # TODO: should it just be '/team' to go to logged in one and disallow viewing other teams' pages?
+# Cam: I think we should have /team always display your team's page, but /team/<t_id> should let you view another team's page
 @http_method('GET')
 class TeamDetailView(DetailView):
     model = models.Team
@@ -94,6 +95,8 @@ class TeamDetailView(DetailView):
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Record in db
     flag = request.POST.get('flag', '')
+    # TODO(Cam): Calculate team from session
+    team = models.Team.objects.get(id=1)
 
     try:
         problem = models.CtfProblem.objects.get(id=problem_id)
@@ -101,7 +104,13 @@ def submit_flag(request, problem_id):
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
         correct, message = problem.grade(flag)
-        messager = messages.success if correct else messages.error
+        if correct:
+            messager = messages.success
+            team.score += problem.points
+            team.save()
+        else:
+            # TODO(Cam): Log submission in team submission log
+            messager = messages.error
         messager(request, message)
         return redirect('ctf:game')
 
