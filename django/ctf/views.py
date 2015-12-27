@@ -104,13 +104,19 @@ def submit_flag(request, problem_id):
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
         correct, message = problem.grade(flag)
-        if correct:
-            messager = messages.success
-            team.score += problem.points
-            team.save()
-        else:
-            # TODO(Cam): Log submission in team submission log
+        if problem_id not in team.submissions:
+            team.submissions[problem_id] = []
+        if flag in team.submissions[problem_id]:
             messager = messages.error
+            message = "You or someone on your team has already tried this!"
+        else:
+            if correct:
+                messager = messages.success
+                team.score += problem.points
+            else:
+                messager = messages.error
+            team.submissions[problem_id].append(flag)
+            team.save()
         messager(request, message)
         return redirect('ctf:game')
 

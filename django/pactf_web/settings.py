@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Django Extensions
+    'django.contrib.postgres',
+
     # 3rd-party Django
     'django_extensions',
     'debug_toolbar',
@@ -82,16 +85,6 @@ TEMPLATES = [
 
 # URL to serve static files at
 STATIC_URL = '/static/'
-
-
-# Database
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': join(DJANGO_DIR, 'db.sqlite3'),
-    }
-}
 
 # Make connections persistent
 CONN_MAX_AGE = 60 * 60

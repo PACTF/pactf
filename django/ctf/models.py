@@ -3,6 +3,7 @@ from os.path import join
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.contrib.postgres import fields as psqlmodels
 
 import importlib.machinery
 import markdown2
@@ -13,7 +14,8 @@ class CtfProblem(models.Model):
     name = models.CharField(unique=True, max_length=20)
 
     points = models.IntegerField()
-
+    # TODO(Cam): phase out the _html fields and just change it in-place in the
+    # save() method in the first place.
     description = models.TextField()
     description_html = models.TextField(editable=False)
     hint = models.TextField(default='')
@@ -52,10 +54,14 @@ class CtfProblem(models.Model):
 
 
 class Team(models.Model):
+    """
+    The format of the submissions dict is {p_id:solves}
+    flags is a list of submitted flags.
+    """
     id = models.AutoField(primary_key=True)
-
     name = models.CharField(max_length=20)
     score = models.IntegerField(default=0)
+    submissions = psqlmodels.JSONField(default={})
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
