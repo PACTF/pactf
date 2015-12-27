@@ -6,10 +6,6 @@ logs/
 pactf_nginx.conf
 pactf_supervisor.conf
 
-# Migrations
-*migrations*
-*.sqlite3
-
 # Python
 *.pyc
 __pycache__/
