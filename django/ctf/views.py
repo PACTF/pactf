@@ -73,8 +73,7 @@ def game(request):
     return render(request, 'ctf/game.html', params)
 
 
-# TODO: should it just be '/team' to go to logged in one and disallow viewing other teams' pages?
-# Cam: I think we should have /team always display your team's page, but /team/<t_id> should let you view another team's page
+# TODO(Yatharth): Make just /team display logged-in team's page
 @http_method('GET')
 class TeamDetailView(DetailView):
     model = models.Team
@@ -93,12 +92,14 @@ class TeamDetailView(DetailView):
 
 @http_method('POST')
 def submit_flag(request, problem_id):
-    # TODO(Yatharth): Record in db
+    # TODO(Yatharth): Update score
+    # TODO(Yatharth): Disable form submission if problem already solved (and add to Feature List)
+    # TODO(Cam): React if the team has already solved the problem
+
     flag = request.POST.get('flag', '')
     # TODO(Cam): Calculate team from session
     team = models.Team.objects.get(id=1)
 
-    # TODO(Cam): Should it react if the team has already solved the problem?
     try:
         problem = models.CtfProblem.objects.get(id=problem_id)
     except models.CtfProblem.DoesNotExist:
