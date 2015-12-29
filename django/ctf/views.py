@@ -4,11 +4,8 @@ from django.contrib.auth.decorators import login_required as django_login_requir
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
-<<<<<<< HEAD
 from django.contrib.auth import authenticate
-=======
 from django.utils.decorators import method_decorator
->>>>>>> 2b93176d776d3a44b06152ee0a5bdd3928d0afb3
 from django.views.generic import DetailView
 from django.conf import settings
 
@@ -119,7 +116,8 @@ def submit_flag(request, problem_id):
     # TODO(Cam): React if the team has already solved the problem
 
     flag = request.POST.get('flag', '')
-    # TODO(Cam): Calculate team from session
+    # TODO(Cam): Calculate user and team from session
+    user = models.Competitor.objects.get(id=1)
     team = models.Team.objects.get(id=1)
 
     try:
@@ -127,20 +125,20 @@ def submit_flag(request, problem_id):
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
-        correct, message = problem.grade(flag)
-        if problem_id not in team.submissions:
-            team.submissions[problem_id] = []
-        if flag in team.submissions[problem_id]:
+        if models.Submission.objects.filter(p_id=problem_id, team=team, correct=True):
             messager = messages.error
-            message = "You or someone on your team has already tried this!"
+            message = "Your team has already solved this problem!"
+        elif models.Submission.objects.filter(p_id=problem_id, team=team, flag=flag):
+            messager = messages.error
+            message = "You or someone on your team has already tried this flag!"
         else:
+            correct, message = problem.grade(flag)
             if correct:
                 messager = messages.success
                 team.score += problem.points
-            else:
-                messager = messages.error
-            team.submissions[problem_id].append(flag)
-            team.save()
+            else: messager = messages.error
+        s = Submission(p_id=problem_id, user=user, flag=flag, correct=correct)
+        s.save()
         messager(request, message)
         return redirect('ctf:game')
 

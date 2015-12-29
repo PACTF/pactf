@@ -14,4 +14,3 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls), name='admin'),
     url(r'', include('ctf.urls')),
 ]
-
