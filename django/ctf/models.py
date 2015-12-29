@@ -65,3 +65,6 @@ class Team(models.Model):
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
+
+# TODO(Yatharth): Override Django's user and link to team
+# TODO(Yatharth): Update existing superuser

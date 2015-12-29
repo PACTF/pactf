@@ -87,6 +87,11 @@ STATIC_URL = '/static/'
 # Make connections persistent
 CONN_MAX_AGE = 60 * 60
 
+# Auth URLs
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'ctf:index'
+
 
 # Internationalization
 

@@ -53,6 +53,7 @@ def http_method(method):
     return decorator
 
 
+# TODO(Yatharth): Consider replacing with from django.contrib.auth.mixins import LoginRequiredMixin
 def login_required(view):
     """Delegates to Django's `login_required` appropriate based on whether `view` is a function or class"""
     if inspect.isclass(view):
@@ -96,14 +97,8 @@ class Team(DetailView):
 @http_method('GET')
 class CurrentTeam(Team):
     def get_object(self):
-        # TODO(Yatharth): Deal with no logged in user or no associated team (update existing superuser)
-        # TODO(yatharth): return from session or whatever shit
-        if self.request.user.is_authenticated():
-            return self.request.user
-            return HttpResponseServerError()
-        else:
-            return models.Team.objects.get(id=1)
-
+        # TODO(Yatharth): Have to deal with no logged in user?
+        return self.request.user
 
 # endregion
 
