@@ -9,9 +9,6 @@
 {% endblock %}
 
 {% block content %}
-  <p>
-    <a href="{% url 'ctf:team' pk=team.id %}">Team view</a>
-  </p>
   <div id="problems">
     {% for prob in prob_list %}
       <form action="{% url 'ctf:submit_flag' prob.id %}" method="post">

@@ -10,7 +10,7 @@
   <title>
     {% block title %}
       PACTF
-{#      TODO(Yatharth): Ensure inheritors override this     #}
+      {#      TODO(Yatharth): Ensure inheritors override this     #}
     {% endblock %}
   </title>
 
@@ -21,6 +21,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
 
   <link href="{% static "ctf/css/main.css" %}" rel="stylesheet">
+  <link href="{% static "ctf/css/header.css" %}" rel="stylesheet">
 
   {% block css %}{% endblock %}
 
@@ -55,19 +56,32 @@
 </head>
 <body>
 
-<!-- TODO(yatharth): write header -->
+<header>
+  <div class="nav">
+    <ul>
+      <li class="Index"><a href="{% url 'ctf:index' %}">Home</a></li>
+      <li class="Game"><a href="{% url 'ctf:game' %}">Game</a></li>
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-        {{ message }}
-      </li>
-    {% endfor %}
-  </ul>
-{% endif %}
+      {# TODO(Yatharth): Pull right #}
+      {# TODO(Yatharth): Show score #}
+      <li class="Team"><a href="{% url 'ctf:current_team' %}">Team</a></li>
+    </ul>
+  </div>
+</header>
 
-{% block content %}{% endblock %}
+<div id="body">
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
 
 </body>
 </html>

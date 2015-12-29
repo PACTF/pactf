@@ -73,16 +73,22 @@ def game(request):
     return render(request, 'ctf/game.html', params)
 
 
-# TODO(Yatharth): Make just /team display logged-in team's page
 @http_method('GET')
-class TeamDetailView(DetailView):
+class Team(DetailView):
     model = models.Team
     template_name = 'ctf/team.html'
 
     def get_context_data(self, **kwargs):
-        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        context = super(Team, self).get_context_data(**kwargs)
         context.update(get_default_dict(self.request))
         return context
+
+@http_method('GET')
+class CurrentTeam(Team):
+    def get_object(self):
+        # TODO(yatharth): return from session or whatever shit
+        # return models.Team.objects.get(id=1)
+        return models.Team.objects.get(id=1)
 
 
 # endregion

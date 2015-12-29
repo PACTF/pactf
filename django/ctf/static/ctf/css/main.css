@@ -1,6 +1,6 @@
 /* TODO(Yatharth): Write in LESS and make it compile automatically */
 
-body {
+#body {
     background-color: lightblue;
     padding: 10px;
 }
