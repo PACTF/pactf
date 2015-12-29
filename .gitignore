@@ -5,6 +5,7 @@ static/
 logs/
 pactf_nginx.conf
 pactf_supervisor.conf
+django/*/migrations/
 
 # Python
 *.pyc
