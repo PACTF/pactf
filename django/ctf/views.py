@@ -1,8 +1,10 @@
 import inspect
 
-from django.http.response import HttpResponseNotAllowed, HttpResponse, Http404, HttpResponseNotFound
+from django.contrib.auth.decorators import login_required as django_login_required
+from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
@@ -51,6 +53,14 @@ def http_method(method):
     return decorator
 
 
+def login_required(view):
+    """Delegates to Django's `login_required` appropriate based on whether `view` is a function or class"""
+    if inspect.isclass(view):
+        decorator = method_decorator(django_login_required, name='dispatch')
+    else:
+        decorator = django_login_required
+    return decorator(view)
+
 # endregion
 
 
@@ -60,10 +70,9 @@ def http_method(method):
 def index(request):
     if request.META.get('REQUEST_METHOD') != 'GET':
         return HttpResponseNotAllowed('Only GET allowed')
-
     return render(request, 'ctf/index.html')
 
-
+@login_required
 @http_method('GET')
 def game(request):
     params = get_default_dict(request)
@@ -83,12 +92,17 @@ class Team(DetailView):
         context.update(get_default_dict(self.request))
         return context
 
+@login_required
 @http_method('GET')
 class CurrentTeam(Team):
     def get_object(self):
+        # TODO(Yatharth): Deal with no logged in user or no associated team (update existing superuser)
         # TODO(yatharth): return from session or whatever shit
-        # return models.Team.objects.get(id=1)
-        return models.Team.objects.get(id=1)
+        if self.request.user.is_authenticated():
+            return self.request.user
+            return HttpResponseServerError()
+        else:
+            return models.Team.objects.get(id=1)
 
 
 # endregion
