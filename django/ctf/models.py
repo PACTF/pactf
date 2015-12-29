@@ -23,7 +23,7 @@ class CtfProblem(models.Model):
 
     grader = models.FilePathField(
         help_text="Basename of the grading script from PROBLEM_DIR",
-        path=settings.PROBLEMS_DIR, recursive=True, match=r'.*\.py'
+        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
 
     def __str__(self):
@@ -71,3 +71,5 @@ class Team(models.Model):
 class Competitor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
+# TODO(Yatharth): Override Django's user and link to team
+# TODO(Yatharth): Update existing superuser

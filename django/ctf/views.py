@@ -1,9 +1,14 @@
 import inspect
 
-from django.http.response import HttpResponseNotAllowed, HttpResponse, Http404, HttpResponseNotFound
+from django.contrib.auth.decorators import login_required as django_login_required
+from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
+<<<<<<< HEAD
 from django.contrib.auth import authenticate
+=======
+from django.utils.decorators import method_decorator
+>>>>>>> 2b93176d776d3a44b06152ee0a5bdd3928d0afb3
 from django.views.generic import DetailView
 from django.conf import settings
 
@@ -52,6 +57,15 @@ def http_method(method):
     return decorator
 
 
+# TODO(Yatharth): Consider replacing with from django.contrib.auth.mixins import LoginRequiredMixin
+def login_required(view):
+    """Delegates to Django's `login_required` appropriate based on whether `view` is a function or class"""
+    if inspect.isclass(view):
+        decorator = method_decorator(django_login_required, name='dispatch')
+    else:
+        decorator = django_login_required
+    return decorator(view)
+
 # endregion
 
 
@@ -61,10 +75,9 @@ def http_method(method):
 def index(request):
     if request.META.get('REQUEST_METHOD') != 'GET':
         return HttpResponseNotAllowed('Only GET allowed')
-
     return render(request, 'ctf/index.html')
 
-
+@login_required
 @http_method('GET')
 def game(request):
     params = get_default_dict(request)
@@ -74,17 +87,22 @@ def game(request):
     return render(request, 'ctf/game.html', params)
 
 
-# TODO(Yatharth): Make just /team display logged-in team's page
 @http_method('GET')
-class TeamDetailView(DetailView):
+class Team(DetailView):
     model = models.Team
     template_name = 'ctf/team.html'
 
     def get_context_data(self, **kwargs):
-        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        context = super(Team, self).get_context_data(**kwargs)
         context.update(get_default_dict(self.request))
         return context
 
+@login_required
+@http_method('GET')
+class CurrentTeam(Team):
+    def get_object(self):
+        # TODO(Yatharth): Have to deal with no logged in user?
+        return self.request.user
 
 # endregion
 
