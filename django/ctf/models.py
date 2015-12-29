@@ -2,11 +2,13 @@ from os.path import join
 
 from django.db import models
 from django.conf import settings
+from django.auth.models import User
 from django.contrib.postgres import fields as psqlmodels
 
 import importlib.machinery
 import markdown2
 
+from ctf.auth import *
 
 class CtfProblem(models.Model):
     id = models.AutoField(primary_key=True)
@@ -64,3 +66,8 @@ class Team(models.Model):
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
+
+
+class Competitor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)

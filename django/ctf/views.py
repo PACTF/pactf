@@ -3,10 +3,11 @@ import inspect
 from django.http.response import HttpResponseNotAllowed, HttpResponse, Http404, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
+from django.contrib.auth import authenticate
 from django.views.generic import DetailView
 from django.conf import settings
 
-from . import models
+from ctf import models
 
 
 # region Helpers
@@ -91,8 +92,11 @@ class TeamDetailView(DetailView):
 # region POSTs
 
 @http_method('POST')
+def register(request, handle, passwd):
+    pass
+
+@http_method('POST')
 def submit_flag(request, problem_id):
-    # TODO(Yatharth): Update score
     # TODO(Yatharth): Disable form submission if problem already solved (and add to Feature List)
     # TODO(Cam): React if the team has already solved the problem
 
