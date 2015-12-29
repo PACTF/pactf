@@ -21,7 +21,7 @@ class CtfProblem(models.Model):
 
     grader = models.FilePathField(
         help_text="Basename of the grading script from PROBLEM_DIR",
-        path=settings.PROBLEMS_DIR, recursive=True, match=r'.*\.py'
+        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
 
     def __str__(self):
@@ -64,3 +64,4 @@ class Team(models.Model):
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
+
