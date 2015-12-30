@@ -2,7 +2,7 @@ import inspect
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
-from django.shortcuts import render, render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView

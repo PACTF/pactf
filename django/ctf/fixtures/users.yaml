@@ -1,7 +1,6 @@
 # (Passwords are 'password')
 
 # Super-users
-# (Need to watch out if not associated with team as 'has_perm' will succeed unintentionally)
 
 - model: "auth.user"
   pk: 100

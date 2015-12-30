@@ -11,12 +11,9 @@ import yaml
 
 from ctf.models import CtfProblem
 
+
 class Command(BaseCommand):
-    help = (
-        'Scans the directory specified in PROBLEMS_DIR for problem.json '
-        'files. For each one it finds, it creates a new database table '
-        'using the options given.'
-    )
+    help = "Adds/Updates problems from PROBLEM_DIR"
 
     def add_arguments(self, parser):
         pass
@@ -86,5 +83,3 @@ class Command(BaseCommand):
             write("\nPrinting stacktraces of encountered exceptions")
             for err in errors:
                 write(''.join(traceback.format_exception(*err)))
-
-
