@@ -1,6 +1,7 @@
 import inspect
 
-from django.contrib.auth.decorators import login_required as django_login_required, permission_required
+from django.contrib.auth.decorators import (login_required as _login_required,
+                                            permission_required as _permission_required)
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
@@ -14,6 +15,8 @@ from .constants import COMPETE_PERMISSION_CODENAME
 
 # region Helpers
 
+# FIXME(Yatharth): Don't just check if user exists but that user's competitor's team exists
+
 # FIXME(Yatharth): Use this in all views
 def get_default_dict(request):
     result = {}
@@ -25,48 +28,52 @@ def get_default_dict(request):
     return result
 
 
+def decorate_classes(methodname):
+    """Decorates a decorator to be able to decorate both a function and a certain method of a class
+
+    Don't call the decorated decorator without arguments (pass nothing if you must). For help, contact Yatharth."""
+
+    def meta_decorator_factory(old_decorator_factory):
+
+        def new_decorator_factory(*args, **kwargs):
+            old_decorator = old_decorator_factory(*args, **kwargs)
+
+            def new_decorator(view):
+                if inspect.isclass(view):
+                    decorator = method_decorator(old_decorator, methodname)
+                else:
+                    decorator = old_decorator
+                return decorator(view)
+
+            return new_decorator
+
+        return new_decorator_factory
+
+    return meta_decorator_factory
+
+
+login_required = decorate_classes('dispatch')(_login_required)
+permission_required = decorate_classes('dispatch')(_permission_required)
+
+
+@decorate_classes(methodname='get')
 def http_method(method):
     """Decorates views to check for HTTP method"""
+
     assert method in ('GET', 'POST', 'PUT', 'DELETE')
     # TODO(Yatharth): Show custom page per http://stackoverflow.com/questions/4614294
     error = HttpResponseNotAllowed('Only {} requests allowed here'.format(method))
 
     def decorator(view):
+        def decorated(request, *args, **kwargs):
+            if request.method != method:
+                return error
+            return view(request, *args, **kwargs)
 
-        # If view is a class
-        if inspect.isclass(view):
-            old_get = view.get
-
-            def new_get(self, request, *args, **kwargs):
-                if request.method != method:
-                    return error
-                return old_get(self, request, *args, **kwargs)
-
-            view.get = new_get
-
-            return view
-
-        # if view is a function
-        else:
-            def decorated(request, *args, **kwargs):
-                if request.method != method:
-                    return error
-                return view(request, *args, **kwargs)
-
-            return decorated
+        return decorated
 
     return decorator
 
-
-# TODO(Yatharth): Consider replacing with from django.contrib.auth.mixins import LoginRequiredMixin
-# TODO(Yatharth): Don't just check if user exists but that user's competitor's team exists
-def login_required(view):
-    """Delegates to Django's `login_required` appropriate based on whether `view` is a function or class"""
-    if inspect.isclass(view):
-        decorator = method_decorator(django_login_required, name='dispatch')
-    else:
-        decorator = django_login_required
-    return decorator(view)
 
 # endregion
 
@@ -76,6 +83,7 @@ def login_required(view):
 @http_method('GET')
 def index(request):
     return render(request, 'ctf/index.html', get_default_dict(request))
+
 
 @permission_required(COMPETE_PERMISSION_CODENAME)
 @http_method('GET')
@@ -96,11 +104,14 @@ class Team(DetailView):
         context.update(get_default_dict(self.request))
         return context
 
-@permission_required(COMPETE_PERMISSION_CODENAME)
+
+# @permission_required(COMPETE_PERMISSION_CODENAME)
+@login_required()
 @http_method('GET')
 class CurrentTeam(Team):
     def get_object(self):
         return self.request.user.competitor.team
+
 
 # endregion
 
@@ -110,6 +121,7 @@ class CurrentTeam(Team):
 @http_method('POST')
 def register(request, handle, passwd):
     pass
+
 
 # @permission_required(COMPETE_PERMISSION_CODENAME)
 @http_method('POST')
@@ -140,7 +152,8 @@ def submit_flag(request, problem_id):
                 messager = messages.success
                 team.score += problem.points
                 team.save()
-            else: messager = messages.error
+            else:
+                messager = messages.error
         s = models.Submission(p_id=problem_id, user=competitor, flag=flag, correct=correct)
         s.save()
         messager(request, message)
