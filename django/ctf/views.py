@@ -1,7 +1,6 @@
 import inspect
 
-from django.contrib.auth.decorators import (login_required as _login_required,
-                                            permission_required as _permission_required)
+from django.contrib.auth.decorators import user_passes_test
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
@@ -10,28 +9,32 @@ from django.views.generic import DetailView
 from django.conf import settings
 
 from . import models
-from .constants import COMPETE_PERMISSION_CODENAME
 
 
-# region Helpers
+# region Helper Methods
 
-# FIXME(Yatharth): Don't just check if user exists but that user's competitor's team exists
+def is_competitor(user):
+    return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
 
-# FIXME(Yatharth): Use this in all views
+
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
-    if request.user.is_authenticated() and request.user.has_perm(COMPETE_PERMISSION_CODENAME):
-        result['team'] = request.user.competitor.team
-    else:
-        result['team'] = None
+    result['team'] = request.user.competitor.team if is_competitor(request.user) else None
     return result
 
 
-def decorate_classes(methodname):
-    """Decorates a decorator to be able to decorate both a function and a certain method of a class
+# endregion
 
-    Don't call the decorated decorator without arguments (pass nothing if you must). For help, contact Yatharth."""
+
+# region Decorators
+
+def decorate_classes(methodname):
+    """Makes a decorator factory able to decorate both a function and a certain method of a class
+
+    This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make your decorator (factory) take no arguments if you must.
+
+    For help, contact Yatharth."""
 
     def meta_decorator_factory(old_decorator_factory):
 
@@ -50,10 +53,6 @@ def decorate_classes(methodname):
         return new_decorator_factory
 
     return meta_decorator_factory
-
-
-login_required = decorate_classes('dispatch')(_login_required)
-permission_required = decorate_classes('dispatch')(_permission_required)
 
 
 @decorate_classes(methodname='get')
@@ -75,6 +74,11 @@ def http_method(method):
     return decorator
 
 
+@decorate_classes(methodname='dispatch')
+def competitors_only():
+    return user_passes_test(is_competitor)
+
+
 # endregion
 
 
@@ -85,12 +89,13 @@ def index(request):
     return render(request, 'ctf/index.html', get_default_dict(request))
 
 
-@permission_required(COMPETE_PERMISSION_CODENAME)
+@competitors_only()
 @http_method('GET')
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = models.CtfProblem.objects.all
-    params['team'] = request.user.competitor.team
+    # Note: Teams will be added automatically
+
     return render(request, 'ctf/game.html', params)
 
 
@@ -105,11 +110,10 @@ class Team(DetailView):
         return context
 
 
-# @permission_required(COMPETE_PERMISSION_CODENAME)
-@login_required()
+@competitors_only()
 @http_method('GET')
 class CurrentTeam(Team):
-    def get_object(self):
+    def get_object(self, **kwargs):
         return self.request.user.competitor.team
 
 
@@ -118,20 +122,19 @@ class CurrentTeam(Team):
 
 # region POSTs
 
+# TODO(Cam): Write
 @http_method('POST')
-def register(request, handle, passwd):
+def register(request, handle, password):
     pass
 
 
-# @permission_required(COMPETE_PERMISSION_CODENAME)
+@competitors_only()
 @http_method('POST')
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
-    # TODO(Cam): React if the team has already solved the problem
+    # FIXME(Cam): React if the team has already solved the problem
 
     flag = request.POST.get('flag', '')
-    # FIXME(Cam): Calculate user and team from session
-
     competitor = request.user.competitor
     team = competitor.team
 
@@ -141,22 +144,24 @@ def submit_flag(request, problem_id):
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
         if models.Submission.objects.filter(p_id=problem_id, team=team, correct=True):
-            messager = messages.error
+            messenger = messages.error
             message = "Your team has already solved this problem!"
+            correct = None
         elif models.Submission.objects.filter(p_id=problem_id, team=team, flag=flag):
-            messager = messages.error
+            messenger = messages.error
             message = "You or someone on your team has already tried this flag!"
+            correct = None
         else:
             correct, message = problem.grade(flag)
             if correct:
-                messager = messages.success
+                messenger = messages.success
                 team.score += problem.points
                 team.save()
             else:
-                messager = messages.error
+                messenger = messages.error
         s = models.Submission(p_id=problem_id, user=competitor, flag=flag, correct=correct)
         s.save()
-        messager(request, message)
+        messenger(request, message)
         return redirect('ctf:game')
 
 # endregion

@@ -145,7 +145,7 @@ class Submission(models.Model):
     user = models.ForeignKey(Competitor, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, editable=False, blank=True)
     flag = models.CharField(max_length=80)
-    correct = models.BooleanField()
+    correct = models.NullBooleanField()
 
     def save(self, **kwargs):
         self.team = self.user.team
