@@ -22,8 +22,6 @@ PROBLEMS_DIR = join(dirname(DJANGO_DIR), 'ctfproblems')
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'ctf.Competitor'
-
 
 # Django App Config
 

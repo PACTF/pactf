@@ -55,6 +55,7 @@ def http_method(method):
 
 
 # TODO(Yatharth): Consider replacing with from django.contrib.auth.mixins import LoginRequiredMixin
+# TODO(Yatharth): Don't just check if user exists but that user's competitor's team exists
 def login_required(view):
     """Delegates to Django's `login_required` appropriate based on whether `view` is a function or class"""
     if inspect.isclass(view):
@@ -79,8 +80,7 @@ def index(request):
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = models.CtfProblem.objects.all
-    # TODO(yatharth): return from session or whatever shit
-    params['team'] = models.Team.objects.get(id=1)
+    params['team'] = request.user.competitor.team
     return render(request, 'ctf/game.html', params)
 
 
@@ -98,8 +98,7 @@ class Team(DetailView):
 @http_method('GET')
 class CurrentTeam(Team):
     def get_object(self):
-        # TODO(Yatharth): Have to deal with no logged in user?
-        return self.request.user
+        return self.request.user.competitor.team
 
 # endregion
 
@@ -112,7 +111,7 @@ def register(request, handle, passwd):
 
 @http_method('POST')
 def submit_flag(request, problem_id):
-    # TODO(Yatharth): Disable form submission if problem already solved (and add to Feature List)
+    # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
     # TODO(Cam): React if the team has already solved the problem
 
     flag = request.POST.get('flag', '')
@@ -137,7 +136,7 @@ def submit_flag(request, problem_id):
                 messager = messages.success
                 team.score += problem.points
             else: messager = messages.error
-        s = Submission(p_id=problem_id, user=user, flag=flag, correct=correct)
+        s = models.Submission(p_id=problem_id, user=user, flag=flag, correct=correct)
         s.save()
         messager(request, message)
         return redirect('ctf:game')
