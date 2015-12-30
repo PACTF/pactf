@@ -4,15 +4,12 @@ from django.contrib.auth.decorators import login_required as django_login_requir
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
-<<<<<<< HEAD
 from django.contrib.auth import authenticate
-=======
 from django.utils.decorators import method_decorator
->>>>>>> 2b93176d776d3a44b06152ee0a5bdd3928d0afb3
 from django.views.generic import DetailView
 from django.conf import settings
 
-from ctf import models
+from . import models
 
 
 # region Helpers

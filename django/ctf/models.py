@@ -1,4 +1,5 @@
 from os.path import join
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 
 from django.db import models
 from django.conf import settings
@@ -60,7 +61,7 @@ class Team(models.Model):
     flags is a list of submitted flags.
     """
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=40, unique=True)
     score = models.IntegerField(default=0)
     submissions = psqlmodels.JSONField(default={})
 
@@ -68,8 +69,32 @@ class Team(models.Model):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
 
+# TODO(Yatharth): Grandfather
+# TODO(Yatharth): Make email unique and required, and change other Django User's fields (or shun them)
 class Competitor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
-# TODO(Yatharth): Override Django's user and link to team
-# TODO(Yatharth): Update existing superuser
+
+# class CompetitorManager(BaseUserManager):
+#     def create_user(username, fullname, email, team, password=None):
+#         pass
+#
+#     def create_superuser(self, username, fullname, email, team, password):
+#         pass
+#
+# class Competitor(AbstractBaseUser):
+#     username = models.CharField(max_length=40, unique=True)
+#     fullname = models.CharField(max_length=100)
+#     email = models.EmailField()
+#     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+#
+#     USERNAME_FIELD = 'username'
+#     REQUIRED_FIELDS = ['fullname', 'email', 'team']
+#
+#     def get_short_name(self):
+#         return self.username
+#
+#     def get_full_name(self):
+#         return self.fullname
+#
+#     objects = CompetitorManager()
