@@ -1,9 +1,17 @@
 /* TODO(Yatharth): Write in LESS and make it compile automatically */
 
-#body {
+body {
+    margin: 0;
+    padding: 0;
+
     background-color: lightblue;
+}
+
+#body {
     padding: 10px;
 }
+
+/* Messages */
 
 .messages .success {
     background-color: green;

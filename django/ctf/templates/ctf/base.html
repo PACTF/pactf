@@ -57,22 +57,20 @@
 <body>
 
 <header>
-  <div class="nav">
-    <ul>
-      <li><a href="{% url 'ctf:index' %}">Home</a></li>
-      <li><a href="{% url 'ctf:game' %}">Game</a></li>
-
-      {# TODO(Yatharth): Pull right #}
-      {# TODO(Yatharth): Show score #}
-      {% if user.is_authenticated %}
-        <li>Score: {{ team.score }}</li>
-        <li><a href="{% url 'ctf:current_team' %}">Team</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-      {% else %}
-        <li><a href="{% url 'login' %}">Login</a></li>
-      {% endif %}
-    </ul>
-  </div>
+  <ul class="pull-left">
+    <li><a href="{% url 'ctf:index' %}">Home</a></li>
+    <li><a href="{% url 'ctf:game' %}">Game</a></li>
+  </ul>
+  <ul class="pull-right">
+    {% if user.is_authenticated %}
+      <li>Score: {{ team.score }}</li>
+      <li><a href="{% url 'ctf:current_team' %}">Team</a></li>
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+    {% else %}
+      <li><a href="{% url 'login' %}">Login</a></li>
+    {% endif %}
+  </ul>
+  <div style="clear: both"></div>
 </header>
 
 <div id="body">

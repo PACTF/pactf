@@ -17,8 +17,10 @@ from . import models
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
-    result['team'] = request.user.competitor.team
-    # TODO(Yatharth): Add team ID
+    if request.user.is_authenticated():
+        result['team'] = request.user.competitor.team
+    else:
+        result['team'] = None
     return result
 
 
