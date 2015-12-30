@@ -3,6 +3,9 @@
 {% load static %}
 {% load ctf_debug %}
 
+{% block title %}
+  Game — {{ block.super }}
+{% endblock %}
 
 {% block css %}
   <link href="{% static "ctf/css/game.css" %}" rel="stylesheet">

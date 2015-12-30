@@ -1,5 +1,9 @@
 {% extends 'ctf/base.html' %}
 
+{% block title %}
+  Login — {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
   {% if form.errors %}

@@ -1,5 +1,9 @@
 {% extends 'ctf/base.html' %}
 
+{% block title %}
+  Team — {{ block.super }}
+{% endblock %}
+
 {% block content %}
     <p>
         Name: {{ object.name }}
