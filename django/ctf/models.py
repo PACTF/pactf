@@ -1,9 +1,8 @@
 from os.path import join
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 
 from django.db import models
 from django.conf import settings
-from django.auth.models import User
+from django.contrib.auth.models import User
 from django.contrib.postgres import fields as psqlmodels
 
 import importlib.machinery
@@ -63,6 +62,7 @@ class Team(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
     score = models.IntegerField(default=0)
+    # TODO(Yatharth): Eliminate JSON field and use another model
     submissions = psqlmodels.JSONField(default={})
 
     def __str__(self):
