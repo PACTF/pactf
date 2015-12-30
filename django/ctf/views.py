@@ -1,10 +1,9 @@
 import inspect
 
 from django.contrib.auth.decorators import login_required as django_login_required
-from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
+from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
@@ -14,10 +13,11 @@ from . import models
 
 # region Helpers
 
+# FIXME(Yatharth): Use this in all views
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
-    # TODO(Yatharth): Add current team ID so can link to team detail view
+    # TODO(Yatharth): Add team ID
     return result
 
 
@@ -115,9 +115,10 @@ def submit_flag(request, problem_id):
     # TODO(Cam): React if the team has already solved the problem
 
     flag = request.POST.get('flag', '')
-    # TODO(Cam): Calculate user and team from session
-    user = models.Competitor.objects.get(id=1)
-    team = models.Team.objects.get(id=1)
+    # FIXME(Cam): Calculate user and team from session
+
+    competitor = request.user.competitor
+    team = competitor.team
 
     try:
         problem = models.CtfProblem.objects.get(id=problem_id)
@@ -136,7 +137,7 @@ def submit_flag(request, problem_id):
                 messager = messages.success
                 team.score += problem.points
             else: messager = messages.error
-        s = models.Submission(p_id=problem_id, user=user, flag=flag, correct=correct)
+        s = models.Submission(p_id=problem_id, user=competitor, flag=flag, correct=correct)
         s.save()
         messager(request, message)
         return redirect('ctf:game')

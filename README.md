@@ -6,7 +6,7 @@
 - `pip install -r requirements.txt`
 - Create pactf_web/local_settings.py and .env
 - `manage.py prep`
-- Directly run using `run_gunicorn.fish` (TODO(Yatharth): support bash)
+- Directly run using `run_gunicorn.fish`
 - (Optional:) Configure, validate and restart nginx to reverse proxy gunicorn via a sockfile
 - (Optional:) Install and configure supervior to keep gunicorn running (reread, update)
 

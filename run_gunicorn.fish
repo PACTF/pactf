@@ -1,5 +1,7 @@
 #!/usr/bin/env fish
 
+# TODO(Yatharth): Port to bash
+
 # Configure directories
 set -l PACTF_ROOT (cd (dirname (status -f)); and pwd)
 set -l PACTF_DJANGO_DIR "$PACTF_ROOT/django"

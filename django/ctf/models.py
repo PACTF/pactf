@@ -52,7 +52,6 @@ class CtfProblem(models.Model):
     name = models.CharField(unique=True, max_length=20)
 
     points = models.IntegerField()
-    # TODO(Cam): Eliminate _html fields and just convert in-place in the save() method
     description = models.TextField()
     description_html = models.TextField(editable=False)
     hint = models.TextField(default='')
@@ -67,7 +66,7 @@ class CtfProblem(models.Model):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
     def grade(self, flag):
-        # TODO(Yatharth): Have real team id forwarded
+        # FIXME(Yatharth): Have real team id forwarded
         if not flag:
             return False, "Empty flag"
 
@@ -85,10 +84,11 @@ class CtfProblem(models.Model):
         self.full_clean()
         super().save(**kwargs)
 
-# TODO(Yatharth): Review Submission model
+# FIXME(Yatharth): Review Submission model
 class Submission(models.Model):
     p_id = models.IntegerField()
     time = models.DateTimeField(auto_now_add=True)
+    # FIXME: Rename to competitor
     user = models.ForeignKey(Competitor, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, editable=False, blank=True)
     flag = models.CharField(max_length=80)
