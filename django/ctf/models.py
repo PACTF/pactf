@@ -48,13 +48,15 @@ class CtfProblem(models.Model):
 
 class Team(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=40, unique=True)
     score = models.IntegerField(default=0)
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
 
+# TODO(Yatharth): Grandfather
+# TODO(Yatharth): Make email unique and required, and change other Django User's fields (or shun them)
 class Competitor(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -72,3 +74,26 @@ class Submission(models.Model):
     def save(self, **kwargs):
         self.team = self.user.team
         super().save(**kwargs)
+# class CompetitorManager(BaseUserManager):
+#     def create_user(username, fullname, email, team, password=None):
+#         pass
+#
+#     def create_superuser(self, username, fullname, email, team, password):
+#         pass
+#
+# class Competitor(AbstractBaseUser):
+#     username = models.CharField(max_length=40, unique=True)
+#     fullname = models.CharField(max_length=100)
+#     email = models.EmailField()
+#     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+#
+#     USERNAME_FIELD = 'username'
+#     REQUIRED_FIELDS = ['fullname', 'email', 'team']
+#
+#     def get_short_name(self):
+#         return self.username
+#
+#     def get_full_name(self):
+#         return self.fullname
+#
+#     objects = CompetitorManager()
