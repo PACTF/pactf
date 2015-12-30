@@ -17,6 +17,7 @@ from . import models
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
+    result['team'] = request.user.competitor.team
     # TODO(Yatharth): Add team ID
     return result
 
@@ -71,9 +72,7 @@ def login_required(view):
 
 @http_method('GET')
 def index(request):
-    if request.META.get('REQUEST_METHOD') != 'GET':
-        return HttpResponseNotAllowed('Only GET allowed')
-    return render(request, 'ctf/index.html')
+    return render(request, 'ctf/index.html', get_default_dict(request))
 
 @login_required
 @http_method('GET')
@@ -136,6 +135,7 @@ def submit_flag(request, problem_id):
             if correct:
                 messager = messages.success
                 team.score += problem.points
+                team.save()
             else: messager = messages.error
         s = models.Submission(p_id=problem_id, user=competitor, flag=flag, correct=correct)
         s.save()
