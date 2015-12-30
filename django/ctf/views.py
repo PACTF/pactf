@@ -1,6 +1,6 @@
 import inspect
 
-from django.contrib.auth.decorators import login_required as django_login_required
+from django.contrib.auth.decorators import login_required as django_login_required, permission_required
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, render_to_response, redirect
 from django.contrib import messages
@@ -9,6 +9,7 @@ from django.views.generic import DetailView
 from django.conf import settings
 
 from . import models
+from .constants import COMPETE_PERMISSION_CODENAME
 
 
 # region Helpers
@@ -17,7 +18,7 @@ from . import models
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.has_perm(COMPETE_PERMISSION_CODENAME):
         result['team'] = request.user.competitor.team
     else:
         result['team'] = None
@@ -76,7 +77,7 @@ def login_required(view):
 def index(request):
     return render(request, 'ctf/index.html', get_default_dict(request))
 
-@login_required
+@permission_required(COMPETE_PERMISSION_CODENAME)
 @http_method('GET')
 def game(request):
     params = get_default_dict(request)
@@ -95,7 +96,7 @@ class Team(DetailView):
         context.update(get_default_dict(self.request))
         return context
 
-@login_required
+@permission_required(COMPETE_PERMISSION_CODENAME)
 @http_method('GET')
 class CurrentTeam(Team):
     def get_object(self):
@@ -110,6 +111,7 @@ class CurrentTeam(Team):
 def register(request, handle, passwd):
     pass
 
+# @permission_required(COMPETE_PERMISSION_CODENAME)
 @http_method('POST')
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)

@@ -1,5 +1,41 @@
-# Users
 # (Passwords are 'password')
+
+# Super-users
+# (Need to watch out if not associated with team as 'has_perm' will succeed unintentionally)
+
+- model: "auth.user"
+  pk: 100
+  fields:
+    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
+    last_login: null
+    is_superuser: true
+    username: "admin1"
+    email: "yatharth999@gmail.com"
+    is_staff: true
+    is_active: true
+    date_joined: "2015-12-30T07:32:56.341Z"
+    groups: []
+    user_permissions: []
+
+
+# Staff
+
+- model: "auth.user"
+  pk: 99
+  fields:
+    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
+    last_login: null
+    is_superuser: false
+    username: "admin2"
+    email: "yatharth999@gmail.com"
+    is_staff: true
+    is_active: true
+    date_joined: "2015-12-30T07:32:56.341Z"
+    groups: []
+    user_permissions: []
+
+
+# Competitors
 
 - model: "auth.user"
   pk: 101
@@ -8,7 +44,6 @@
     last_login: null
     is_superuser: true
     username: "user1"
-    email: "yatharth999@gmail.com"
     is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
@@ -22,7 +57,6 @@
     last_login: null
     is_superuser: true
     username: "user2"
-    email: "example@example.com"
     is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
@@ -36,53 +70,8 @@
     last_login: null
     is_superuser: true
     username: "user3"
-    email: "example@example.com"
     is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
     user_permissions: []
-
-
-# Teams
-
-- model: "ctf.Team"
-  pk: 101
-  fields:
-    name: "Team 1"
-    score: 101
-
-- model: "ctf.Team"
-  pk: 102
-  fields:
-    name: "Team 2"
-
-
-# Competitors
-
-- model: "ctf.Competitor"
-  pk: 101
-  fields:
-    user: 101
-    team: 101
-    first_name: "User 1"
-    last_name: "Last"
-    email: "example1@example.com"
-
-- model: "ctf.Competitor"
-  pk: 102
-  fields:
-    user: 102
-    team: 101
-    first_name: "User 2"
-    last_name: "Team 2"
-    email: "example2@example.com"
-
-- model: "ctf.Competitor"
-  pk: 103
-  fields:
-    user: 103
-    team: 102
-    first_name: "User 3"
-    last_name: "Team 2"
-    email: "example3@example.com"
