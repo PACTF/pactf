@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
-from . import models
+from ctf import models
 
 
 # region Helper Methods

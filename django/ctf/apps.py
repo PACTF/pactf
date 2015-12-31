@@ -25,6 +25,7 @@ from django.apps import AppConfig
 
 
 class CtfConfig(AppConfig):
+    # TODO(Yatharth): Rename to 'pactf'
     name = 'ctf'
 
     # def ready(self):
