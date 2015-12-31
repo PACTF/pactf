@@ -6,6 +6,7 @@ logs/
 pactf_nginx.conf
 pactf_supervisor.conf
 django/*/migrations/
+ctfproblems/_static
 
 # Python
 *.pyc

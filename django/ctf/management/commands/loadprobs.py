@@ -13,6 +13,17 @@ import yaml
 from ctf.models import CtfProblem
 
 
+PROBLEMS_DIR = settings.PROBLEMS_DIR
+PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
+
+PROBLEM_BASENAME = 'problem.yaml'
+GRADER_BASENAME = 'grader.py'
+STATIC_BASENAME = 'static'
+
+NAME_FIELD = 'name'
+PK_FIELD = 'id'
+
+
 class Command(BaseCommand):
     help = "Adds/Updates problems from PROBLEM_DIR"
 
@@ -20,22 +31,15 @@ class Command(BaseCommand):
         pass
 
     def handle(self, **options):
-        BASEDIR = settings.PROBLEMS_DIR
-        STATIC_DIRNAME = join(settings.STATIC_ROOT, 'problems')
-        STATIC_BASENAME = 'static'
-        PROBLEM_BASENAME = 'problem.yaml'
-        GRADER_BASENAME = 'grader.py'
-        PK_FIELD = 'id'
 
         write = self.stdout.write
-
         errors = []
 
-        write("Walking '{}'".format(BASEDIR))
-        for root in os.listdir(BASEDIR):
+        write("Walking '{}'".format(PROBLEMS_DIR))
+        for root in os.listdir(PROBLEMS_DIR):
 
             # Skip files
-            if isfile(join(BASEDIR, root)):
+            if isfile(join(PROBLEMS_DIR, root)):
                 continue
 
             # Ignore private dirs
@@ -44,7 +48,7 @@ class Command(BaseCommand):
                 continue
 
             # Load problem file
-            problem_filename = join(BASEDIR, root, PROBLEM_BASENAME)
+            problem_filename = join(PROBLEMS_DIR, root, PROBLEM_BASENAME)
             try:
                 with open(problem_filename) as problem_file:
                     data = yaml.load(problem_file)
@@ -56,8 +60,8 @@ class Command(BaseCommand):
                 data['grader'] = join(root, GRADER_BASENAME)
 
             # Create the directories we'd copy static files to and from
-            static_from = join(BASEDIR, root, STATIC_BASENAME)
-            static_to = join(STATIC_DIRNAME, root)
+            static_from = join(PROBLEMS_DIR, root, STATIC_BASENAME)
+            static_to = join(PROBLEMS_STATIC_DIR, data[NAME_FIELD])
 
             # Check if the problem already exists
             problem_id = data.get(PK_FIELD, '')
@@ -65,15 +69,16 @@ class Command(BaseCommand):
             try:
                 if PK_FIELD in data and query.exists():
 
-                    # Update problem
+                    # If so, update the problem
                     write("Trying to update problem for '{}'".format(root))
                     query.update(**data)
                     for problem in query:
                         problem.save()
 
-                    # Delete existing files
+                    # Also, delete existing files
+                    # TODO(Yatharth): Replace this with deleting all files in PROBLEMS_STATIC_DIR right in the beginning
                     if isdir(static_to):
-                        write("Warning: Deleting existing staticfiles at '{}'".format(static_to))
+                        write("Warning: Deleting existing staticfiles at '{}'".format(data[NAME_FIELD]))
                         shutil.rmtree(static_to)
 
                 # Otherwise, create a new one
@@ -83,9 +88,8 @@ class Command(BaseCommand):
                     problem.save()
 
                 # Either way, copy over any static files
-                print(static_to)
                 if isdir(static_from):
-                    write("Trying to copy static files from '{}'".format(static_from))
+                    write("Trying to copy static files from '{}'".format(root))
                     shutil.copytree(static_from, static_to)
 
             # Output success or failure
