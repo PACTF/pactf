@@ -19,16 +19,16 @@ PROBLEMS_DIR = join(BASE_DIR, 'ctfproblems')
 # Intermediate folder for problem static files
 # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
 # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
-PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR, '_static', 'ctfproblems')
+PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR, '_static')
 
 # Where to finally collect static files to
 # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
-STATIC_ROOT = join(dirname(BASE_DIR), 'static')
+STATIC_ROOT = join(BASE_DIR, 'static')
 
 # Where all to collect static files from
-STATICFILES_DIRS = [
-    PROBLEMS_STATIC_DIR,
-]
+STATICFILES_DIRS = (
+    ('ctfproblems', PROBLEMS_STATIC_DIR),
+)
 
 
 # Database

@@ -45,6 +45,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+)
+
 
 # Django Web config
 
@@ -91,4 +95,4 @@ USE_TZ = True
 # Local config
 
 # (This import comes in last because local settings should have priority.)
-from .local_settings import *
+from pactf_web.local_settings import *
