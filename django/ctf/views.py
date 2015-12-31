@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
-from . import models
+from ctf import models
 
 
 # region Helper Methods
@@ -132,7 +132,6 @@ def register(request, handle, password):
 @http_method('POST')
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
-    # FIXME(Cam): React if the team has already solved the problem
 
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor

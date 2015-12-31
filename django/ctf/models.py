@@ -6,37 +6,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group, Permission
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 import markdown2
-
-from .constants import COMPETITOR_GROUP_NAME
-
-
-# region Permissions and Groups
-
-class GlobalPermissionManager(models.Manager):
-    def get_query_set(self):
-        return super(GlobalPermissionManager, self).filter(content_type__name='global_permission')
-
-
-class GlobalPermission(Permission):
-    """A global permission, not attached to a model"""
-
-    objects = GlobalPermissionManager()
-
-    class Meta:
-        proxy = True
-
-    def save(self, *args, **kwargs):
-        content_type, created = ContentType.objects.get_or_create(
-            model="global_permission", app_label=self._meta.app_label
-        )
-        self.content_type = content_type
-        super().save(*args, **kwargs)
-
-# endregion
 
 
 # region User Models (by wrapping)
@@ -75,25 +46,27 @@ class Competitor(models.Model):
         return self.user.username
 
 
+# # # FIXME(Yatharth): Test
+# @receiver(post_save, sender=Competitor, dispatch_uid='ctf.competitor_post_save_add_to_group')
+# def competitor_post_save_add_to_group(sender, instance, created, **kwargs):
+#     if created:
+#         # print(competitorGroup)
+#         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
+#         # print(Group.objects.all(), flush=True)
+#         # g = Group.objects.get(name=COMPETITOR_GROUP_NAME)
+#         # FIXME(Yatharth): Remove
+#         # print("Adding to {}".format(user.id))
+#         instance.user.groups.add(competitorGroup)
+#
+#
 # # FIXME(Yatharth): Test
-@receiver(post_save, sender=Competitor, dispatch_uid='ctf.competitor_post_save_add_to_group')
-def competitor_post_save_add_to_group(sender, instance, created, **kwargs):
-    if created:
-        # print(competitorGroup)
-        competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
-        # print(Group.objects.all(), flush=True)
-        # g = Group.objects.get(name=COMPETITOR_GROUP_NAME)
-        # FIXME(Yatharth): Remove
-        # print("Adding to {}".format(user.id))
-        instance.user.groups.add(competitorGroup)
-
-
-# FIXME(Yatharth): Test
-@receiver(post_delete, sender=Competitor, dispatch_uid='ctf.competitor_post_delete_remove_from_group')
-def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs):
-    if created:
-        competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
-        instance.user.groups.remove(competitorGroup)
+# @receiver(post_delete, sender=Competitor, dispatch_uid='ctf.competitor_post_delete_remove_from_group')
+# def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs):
+#     if created:
+#         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
+#         instance.user.groups.remove(competitorGroup)
+#     def __str__(self):
+#         return "<Competitor #{} {!r}>".format(self.id, self.user.name)
 
 
 # endregion
@@ -140,6 +113,7 @@ class CtfProblem(models.Model):
 
 
 # FIXME(Yatharth): Review Submission model
+# FIXME(Yatharth): Write __str__ method
 class Submission(models.Model):
     p_id = models.UUIDField()
     time = models.DateTimeField(auto_now_add=True)
@@ -156,8 +130,47 @@ class Submission(models.Model):
 # endregion
 
 
-# region User Models (by substitution)
 
+# region Permissions and Groups
+#
+# class GlobalPermissionManager(models.Manager):
+#     def get_query_set(self):
+#         return super(GlobalPermissionManager, self).filter(content_type__name='global_permission')
+#
+#
+# class GlobalPermission(Permission):
+#     """A global permission, not attached to a model"""
+#
+#     objects = GlobalPermissionManager()
+#
+#     class Meta:
+#         proxy = True
+#
+#     def save(self, *args, **kwargs):
+#         content_type, created = ContentType.objects.get_or_create(
+#             model="global_permission", app_label=self._meta.app_label
+#         )
+#         self.content_type = content_type
+#         super().save(*args, **kwargs)
+#
+# @receiver(post_save, sender=Competitor, dispatch_uid='ctf.competitor_post_save_add_to_group')
+# def competitor_post_save_add_to_group(sender, instance, created, **kwargs):
+#     if created:
+#         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
+#         instance.user.groups.add(competitorGroup)
+#
+#
+# @receiver(post_delete, sender=Competitor, dispatch_uid='ctf.competitor_post_delete_remove_from_group')
+# def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs):
+#     if created:
+#         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
+#         instance.user.groups.remove(competitorGroup)
+#
+# endregion
+
+
+# region User Models (by substitution)
+#
 # class CompetitorManager(BaseUserManager):
 #     def create_user(username, fullname, email, team, password=None):
 #         pass
@@ -181,5 +194,5 @@ class Submission(models.Model):
 #         return self.fullname
 #
 #     objects = CompetitorManager()
-
+#
 # endregion

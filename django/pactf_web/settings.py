@@ -9,20 +9,6 @@ See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 from os.path import abspath, dirname, join
 
 
-# Directories
-
-# Root to join other paths too
-DJANGO_DIR = dirname(dirname(abspath(__file__)))
-
-# Used to import problems
-PROBLEMS_DIR = join(dirname(DJANGO_DIR), 'ctfproblems')
-
-
-# Security
-
-ALLOWED_HOSTS = []
-
-
 # Django App Config
 
 INSTALLED_APPS = [
@@ -57,6 +43,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 
@@ -104,5 +95,5 @@ USE_TZ = True
 
 # Local config
 
-# This import comes in last because local settings have priority.
-from .local_settings import *
+# (This import comes in last because local settings should have priority.)
+from pactf_web.local_settings import *

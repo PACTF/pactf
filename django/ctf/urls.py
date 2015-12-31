@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views
+from ctf import views
 
 UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
