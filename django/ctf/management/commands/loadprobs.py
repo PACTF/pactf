@@ -36,27 +36,27 @@ class Command(BaseCommand):
 
         write = self.stdout.write
 
-        # Delete existing files after confirmation
-        message = textwrap.dedent("""\
-            You have requested to load problems into the database and collect static files
-            to the intermediate location as specified in your settings:
+        # Delete any existing files after confirmation
+        if isdir(PROBLEMS_STATIC_DIR):
+            message = textwrap.dedent("""\
+                You have requested to load problems into the database and collect static files
+                to the intermediate     location as specified in your settings:
 
-                {}
+                    {}
 
-            This will DELETE ALL FILES in this location!
-            Are you sure you want to do this?
+                This will DELETE ALL FILES in this location!
+                Are you sure you want to do this?
 
-            Type 'yes' to continue, or 'no' to cancel:\
-            """.format(PROBLEMS_STATIC_DIR))
-        if options['interactive'] and input(message) != "yes":
-            raise CommandError("Loading problems cancelled.")
-        write("Deleting all files in the intermediate location")
-        write('')
-        shutil.rmtree(PROBLEMS_STATIC_DIR)
+                Type 'yes' to continue, or 'no' to cancel:\
+                """.format(PROBLEMS_STATIC_DIR))
+            if options['interactive'] and input(message) != "yes":
+                raise CommandError("Loading problems cancelled.")
+            write("Deleting all files in the intermediate location\n")
+            shutil.rmtree(PROBLEMS_STATIC_DIR)
 
         errors = []
 
-        write("Walking '{}'".format(PROBLEMS_DIR))
+        write("Walking '{}'\n".format(PROBLEMS_DIR))
         for root in os.listdir(PROBLEMS_DIR):
 
             # Skip files
@@ -80,10 +80,6 @@ class Command(BaseCommand):
             else:
                 data['grader'] = join(root, GRADER_BASENAME)
 
-            # Create the directories we'd copy static files to and from
-            static_from = join(PROBLEMS_DIR, root, STATIC_BASENAME)
-            static_to = join(PROBLEMS_STATIC_DIR, data[NAME_FIELD])
-
             # Check if the problem already exists
             problem_id = data.get(PK_FIELD, '')
             query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
@@ -100,9 +96,12 @@ class Command(BaseCommand):
                 else:
                     write("Trying to create problem for '{}'".format(root))
                     problem = CtfProblem(**data)
+                    problem_id = problem.id
                     problem.save()
 
                 # Either way, copy over any static files
+                static_from = join(PROBLEMS_DIR, root, STATIC_BASENAME)
+                static_to = join(PROBLEMS_STATIC_DIR, str(problem_id))
                 if isdir(static_from):
                     write("Trying to copy static files from '{}'".format(root))
                     shutil.copytree(static_from, static_to)
