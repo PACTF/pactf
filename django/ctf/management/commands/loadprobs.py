@@ -6,7 +6,7 @@ from os.path import join, isfile, isdir
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 import yaml
 
@@ -20,10 +20,9 @@ class Command(BaseCommand):
         pass
 
     def handle(self, **options):
-        # TODO(Cam): Copy static files
-
         BASEDIR = settings.PROBLEMS_DIR
-        STATIC_BASE = join(settings.STATIC_ROOT, 'problems')
+        STATIC_DIRNAME = join(settings.STATIC_ROOT, 'problems')
+        STATIC_BASENAME = 'static'
         PROBLEM_BASENAME = 'problem.yaml'
         GRADER_BASENAME = 'grader.py'
         PK_FIELD = 'id'
@@ -56,22 +55,26 @@ class Command(BaseCommand):
             else:
                 data['grader'] = join(root, GRADER_BASENAME)
 
-            # Check it problem already exists
+            # Create the directories we'd copy static files to and from
+            static_from = join(BASEDIR, root, STATIC_BASENAME)
+            static_to = join(STATIC_DIRNAME, root)
+
+            # Check if the problem already exists
             problem_id = data.get(PK_FIELD, '')
-            # XXX(Cam) - why make the end developer have to keep track of his own problem IDs?
             query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
-            # create the directories we'd copy static files to and from
-            static_from = join(BASEDIR, root, 'static')
-            static_to = join(STATIC_BASE, root, 'static')
             try:
                 if PK_FIELD in data and query.exists():
+
+                    # Update problem
                     write("Trying to update problem for '{}'".format(root))
                     query.update(**data)
                     for problem in query:
                         problem.save()
-                    if isdir(static_from):
+
+                    # Delete existing files
+                    if isdir(static_to):
                         write("Warning: Deleting existing staticfiles at '{}'".format(static_to))
-                        shutil.rmtree(static_from)
+                        shutil.rmtree(static_to)
 
                 # Otherwise, create a new one
                 else:
@@ -79,6 +82,8 @@ class Command(BaseCommand):
                     problem = CtfProblem(**data)
                     problem.save()
 
+                # Either way, copy over any static files
+                print(static_to)
                 if isdir(static_from):
                     write("Trying to copy static files from '{}'".format(static_from))
                     shutil.copytree(static_from, static_to)
@@ -95,7 +100,7 @@ class Command(BaseCommand):
             else:
                 write("Successfully imported problem for '{}'".format(root))
 
-        # Print stacktraces from before
+        # Print the stack traces from before
         if errors:
             write("\nPrinting stacktraces of encountered exceptions")
             for err in errors:
