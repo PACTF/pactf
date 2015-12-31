@@ -1,17 +1,17 @@
 import os
 import sys
+import textwrap
 import traceback
 import shutil
 from os.path import join, isfile, isdir
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 import yaml
 
 from ctf.models import CtfProblem
-
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
 PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
@@ -28,11 +28,32 @@ class Command(BaseCommand):
     help = "Adds/Updates problems from PROBLEM_DIR"
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
+            help="Do NOT prompt the user for input of any kind.")
 
     def handle(self, **options):
 
         write = self.stdout.write
+
+        # Delete existing files after confirmation
+        message = textwrap.dedent("""\
+            You have requested to load problems into the database and collect static files
+            to the intermediate location as specified in your settings:
+
+                {}
+
+            This will DELETE ALL FILES in this location!
+            Are you sure you want to do this?
+
+            Type 'yes' to continue, or 'no' to cancel:\
+            """.format(PROBLEMS_STATIC_DIR))
+        if options['interactive'] and input(message) != "yes":
+            raise CommandError("Loading problems cancelled.")
+        write("Deleting all files in the intermediate location")
+        write('')
+        shutil.rmtree(PROBLEMS_STATIC_DIR)
+
         errors = []
 
         write("Walking '{}'".format(PROBLEMS_DIR))
@@ -67,19 +88,13 @@ class Command(BaseCommand):
             problem_id = data.get(PK_FIELD, '')
             query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
             try:
-                if PK_FIELD in data and query.exists():
 
-                    # If so, update the problem
+                # If so, update the problem
+                if PK_FIELD in data and query.exists():
                     write("Trying to update problem for '{}'".format(root))
                     query.update(**data)
                     for problem in query:
                         problem.save()
-
-                    # Also, delete existing files
-                    # TODO(Yatharth): Replace this with deleting all files in PROBLEMS_STATIC_DIR right in the beginning
-                    if isdir(static_to):
-                        write("Warning: Deleting existing staticfiles at '{}'".format(data[NAME_FIELD]))
-                        shutil.rmtree(static_to)
 
                 # Otherwise, create a new one
                 else:
@@ -103,6 +118,8 @@ class Command(BaseCommand):
                 continue
             else:
                 write("Successfully imported problem for '{}'".format(root))
+
+            write('')
 
         # Print the stack traces from before
         if errors:
