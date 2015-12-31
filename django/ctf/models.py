@@ -68,6 +68,7 @@ class Competitor(models.Model):
     email = models.EmailField("Email", unique=True)
 
     # TODO(Yatharth): Is this useful? It can be set but not filtered against.
+    # Cam: Can we not just filter with user__username=name?
     @property
     def username(self):
         return self.user.username

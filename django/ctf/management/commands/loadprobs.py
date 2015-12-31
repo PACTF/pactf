@@ -1,7 +1,8 @@
 import os
 import sys
 import traceback
-from os.path import join, isfile
+import shutil
+from os.path import join, isfile, isdir
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -22,6 +23,7 @@ class Command(BaseCommand):
         # TODO(Cam): Copy static files
 
         BASEDIR = settings.PROBLEMS_DIR
+        STATIC_BASE = join(settings.STATIC_ROOT, 'problems')
         PROBLEM_BASENAME = 'problem.yaml'
         GRADER_BASENAME = 'grader.py'
         PK_FIELD = 'id'
@@ -56,13 +58,20 @@ class Command(BaseCommand):
 
             # Check it problem already exists
             problem_id = data.get(PK_FIELD, '')
+            # XXX(Cam) - why make the end developer have to keep track of his own problem IDs?
             query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
+            # create the directories we'd copy static files to and from
+            static_from = join(BASEDIR, root, 'static')
+            static_to = join(STATIC_BASE, root, 'static')
             try:
                 if PK_FIELD in data and query.exists():
                     write("Trying to update problem for '{}'".format(root))
                     query.update(**data)
                     for problem in query:
                         problem.save()
+                    if isdir(static_from):
+                        write("Warning: Deleting existing staticfiles at '{}'".format(static_to))
+                        shutil.rmtree(static_from)
 
                 # Otherwise, create a new one
                 else:
@@ -70,9 +79,17 @@ class Command(BaseCommand):
                     problem = CtfProblem(**data)
                     problem.save()
 
+                if isdir(static_from):
+                    write("Trying to copy static files from '{}'".format(static_from))
+                    shutil.copytree(static_from, static_to)
+
             # Output success or failure
             except ValidationError:
                 write("Validation failed for '{}'".format(root))
+                errors.append(sys.exc_info())
+                continue
+            except (shutil.Error, IOError):
+                write("Unable to copy static files for '{}'".format(root))
                 errors.append(sys.exc_info())
                 continue
             else:
