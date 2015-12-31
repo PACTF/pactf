@@ -1,4 +1,5 @@
 from os.path import join
+import uuid
 import importlib.machinery
 
 from django.db import models
@@ -68,6 +69,7 @@ class Competitor(models.Model):
     email = models.EmailField("Email", unique=True)
 
     # TODO(Yatharth): Is this useful? It can be set but not filtered against.
+    # Cam: Can we not just filter with user__username=name?
     @property
     def username(self):
         return self.user.username
@@ -100,7 +102,7 @@ def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs
 # region Contest Models
 
 class CtfProblem(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(unique=True, max_length=20)
 
     points = models.IntegerField()
@@ -130,7 +132,7 @@ class CtfProblem(models.Model):
     def save(self, **kwargs):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
 
-        # markdown's safe_mode is deprecated
+        # XXX(Cam): markdown's safe_mode is deprecated
         self.description_html = markdown2.markdown(self.description, extras=EXTRAS, safe_mode='escape')
         self.hint_html = markdown2.markdown(self.hint, extras=EXTRAS, safe_mode='escape')
         self.full_clean()
@@ -139,7 +141,7 @@ class CtfProblem(models.Model):
 
 # FIXME(Yatharth): Review Submission model
 class Submission(models.Model):
-    p_id = models.IntegerField()
+    p_id = models.UUIDField()
     time = models.DateTimeField(auto_now_add=True)
     # FIXME: Rename to competitor
     user = models.ForeignKey(Competitor, on_delete=models.CASCADE)
