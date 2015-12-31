@@ -1,25 +1,57 @@
 """Local configuration file
 
-Make a copy of this without the `example` in the filename, and set the variables appropriately.
+Make a copy of this without the `example` in the filename, and set the variables, the empty ones atleast, appropriately.
 Commented out variables are optional.
 """
 
 from os.path import abspath, dirname, join
 
 
-BASE_DIR = dirname(dirname(abspath(__file__)))
+# Directories
 
-# Postgres is recommended.
+# Roots to join other paths to
+DJANGO_DIR = dirname(dirname(abspath(__file__)))
+BASE_DIR = dirname(DJANGO_DIR)
+
+# Where to import problems from
+PROBLEMS_DIR = join(BASE_DIR, 'ctfproblems')
+
+# Intermediate folder for problem static files
+# (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
+# (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
+PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR, '_static', 'ctfproblems')
+
+# Where to finally collect static files to
+# (Point your server (nginx, Apache etc.) to serve from this folder directly.)
+STATIC_ROOT = join(dirname(BASE_DIR), 'static')
+
+# Where all to collect static files from
+STATICFILES_DIRS = [
+    PROBLEMS_STATIC_DIR,
+]
+
+
+# Database
+# (Postgres is recommended.)
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'pactf',
+        'USER': 'pactf_user',
+        'PASSWORD': 'pactf_user_password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
-# Point your server (nginx, Apache etc.) to serve from this folder directly.
-STATIC_ROOT = join(dirname(BASE_DIR), 'static')
 
 # Security settings
-SECRET_KEY = ''
+
+# Whether Django and the CTF framework should display helpful but potentially sensitive debugging info
 DEBUG = True
+
+# (Change this value before going into production.)
+SECRET_KEY = '8tcjrugv2k16%fv8&ipn#051k=32hdorh-!n601ed-6#vrbfow'
+
+ALLOWED_HOSTS = []
