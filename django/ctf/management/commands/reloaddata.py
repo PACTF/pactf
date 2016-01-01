@@ -8,9 +8,17 @@ FIXTURES = ['users.yaml', 'teams.yaml', 'competitors.yaml']
 
 
 class Command(BaseCommand):
-    help = "Flushes and reloads fixtures"
+    help = "Flushes and reloads fixtures and problems"
+
+    def add_arguments(self, parser):
+        parser.add_argument('--noinput', '--no-input', '-n',
+                            action='store_false', dest='interactive', default=True,
+                            help="Do NOT prompt the user for input of any kind.")
 
     def handle(self, **options):
-        management.call_command('flush')
+        interactive_args = () if options['interactive'] else ('--no-input',)
+        management.call_command('flush', *interactive_args)
         for fixture in FIXTURES:
             management.call_command('loaddata', join(BASE_DIR, fixture))
+        management.call_command('loadprobs', *interactive_args)
+        management.call_command('collectstatic', *interactive_args)

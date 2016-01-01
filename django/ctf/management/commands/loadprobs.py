@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import textwrap
 import traceback
@@ -12,6 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 import yaml
 
 from ctf.models import CtfProblem
+from ctf.constants import UUID_REGEX
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
 PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
@@ -19,6 +21,8 @@ PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
 PROBLEM_BASENAME = 'problem.yaml'
 GRADER_BASENAME = 'grader.py'
 STATIC_BASENAME = 'static'
+UUID_BASENAME = '.uuid'
+UUID_BACKUP_BASENAME = '.uuid.rejected'
 
 PK_FIELD = 'id'
 
@@ -27,9 +31,9 @@ class Command(BaseCommand):
     help = "Adds/Updates problems from PROBLEM_DIR"
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
-            help="Do NOT prompt the user for input of any kind.")
+        parser.add_argument('--noinput', '--no-input', '-n',
+                            action='store_false', dest='interactive', default=True,
+                            help="Do NOT prompt the user for input of any kind.")
 
     def handle(self, **options):
 
@@ -50,13 +54,14 @@ class Command(BaseCommand):
                 """.format(PROBLEMS_STATIC_DIR))
             if options['interactive'] and input(message) != "yes":
                 raise CommandError("Loading problems cancelled.")
-            write("Deleting all files in the intermediate location\n")
+            write("Deleting all files in the intermediate location\n\n")
             shutil.rmtree(PROBLEMS_STATIC_DIR)
 
         errors = []
 
-        write("Walking '{}'\n".format(PROBLEMS_DIR))
+        write("Walking '{}'".format(PROBLEMS_DIR))
         for root in os.listdir(PROBLEMS_DIR):
+            write("")
 
             # Skip files
             if isfile(join(PROBLEMS_DIR, root)):
@@ -76,17 +81,40 @@ class Command(BaseCommand):
                 write("Skipping '{}': No problems file found".format(root))
                 errors.append(sys.exc_info())
                 continue
-            else:
-                data['grader'] = join(root, GRADER_BASENAME)
+            data['grader'] = join(root, GRADER_BASENAME)
 
-            # Check if the problem already exists
-            problem_id = data.get(PK_FIELD, '')
-            query = CtfProblem.objects.filter(**{PK_FIELD: problem_id})
+            # Clean and warn about integer IDs
+            if 'id' in data:
+                self.stderr.write(textwrap.dedent("""\
+                    Warning: Integer IDs are obsolete and will be ignored.
+                    Create/modify a {} file in folder '{}' instead.\
+                    """.format(UUID_BASENAME, root)))
+                del data['id']
+
+            # Check for and validate existing UUID file
+            uuid_path = join(PROBLEMS_DIR, root, UUID_BASENAME)
+            if isfile(uuid_path):
+                with open(uuid_path) as uuid_file:
+                    uuid = uuid_file.read().strip()
+
+                if not re.match('{}$'.format(UUID_REGEX), uuid):
+                    write("Error: UUID File did not match the expected format '{}'".format(UUID_REGEX))
+                    uuid = None
+
+                    write("Backing up and deleting existing UUID file")
+                    backip_uuid_path = join(PROBLEMS_DIR, root, UUID_BACKUP_BASENAME)
+                    shutil.move(uuid_path, backip_uuid_path)
+            else:
+                uuid = None
+
+            query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
             try:
 
                 # If so, update the problem
-                if PK_FIELD in data and query.exists():
+                if uuid and query.exists():
                     write("Trying to update problem for '{}'".format(root))
+                    # TODO(Yatharth): Have single problem, keep problem.save() for later for  ValidationError
+                    # Consider using exception handling and __dict__.update or update_or_create)
                     query.update(**data)
                     for problem in query:
                         problem.save()
@@ -95,29 +123,35 @@ class Command(BaseCommand):
                 else:
                     write("Trying to create problem for '{}'".format(root))
                     problem = CtfProblem(**data)
-                    problem_id = problem.id
                     problem.save()
 
-                # Either way, copy over any static files
-                static_from = join(PROBLEMS_DIR, root, STATIC_BASENAME)
-                static_to = join(PROBLEMS_STATIC_DIR, str(problem_id))
-                if isdir(static_from):
-                    write("Trying to copy static files from '{}'".format(root))
-                    shutil.copytree(static_from, static_to)
+                    # Save the UUID to a file
+                    uuid = str(problem.id)
+                    write("Creating a UUID file for '{}'".format(root))
+                    with open(uuid_path, 'w') as uuid_file:
+                        uuid_file.write(uuid)
 
-            # Output success or failure
+            # Catch validation errors
             except ValidationError:
                 write("Validation failed for '{}'".format(root))
                 errors.append(sys.exc_info())
                 continue
+
+            # Either way, copy over any static files
+            try:
+                static_from = join(PROBLEMS_DIR, root, STATIC_BASENAME)
+                static_to = join(PROBLEMS_STATIC_DIR, str(uuid))
+                if isdir(static_from):
+                    write("Trying to copy static files from '{}'".format(root))
+                    shutil.copytree(static_from, static_to)
+
             except (shutil.Error, IOError):
                 write("Unable to copy static files for '{}'".format(root))
                 errors.append(sys.exc_info())
                 continue
-            else:
-                write("Successfully imported problem for '{}'".format(root))
 
-            write('')
+            # We made it!
+            write("Successfully imported problem for '{}'".format(root))
 
         # Print the stack traces from before
         if errors:
