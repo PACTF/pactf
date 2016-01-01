@@ -1,3 +1,4 @@
+import uuid
 from os.path import join
 import importlib.machinery
 
@@ -48,8 +49,8 @@ class Competitor(models.Model):
 # region Contest Models
 
 class CtfProblem(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(unique=True, max_length=20)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=50)
 
     points = models.IntegerField()
     description = models.TextField()
@@ -76,29 +77,45 @@ class CtfProblem(models.Model):
         return correct, message
 
     def save(self, **kwargs):
-        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
-
         # TODO(Cam): Markdown's safe_mode is deprecated; research safety
+        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
         self.description_html = markdown2.markdown(self.description, extras=EXTRAS, safe_mode='escape')
         self.hint_html = markdown2.markdown(self.hint, extras=EXTRAS, safe_mode='escape')
+
         self.full_clean()
         super().save(**kwargs)
 
 
-# FIXME(Yatharth): Review Submission model
-# FIXME(Yatharth): Write __str__ method
 class Submission(models.Model):
-    p_id = models.IntegerField()
+    """Records a flag submission attempt
+
+    The `p_id` field exists in addition to the `problem` foreign key.
+    This is so in order to handle deletion of problems while not deleting Submissions for historical reasons.
+    This is not done with competitor and team as 1) IDs are less useful for deleted objects of such types and 2) they are linked with Users, which have an is_active property which is used instead of deletion.
+
+    `team` exists for quick querying of whether someone in a particular competitor's team has solved a particular problem.
+    """
+    id = models.AutoField(primary_key=True)
+
+    p_id = models.UUIDField()
+    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True)
+    competitor = models.ForeignKey(Competitor, on_delete=models.SET_NULL, null=True)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+
     time = models.DateTimeField(auto_now_add=True)
-    # FIXME: Rename to competitor
-    user = models.ForeignKey(Competitor, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, editable=False, blank=True)
     flag = models.CharField(max_length=80)
     correct = models.NullBooleanField()
 
     def save(self, **kwargs):
-        self.team = self.user.team
+        try:
+            self.problem = CtfProblem.objects.get(pk=self.p_id)
+        except (CtfProblem.DoesNotExist, CtfProblem.MultipleObjectsReturned):
+            pass
+        self.team = self.competitor.team
         super().save(**kwargs)
+
+    def __str__(self):
+        return "<Submission @{} problem={} competitor={}>".format(self.time, self.problem, self.competitor)
 
 # endregion
 

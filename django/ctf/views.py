@@ -94,8 +94,6 @@ def index(request):
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = models.CtfProblem.objects.all
-    # Note: Teams will be added automatically
-
     return render(request, 'ctf/game.html', params)
 
 
@@ -133,33 +131,47 @@ def register(request, handle, password):
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
 
+    # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
     team = competitor.team
 
+    # Check if problem exists
     try:
         problem = models.CtfProblem.objects.get(id=problem_id)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
-        if models.Submission.objects.filter(p_id=problem_id, team=team, correct=True):
+
+        # Check if problem has already been solved
+        if models.Submission.objects.filter(problem=problem, team=team, correct=True):
             messenger = messages.error
             message = "Your team has already solved this problem!"
             correct = None
-        elif models.Submission.objects.filter(p_id=problem_id, team=team, flag=flag):
+
+        # Check if that flag had already been tried
+        elif models.Submission.objects.filter(problem_id=problem_id, team=team, flag=flag):
             messenger = messages.error
             message = "You or someone on your team has already tried this flag!"
             correct = None
+
         else:
+            # Grade
             correct, message = problem.grade(flag)
             if correct:
                 messenger = messages.success
+
+                # Update score if correct
                 team.score += problem.points
                 team.save()
             else:
                 messenger = messages.error
-        s = models.Submission(p_id=problem_id, user=competitor, flag=flag, correct=correct)
-        s.save()
+
+        # Create submission
+        submission = models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
+        submission.save()
+
+        # Flash message and redirect
         messenger(request, message)
         return redirect('ctf:game')
 
