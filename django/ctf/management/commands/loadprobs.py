@@ -20,7 +20,6 @@ PROBLEM_BASENAME = 'problem.yaml'
 GRADER_BASENAME = 'grader.py'
 STATIC_BASENAME = 'static'
 
-NAME_FIELD = 'name'
 PK_FIELD = 'id'
 
 

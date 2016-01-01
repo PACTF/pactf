@@ -78,7 +78,7 @@ class CtfProblem(models.Model):
     def save(self, **kwargs):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
 
-        # markdown's safe_mode is deprecated
+        # TODO(Cam): Markdown's safe_mode is deprecated; research safety
         self.description_html = markdown2.markdown(self.description, extras=EXTRAS, safe_mode='escape')
         self.hint_html = markdown2.markdown(self.hint, extras=EXTRAS, safe_mode='escape')
         self.full_clean()
