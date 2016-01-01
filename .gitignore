@@ -1,14 +1,14 @@
 # Local config
-.env
-django/pactf_web/local_settings.py
-static/
-logs/
-pactf_nginx.conf
-pactf_supervisor.conf
-django/*/migrations/
-ctfproblems/_static
+/.env
+/django/pactf_web/local_settings.py
+/static/
+/logs/
+/pactf_nginx.conf
+/pactf_supervisor.conf
+/django/*/migrations/
+/ctfproblems/_static
 
 # Python
 *.pyc
 __pycache__/
-.venv
+/.venv
