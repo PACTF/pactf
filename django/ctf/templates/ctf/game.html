@@ -11,26 +11,32 @@
 {% endblock %}
 
 {% block content %}
-  <div id="problems">
-    {% for prob in prob_list %}
-      <form action="{% url 'ctf:submit_flag' prob.id|str %}" method="post">
-        <div class="problem-header">
-          <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
-        </div>
+  {% if problems_viewable %}
+    <div id="problems">
+      {% for prob in prob_list %}
+        <form action="{% url 'ctf:submit_flag' prob.id|str %}" method="post">
+          <div class="problem-header">
+            <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
+          </div>
 
-        <div class="problem-description">
-          {{ prob.description_html|safe }}
-        </div>
+          <div class="problem-description">
+            {{ prob.description_html|safe }}
+          </div>
 
-        <label for="flag-{{ prob.id }}">Flag: </label>
-        <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-        <input type="submit" value="Submit!"/>
+          <label for="flag-{{ prob.id }}">Flag: </label>
+          <input id="flag-{{ prob.id }}" type="text" name="flag"/>
+          <input type="submit" value="Submit!"/>
+          {% csrf_token %}
+        </form>
+        <br/>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div id="start-button">
+      <form action="{% url 'ctf:start_window' %}">
+        <input type="submit" value="Start!"/>
         {% csrf_token %}
       </form>
-      <br/>
-    {% endfor %}
-  </div>
+    </div>
+  {% endif %}
 {% endblock %}
-
-
-

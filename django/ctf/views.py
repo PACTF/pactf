@@ -1,4 +1,4 @@
-import inspect
+import inspect, datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
@@ -20,7 +20,9 @@ def is_competitor(user):
 def get_default_dict(request):
     result = {}
     result['production'] = not settings.DEBUG
-    result['team'] = request.user.competitor.team if is_competitor(request.user) else None
+    team = request.user.competitor.team if is_competitor(request.user) else None
+    result['team'] = team
+    result['problems_viewable'] = team.problems_viewable() if team else False
     return result
 
 
@@ -118,6 +120,15 @@ class CurrentTeam(Team):
 
 # endregion
 
+@competitors_only()
+#@http_method('POST')
+def start_window(request):
+    team = request.user.competitor.team
+    if team.window_active():
+        # No point in restarting
+        return redirect('ctf:game')
+    team.start_window()
+    return redirect('ctf:game')
 
 # region POSTs
 
@@ -126,9 +137,9 @@ class CurrentTeam(Team):
 def register(request, handle, password):
     pass
 
-
 @competitors_only()
 @http_method('POST')
+# XXX - Refactor
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
 
@@ -143,7 +154,6 @@ def submit_flag(request, problem_id):
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
-
         # Check if problem has already been solved
         if models.Submission.objects.filter(problem=problem, team=team, correct=True):
             messenger = messages.error
@@ -162,9 +172,12 @@ def submit_flag(request, problem_id):
             if correct:
                 messenger = messages.success
 
-                # Update score if correct
-                team.score += problem.points
-                team.save()
+                if team.window.active():
+                    # Update score if correct
+                    team.score += problem.points
+                    team.save()
+                else:
+                    message += '\nYour window has expired, so no points were added.'
             else:
                 messenger = messages.error
 

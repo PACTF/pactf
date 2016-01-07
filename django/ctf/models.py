@@ -1,4 +1,4 @@
-import uuid
+import uuid, datetime
 from os.path import join
 import importlib.machinery
 
@@ -6,6 +6,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group, Permission
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 import markdown2
 
@@ -19,6 +21,25 @@ class Team(models.Model):
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
+
+    def window_active(self):
+        try:
+            return self.window.active()
+        except ObjectDoesNotExist:
+            return False
+
+    def start_window(self):
+        try:
+            self.window.save()
+        except ObjectDoesNotExist:
+            win = Window(team=self)
+            win.save()
+
+    def problems_viewable(self):
+        try:
+            return self.window.start < timezone.now()
+        except ObjectDoesNotExist:
+            return False
 
 
 class Competitor(models.Model):
@@ -118,6 +139,24 @@ class Submission(models.Model):
 
     def __str__(self):
         return "<Submission @{} problem={} competitor={}>".format(self.time, self.problem, self.competitor)
+
+class Window(models.Model):
+    """
+    Describes a "window" during which a team is allowed to submit flags.
+
+    Contains start/end times and the id
+    """
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(editable=False, blank=True)
+    # XXX - I'm not so sure this is a great place to put it.
+    team = models.OneToOneField(Team, primary_key=True, on_delete=models.CASCADE)
+
+    def save(self, **kwargs):
+        self.end = timezone.now() + datetime.timedelta(**settings.TIMES['window-duration'])
+        super().save(**kwargs)
+
+    def active(self):
+        return self.start <= timezone.now() <= self.end
 
 # endregion
 
