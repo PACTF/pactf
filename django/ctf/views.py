@@ -32,8 +32,7 @@ def get_default_dict(request):
 # region Decorators
 
 def decorate_classes(methodname):
-    """
-    Makes a decorator factory able to decorate both a function and a certain method of a class
+    """Makes a decorator factory able to decorate both a function and a certain method of a class
 
     This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make your decorator (factory) take no arguments if you must.
 

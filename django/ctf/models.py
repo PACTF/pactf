@@ -43,8 +43,7 @@ class Team(models.Model):
 
 
 class Competitor(models.Model):
-    """
-    Represents a competitor 'profile'
+    """Represents a competitor 'profile'
 
     Django's User class's fields are shunned. The only ones that are used are:
 
@@ -109,8 +108,7 @@ class CtfProblem(models.Model):
 
 
 class Submission(models.Model):
-    """
-    Records a flag submission attempt
+    """Records a flag submission attempt
 
     The `p_id` field exists in addition to the `problem` foreign key.
     This is so in order to handle deletion of problems while not deleting Submissions for historical reasons.
