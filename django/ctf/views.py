@@ -24,7 +24,7 @@ def get_default_dict(request):
     result['production'] = not settings.DEBUG
     team = request.user.competitor.team if is_competitor(request.user) else None
     result['team'] = team
-    result['problems_viewable'] = team.can_view_problems() if team else False
+    result['problems_viewable'] = team.problems_viewable() if team else False
     return result
 
 
@@ -45,7 +45,7 @@ def universal_decorator(methodname):
         def new_decorator_factory(*args, **kwargs):
             old_decorator = old_decorator_factory(*args, **kwargs)
 
-            @wraps
+            @wraps(old_decorator)
             def new_decorator(view):
                 if inspect.isclass(view):
                     decorator = method_decorator(old_decorator, methodname)
@@ -144,7 +144,6 @@ def start_window(request):
 
 @single_http_method('POST')
 @competitors_only()
-@http_method('POST')
 # XXX(Cam) - The entirety of this should probably go into some business logic file instead of here.
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
@@ -156,7 +155,7 @@ def submit_flag(request, problem_id):
 
     # Check if problem exists
     try:
-        problem = queries.query_filter(models.CtfProblem, id=problem_id)
+        problem = queries.query_get(models.CtfProblem, id=problem_id)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
@@ -180,7 +179,7 @@ def submit_flag(request, problem_id):
 
                 if queries.window_active(team):
                     # Update score if correct
-                    team.update_score()
+                    queries.update_score(team, problem)
                 else:
                     message += '\nYour window has expired, so no points were added.'
             else:
