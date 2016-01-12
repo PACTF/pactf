@@ -25,9 +25,12 @@ PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR, '_static')
 # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
 STATIC_ROOT = join(BASE_DIR, 'static')
 
+# Subfolder for problem static files
+PROBLEMS_STATIC_URL = 'ctfproblems'
+
 # Where all to collect static files from
 STATICFILES_DIRS = (
-    ('ctfproblems', PROBLEMS_STATIC_DIR),
+    (PROBLEMS_STATIC_URL, PROBLEMS_STATIC_DIR),
 )
 
 
