@@ -1,6 +1,9 @@
-import uuid, datetime
+import re
+import uuid
+import datetime
 from os.path import join
 import importlib.machinery
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from django.db import models
 from django.conf import settings
@@ -97,11 +100,29 @@ class CtfProblem(models.Model):
         correct, message = grader.grade(1, flag)
         return correct, message
 
-    def save(self, **kwargs):
-        # TODO(Cam): Markdown's safe_mode is deprecated; research safety
+    # TODO(Cam): Markdown's safe_mode is deprecated; research safety
+    @staticmethod
+    def markdown_to_html(markdown):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
-        self.description_html = markdown2.markdown(self.description, extras=EXTRAS, safe_mode='escape')
-        self.hint_html = markdown2.markdown(self.hint, extras=EXTRAS, safe_mode='escape')
+
+        html = markdown2.markdown(markdown, extras=EXTRAS, safe_mode='escape')
+        return html
+
+    def link_static(self, old_text):
+        PATTERN = re.compile(r'''{% \s* ctfstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
+        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, self.id)
+        REPLACER = lambda match: static(REPLACEMENT.format(match.group('basename')))
+
+
+        new_text = PATTERN.sub(REPLACER, old_text)
+        return new_text
+
+    def process_html(self, html):
+        return self.markdown_to_html(self.link_static(html))
+
+    def save(self, **kwargs):
+        self.description_html = self.process_html(self.description)
+        self.hint_html = self.process_html(self.hint)
 
         self.full_clean()
         super().save(**kwargs)
