@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^team$', views.CurrentTeam.as_view(), name='current_team'),
     url(r'^team/(?P<pk>\d+)$', views.Team.as_view(), name='team'),
     url(r'^submit_flag/({})$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
-    url(r'^start_window$', views.start_window, name='start_window')
+    url(r'^start_window$', views.start_window, name='start_window'),
+    url(r'^board$', views.board, name='scoreboard')
 ]

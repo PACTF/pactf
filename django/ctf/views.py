@@ -103,6 +103,12 @@ def game(request):
 
 
 @single_http_method('GET')
+def board(request):
+    params = get_default_dict(request)
+    params['teams'] = enumerate(models.Team.objects.order_by('-score'))
+    return render(request, 'ctf/board.html', params)
+
+@single_http_method('GET')
 class Team(DetailView):
     model = models.Team
     template_name = 'ctf/team.html'
