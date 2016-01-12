@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
-from ctf import models
+from ctf import models, queries
 
 
 # region Helper Methods
@@ -123,10 +123,10 @@ class CurrentTeam(Team):
 #@http_method('POST')
 def start_window(request):
     team = request.user.competitor.team
-    if team.window_active():
+    if queries.window_active(team):
         # No point in restarting
         return redirect('ctf:game')
-    team.start_window()
+    queries.start_window(team)
     return redirect('ctf:game')
 
 # region POSTs
@@ -138,7 +138,7 @@ def register(request, handle, password):
 
 @competitors_only()
 @http_method('POST')
-# XXX - Refactor
+# XXX(Cam) - The entirety of this should probably go into 
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
 
@@ -149,18 +149,18 @@ def submit_flag(request, problem_id):
 
     # Check if problem exists
     try:
-        problem = models.CtfProblem.objects.get(id=problem_id)
+        problem = queries.query_filter(models.CtfProblem, id=problem_id)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
     else:
         # Check if problem has already been solved
-        if models.Submission.objects.filter(problem=problem, team=team, correct=True):
+        if queries.query_filter(models.Submission, problem=problem, team=team, correct=True):
             messenger = messages.error
             message = "Your team has already solved this problem!"
             correct = None
 
         # Check if that flag had already been tried
-        elif models.Submission.objects.filter(problem_id=problem_id, team=team, flag=flag):
+        elif queries.query_filter(models.Submission, problem_id=problem_id, team=team, flag=flag):
             messenger = messages.error
             message = "You or someone on your team has already tried this flag!"
             correct = None
@@ -171,18 +171,16 @@ def submit_flag(request, problem_id):
             if correct:
                 messenger = messages.success
 
-                if team.window.active():
+                if queries.window_active(team):
                     # Update score if correct
-                    team.score += problem.points
-                    team.save()
+                    team.update_score()
                 else:
                     message += '\nYour window has expired, so no points were added.'
             else:
                 messenger = messages.error
 
         # Create submission
-        submission = models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
-        submission.save()
+        queries.create_object(models.Submission, p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
 
         # Flash message and redirect
         messenger(request, message)
