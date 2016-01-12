@@ -1,4 +1,6 @@
-import inspect, datetime
+import inspect
+import datetime
+from functools import wraps
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
@@ -22,7 +24,7 @@ def get_default_dict(request):
     result['production'] = not settings.DEBUG
     team = request.user.competitor.team if is_competitor(request.user) else None
     result['team'] = team
-    result['problems_viewable'] = team.problems_viewable() if team else False
+    result['problems_viewable'] = team.can_view_problems() if team else False
     return result
 
 
@@ -31,7 +33,7 @@ def get_default_dict(request):
 
 # region Decorators
 
-def decorate_classes(methodname):
+def universal_decorator(methodname):
     """Makes a decorator factory able to decorate both a function and a certain method of a class
 
     This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make your decorator (factory) take no arguments if you must.
@@ -43,6 +45,7 @@ def decorate_classes(methodname):
         def new_decorator_factory(*args, **kwargs):
             old_decorator = old_decorator_factory(*args, **kwargs)
 
+            @wraps
             def new_decorator(view):
                 if inspect.isclass(view):
                     decorator = method_decorator(old_decorator, methodname)
@@ -57,8 +60,8 @@ def decorate_classes(methodname):
     return meta_decorator_factory
 
 
-@decorate_classes(methodname='get')
-def http_method(method):
+@universal_decorator(methodname='get')
+def single_http_method(method):
     """Decorates views to check for HTTP method"""
 
     assert method in ('GET', 'POST', 'PUT', 'DELETE')
@@ -76,7 +79,7 @@ def http_method(method):
     return decorator
 
 
-@decorate_classes(methodname='dispatch')
+@universal_decorator(methodname='dispatch')
 def competitors_only():
     return user_passes_test(is_competitor)
 
@@ -86,20 +89,20 @@ def competitors_only():
 
 # region GETs
 
-@http_method('GET')
+@single_http_method('GET')
 def index(request):
     return render(request, 'ctf/index.html', get_default_dict(request))
 
 
+@single_http_method('GET')
 @competitors_only()
-@http_method('GET')
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = models.CtfProblem.objects.all
     return render(request, 'ctf/game.html', params)
 
 
-@http_method('GET')
+@single_http_method('GET')
 class Team(DetailView):
     model = models.Team
     template_name = 'ctf/team.html'
@@ -110,8 +113,8 @@ class Team(DetailView):
         return context
 
 
+@single_http_method('GET')
 @competitors_only()
-@http_method('GET')
 class CurrentTeam(Team):
     def get_object(self, **kwargs):
         return self.request.user.competitor.team
@@ -119,8 +122,17 @@ class CurrentTeam(Team):
 
 # endregion
 
+
+# region POSTs
+
+# TODO(Cam): Write
+# @single_http_method('POST')
+# def register(request, handle, password):
+#     pass
+
+
+@single_http_method('POST')
 @competitors_only()
-#@http_method('POST')
 def start_window(request):
     team = request.user.competitor.team
     if queries.window_active(team):
@@ -129,16 +141,11 @@ def start_window(request):
     queries.start_window(team)
     return redirect('ctf:game')
 
-# region POSTs
 
-# TODO(Cam): Write
-@http_method('POST')
-def register(request, handle, password):
-    pass
-
+@single_http_method('POST')
 @competitors_only()
 @http_method('POST')
-# XXX(Cam) - The entirety of this should probably go into 
+# XXX(Cam) - The entirety of this should probably go into some business logic file instead of here.
 def submit_flag(request, problem_id):
     # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
 
