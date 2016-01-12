@@ -96,6 +96,7 @@ class Command(BaseCommand):
             if isfile(uuid_path):
                 with open(uuid_path) as uuid_file:
                     uuid = uuid_file.read().strip()
+                    data[PK_FIELD] = uuid
 
                 if not re.match('{}$'.format(UUID_REGEX), uuid):
                     write("Error: UUID File did not match the expected format '{}'".format(UUID_REGEX))
