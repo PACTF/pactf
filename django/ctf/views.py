@@ -1,5 +1,4 @@
 import inspect
-import datetime
 from functools import wraps
 
 from django.contrib.auth.decorators import user_passes_test
@@ -69,6 +68,8 @@ def single_http_method(method):
     error = HttpResponseNotAllowed('Only {} requests allowed here'.format(method))
 
     def decorator(view):
+
+        @wraps(view)
         def decorated(request, *args, **kwargs):
             if request.method != method:
                 return error
