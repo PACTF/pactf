@@ -1,18 +1,30 @@
 import re
 import uuid
-import datetime
 from os.path import join
 import importlib.machinery
-from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group, Permission
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 import markdown2
+
+
+# TODO(Yatharth): Write decorator to set dispatch_uid automatically
+# TODO(Yatharth): Write helper so error of clean returns all validationerrors
+
+
+@receiver(pre_save, dispatch_uid='ctf.pre_save_validate')
+def pre_save_validate(sender, instance, *args, **kwargs):
+    # validate only fixtures (`loaddata` causes `raw` to be True)"""
+    # if kwargs.get('raw', False):
+    instance.full_clean()
 
 
 # region User Models (by wrapping)
@@ -25,30 +37,36 @@ class Team(models.Model):
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
-    def window_active(self):
-        try:
-            return self.window.active()
-        except ObjectDoesNotExist:
-            return False
+    def timer(self, window=None):
+        if window is None:
+            window = Window.current()
+        return Timer.objects.get(window=window, team=self)
 
-    def start_window(self):
+    def has_timer(self, window=None):
         try:
-            self.window.save()
-        except ObjectDoesNotExist:
-            win = Window(team=self)
-            win.save()
-
-    def problems_viewable(self):
-        try:
-            return self.window.start < timezone.now()
-        except ObjectDoesNotExist:
+            self.timer(window=window)
+        except Timer.DoesNotExist:
             return False
+        else:
+            return True
+
+    def has_active_timer(self):
+        return self.has_timer() and self.timer().active()
+
+    def can_view_problems(self, window=None):
+        return self.has_timer(window=window) and self.timer(window=window).start <= timezone.now()
+
+    def start_timer(self):
+        assert not self.has_timer()
+
+        timer = Timer(window=Window.current(), team=self)
+        timer.save()
 
 
 class Competitor(models.Model):
     """Represents a competitor 'profile'
 
-    Django's User class's fields are shunned. The only ones that are used are:
+    Django's User class's fields are shunned except for:
 
         username, password, is_active, is_staff, date_joined
 
@@ -56,7 +74,7 @@ class Competitor(models.Model):
 
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+    team = models.ForeignKey(Team, on_delete=models.PROTECT)
 
     # Shunned fields
     first_name = models.CharField("First name", max_length=30, blank=True)
@@ -70,7 +88,7 @@ class Competitor(models.Model):
 # endregion
 
 
-# region Contest Models
+# region Problem Models
 
 class CtfProblem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -113,7 +131,6 @@ class CtfProblem(models.Model):
         REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, self.id)
         REPLACER = lambda match: static(REPLACEMENT.format(match.group('basename')))
 
-
         new_text = PATTERN.sub(REPLACER, old_text)
         return new_text
 
@@ -148,37 +165,132 @@ class Submission(models.Model):
     flag = models.CharField(max_length=80)
     correct = models.NullBooleanField()
 
-    def save(self, **kwargs):
-        try:
-            self.problem = CtfProblem.objects.get(pk=self.p_id)
-        except (CtfProblem.DoesNotExist, CtfProblem.MultipleObjectsReturned):
-            pass
-        self.team = self.competitor.team
-        super().save(**kwargs)
-
     def __str__(self):
         return "<Submission @{} problem={} competitor={}>".format(self.time, self.problem, self.competitor)
 
-class Window(models.Model):
-    """
-    Describes a "window" during which a team is allowed to submit flags.
+    def sync_problem(self):
+        try:
+            self.problem = CtfProblem.objects.get(pk=self.p_id)
+        except CtfProblem.DoesNotExist:
+            pass
 
-    Contains start/end times and the id
-    """
+    def sync_team(self):
+        self.team = self.competitor.team
+
+    def clean(self):
+        self.sync_problem()
+        self.sync_team()
+
+
+# endregion
+
+
+# region Config Models
+
+# TODO: Consider dbsettings
+
+# class SingletonModel(models.Model):
+#     id = models.AutoField
+#
+#     class Meta:
+#         abstract = True
+#
+#     def save(self, *args, **kwargs):
+#         self.__class__.objects.exclude(id=self.id).delete()
+#         super(SingletonModel, self).save(*args, **kwargs)
+#
+#     @classmethod
+#     def load(cls):
+#         try:
+#             return cls.objects.get()
+#         except cls.DoesNotExist:
+#             return cls()
+#
+# class Config():
+#     passs
+
+# endregion
+
+
+# region Timer Models
+
+print_time = lambda time: time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
+
+
+class Window(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    personal_timer_duration = models.DurationField()
+
+    def __str__(self):
+        return "<Window #{} {} – {}>".format(self.id, print_time(self.start), print_time(self.end))
+
+    @staticmethod
+    def active():
+        try:
+            Window.current()
+        except Window.DoesNotExist:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def current():
+        now = timezone.now()
+        return Window.objects.get(start__lte=now, end__gte=now)
+
+    def validate_windows_dont_overlap(self):
+        for window in Window.objects.exclude(id=self.id):
+            if window.start <= self.end and self.start <= window.end:
+                raise ValidationError("Window overlaps with {}".format(window))
+
+    def validate_positive_timedelta(self):
+        if self.start >= self.end:
+            raise ValidationError("End is not after start")
+
+    def clean(self):
+        self.validate_positive_timedelta()
+        self.validate_windows_dont_overlap()
+
+
+class Timer(models.Model):
+    """Represent the time period in which a team can, for example, submit flags"""
+
+    class Meta:
+        unique_together = ('window', 'team',)
+
+    id = models.AutoField(primary_key=True)
+
+    window = models.ForeignKey(Window, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
     start = models.DateTimeField(auto_now=True)
     end = models.DateTimeField(editable=False, blank=True)
-    # XXX - I'm not so sure this is a great place to put it.
-    team = models.OneToOneField(Team, primary_key=True, on_delete=models.CASCADE)
 
-    def save(self, **kwargs):
-        self.end = timezone.now() + datetime.timedelta(**settings.TIMES['window-duration'])
-        super().save(**kwargs)
+    def __str__(self):
+        return "<Timer #{} window=#{} team=#{} {} – {}>".format(
+            self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
     def active(self):
         return self.start <= timezone.now() <= self.end
 
-# endregion
+    def sync_end(self):
+        self.end = timezone.now() + self.window.personal_timer_duration
 
+    def clean(self):
+        self.sync_end()
+
+
+@receiver(post_save, sender=Window, dispatch_uid='ctf.window_post_save_update_timers')
+def window_post_save_update_timers(sender, instance, **kwargs):
+    """Make timers update their end timers per changes in their window"""
+    for timer in instance.timer_set.all():
+        timer.save()
+
+# endregion
 
 
 # region Permissions and Groups

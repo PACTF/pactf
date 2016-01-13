@@ -114,8 +114,8 @@ class Command(BaseCommand):
                 # If so, update the problem
                 if uuid and query.exists():
                     write("Trying to update problem for '{}'".format(root))
-                    # TODO(Yatharth): Have single problem, keep problem.save() for later for  ValidationError
-                    # Consider using exception handling and __dict__.update or update_or_create)
+                    # XXX(Yatharth): Have single problem, keep problem.save() for later for  ValidationError
+                    # XXX(Yatharth): Consider using exception handling and __dict__.update or update_or_create)
                     query.update(**data)
                     for problem in query:
                         problem.save()

@@ -20,3 +20,7 @@ admin.site.register(User, UserAdmin)
 
 admin.site.register(models.CtfProblem)
 admin.site.register(models.Team)
+
+admin.site.register(models.Submission)
+admin.site.register(models.Timer)
+admin.site.register(models.Window)

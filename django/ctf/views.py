@@ -23,7 +23,8 @@ def get_default_dict(request):
     result['production'] = not settings.DEBUG
     team = request.user.competitor.team if is_competitor(request.user) else None
     result['team'] = team
-    result['problems_viewable'] = team.problems_viewable() if team else False
+    result['is_active_window'] = models.Window.active()
+    result['can_view_problems'] = models.Window.active() and team and team.can_view_problems()
     return result
 
 
@@ -68,7 +69,6 @@ def single_http_method(method):
     error = HttpResponseNotAllowed('Only {} requests allowed here'.format(method))
 
     def decorator(view):
-
         @wraps(view)
         def decorated(request, *args, **kwargs):
             if request.method != method:
@@ -85,6 +85,22 @@ def competitors_only():
     return user_passes_test(is_competitor)
 
 
+@universal_decorator(methodname='get')
+def active_window_only():
+    def decorator(view):
+        @wraps(view)
+        def decorated(request, *args, **kwargs):
+            if not models.Window.active():
+                messages.warning("No window is currently active.")
+                return redirect('ctf:index')
+
+            return view(request, *args, **kwargs)
+
+        return decorated
+
+    return decorator
+
+
 # endregion
 
 
@@ -97,6 +113,7 @@ def index(request):
 
 @single_http_method('GET')
 @competitors_only()
+@active_window_only()
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = models.CtfProblem.objects.all
@@ -134,63 +151,76 @@ class CurrentTeam(Team):
 
 @single_http_method('POST')
 @competitors_only()
+@active_window_only()
 def start_window(request):
     team = request.user.competitor.team
-    if queries.window_active(team):
-        # No point in restarting
-        return redirect('ctf:game')
-    queries.start_window(team)
+
+    if team.has_timer():
+        if team.has_active_timer():
+            messages.warning("Your timer has already started.")
+            return redirect('ctf:game')
+        else:
+            messages.error("Your timer for this window has expired.")
+            return redirect('ctf:index')
+
+    team.start_timer()
     return redirect('ctf:game')
 
 
 @single_http_method('POST')
 @competitors_only()
-# XXX(Cam) - The entirety of this should probably go into some business logic file instead of here.
+@active_window_only()
+# XXX(Cam): Move all of this elsewhere
 def submit_flag(request, problem_id):
-    # TODO(Yatharth): Disable form submission if problem has already been solved (and add to Feature List)
-
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
     team = competitor.team
+
+    if not team.has_active_timer():
+        if team.has_timer():
+            message = "Your timer for this window has already expired."
+        else:
+            message = "Start your timer before submitting flags."
+        messages.error(request, message)
+
+        return redirect('ctf:index')
 
     # Check if problem exists
     try:
         problem = queries.query_get(models.CtfProblem, id=problem_id)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
+
+    # Check if problem has already been solved
+    if queries.query_filter(models.Submission, problem=problem, team=team, correct=True):
+        messenger = messages.error
+        message = "Your team has already solved this problem!"
+        correct = None
+
+    # Check if that flag had already been tried
+    elif queries.query_filter(models.Submission, problem_id=problem_id, team=team, flag=flag):
+        messenger = messages.error
+        message = "You or someone on your team has already tried this flag!"
+        correct = None
+
+    # Grade
     else:
-        # Check if problem has already been solved
-        if queries.query_filter(models.Submission, problem=problem, team=team, correct=True):
-            messenger = messages.error
-            message = "Your team has already solved this problem!"
-            correct = None
+        correct, message = problem.grade(flag)
 
-        # Check if that flag had already been tried
-        elif queries.query_filter(models.Submission, problem_id=problem_id, team=team, flag=flag):
-            messenger = messages.error
-            message = "You or someone on your team has already tried this flag!"
-            correct = None
+        if correct:
+            messenger = messages.success
 
+            team.score += problem.points
+            team.save()
         else:
-            # Grade
-            correct, message = problem.grade(flag)
-            if correct:
-                messenger = messages.success
+            messenger = messages.error
 
-                if queries.window_active(team):
-                    # Update score if correct
-                    queries.update_score(team, problem)
-                else:
-                    message += '\nYour window has expired, so no points were added.'
-            else:
-                messenger = messages.error
+    # Create submission
+    queries.create_object(models.Submission, p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
 
-        # Create submission
-        queries.create_object(models.Submission, p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
-
-        # Flash message and redirect
-        messenger(request, message)
-        return redirect('ctf:game')
+    # Flash message and redirect
+    messenger(request, message)
+    return redirect('ctf:game')
 
 # endregion
