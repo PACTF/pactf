@@ -30,9 +30,14 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 # region User Models (by wrapping)
 
 class Team(models.Model):
+
+    # Essential data
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
     score = models.IntegerField(default=0)
+
+    # Extra data
+    school = models.CharField(max_length=40, blank=True, default='None')
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
