@@ -19,5 +19,6 @@ def start_window(team):
     team.start_window()
 
 def update_score(team, problem):
+    # FIXME(Yatharth): Use F() to avoid races
     team.score += problem.points
     team.save()

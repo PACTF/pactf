@@ -6,10 +6,6 @@
   Scoreboard — {{ block.super }}
 {% endblock %}
 
-{% block css %}
-  <!-- <link href="{% static "ctf/css/scoreboard.css" %}" rel="stylesheet"> -->
-{% endblock %}
-
 {% block content %}
   <div>
     I GUESS WE CAN PUT A GRAPH HERE
@@ -33,5 +29,5 @@
         </tr>
       {% endfor %}
     </tbody>
-  </div>
+  </table>
 {% endblock %}
