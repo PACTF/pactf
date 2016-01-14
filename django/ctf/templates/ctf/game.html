@@ -12,6 +12,9 @@
 
 {% block content %}
   {% if can_view_problems %}
+    {% if not is_active_window %}
+    This round is over!
+    {% endif %}
     <div id="problems">
       {% for prob in prob_list %}
         <form action="{% url 'ctf:submit_flag' prob.id|str %}" method="post">
@@ -25,7 +28,7 @@
 
           <label for="flag-{{ prob.id }}">Flag: </label>
           <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-          <input type="submit" value="Submit!" {% if is_active_window %} disabled {% endif %}/>
+          <input type="submit" value="Submit!" {% if not is_active_window %} disabled {% endif %}/>
           {% csrf_token %}
         </form>
         <br/>

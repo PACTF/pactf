@@ -108,6 +108,9 @@ class Command(BaseCommand):
             else:
                 uuid = None
 
+            if 'dynamic' not in data:
+                data['dynamic'] = None
+
             query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
             try:
 

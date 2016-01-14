@@ -1,0 +1,5 @@
+name: 'problem6'
+points: 40
+dynamic: 'test6/generator.py'
+hint: |
+  hint6

@@ -100,7 +100,7 @@ class CtfProblem(models.Model):
     name = models.CharField(max_length=50)
 
     points = models.IntegerField()
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     description_html = models.TextField(editable=False)
     hint = models.TextField(default='')
     hint_html = models.TextField(editable=False, blank=True, null=True)
@@ -109,18 +109,22 @@ class CtfProblem(models.Model):
         help_text="Basename of the grading script from PROBLEM_DIR",
         path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
+    dynamic = models.FilePathField(
+        help_text="Basename of the generator script in PROBLEM_DIR",
+        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
+        blank=True, null=True
+    )
 
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
-    def grade(self, flag):
-        # FIXME(Yatharth): Have real team id forwarded
+    def grade(self, flag, team):
         if not flag:
             return False, "Empty flag"
 
         grader_path = join(settings.PROBLEMS_DIR, self.grader)
         grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
-        correct, message = grader.grade(1, flag)
+        correct, message = grader.grade(team, flag)
         return correct, message
 
     # TODO(Cam): Markdown's safe_mode is deprecated; research safety
@@ -143,12 +147,25 @@ class CtfProblem(models.Model):
         return self.markdown_to_html(self.link_static(html))
 
     def save(self, **kwargs):
-        self.description_html = self.process_html(self.description)
+        if not self.dynamic:
+            if not self.description:
+                raise ValidationError('Description must be provided for non-dynamic problems!')
+            self.description_html = self.process_html(self.description)
+        elif self.description:
+            raise ValidationError('Description should be blank for dynamic problems')
+        #self.description_html = self.process_html(self.description)
         self.hint_html = self.process_html(self.hint)
 
         self.full_clean()
         super().save(**kwargs)
 
+    def generate_desc(self, team):
+        if not self.dynamic:
+            return self.description_html
+        gen_path = join(settings.PROBLEMS_DIR, self.dynamic)
+        gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
+        desc = gen.generate(team)
+        return self.process_html(desc)
 
 class Submission(models.Model):
     """Records a flag submission attempt
@@ -223,8 +240,6 @@ print_time = lambda time: time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
 
 
 class Window(models.Model):
-    id = models.AutoField(primary_key=True)
-
     start = models.DateTimeField()
     end = models.DateTimeField()
 
@@ -259,6 +274,7 @@ class Window(models.Model):
     def clean(self):
         self.validate_positive_timedelta()
         self.validate_windows_dont_overlap()
+        super().clean()
 
 
 class Timer(models.Model):

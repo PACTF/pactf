@@ -91,7 +91,7 @@ def active_window_only():
         @wraps(view)
         def decorated(request, *args, **kwargs):
             if not models.Window.active():
-                messages.warning("No window is currently active.")
+                messages.warning(request, "No window is currently active.")
                 return redirect('ctf:index')
 
             return view(request, *args, **kwargs)
@@ -116,7 +116,7 @@ def index(request):
 @active_window_only()
 def game(request):
     params = get_default_dict(request)
-    params['prob_list'] = models.CtfProblem.objects.all
+    params['prob_list'] = queries.viewable_problems(request.user.competitor.team)
     return render(request, 'ctf/game.html', params)
 
 
@@ -212,18 +212,16 @@ def submit_flag(request, problem_id):
 
     # Grade
     else:
-        correct, message = problem.grade(flag)
+        correct, message = problem.grade(flag, team)
 
         if correct:
             messenger = messages.success
-
-            team.score += problem.points
-            team.save()
+            queries.update_score(team, problem)
         else:
             messenger = messages.error
 
     # Create submission
-    queries.create_object(models.Submission, p_id=problem.id, competitor=competitor, flag=flag, correct=correct)
+    queries.create_object(models.Submission, p_id=problem.id, problem=problem, team=team, competitor=competitor, flag=flag, correct=correct)
 
     # Flash message and redirect
     messenger(request, message)
