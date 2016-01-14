@@ -121,6 +121,7 @@ def game(request):
 
 
 @single_http_method('GET')
+@active_window_only()
 def board(request):
     params = get_default_dict(request)
     params['teams'] = enumerate(models.Team.objects.order_by('-score'))
