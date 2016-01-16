@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.staticfiles.templatetags.staticfiles import static
-import django.contrib.postgres.fields as psql
+from django.contrib.postgres import fields as psql
 
 import markdown2
 
