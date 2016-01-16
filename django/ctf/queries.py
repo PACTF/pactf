@@ -21,10 +21,13 @@ def viewable_problems(team):
     result = models.CtfProblem.objects.all()
     return map(partial(format_problem, team), result)
 
+def problem_unlocked(team, problem):
+    if not problem.threshold: return True
+
 # XXX(Cam) - this is really hacky
 def format_problem(team, problem):
     data = problem.__dict__
-    if 'dynamic' in data and not problem.dynamic: return problem
+    if 'dynamic' not in data or not problem.dynamic: return problem
     class dummy: pass
     result = dummy()
     data['description_html'] = problem.generate_desc(team)
