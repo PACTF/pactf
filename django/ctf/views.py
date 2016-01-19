@@ -24,7 +24,8 @@ def get_default_dict(request):
     team = request.user.competitor.team if is_competitor(request.user) else None
     result['team'] = team
     result['is_active_window'] = models.Window.active()
-    result['can_view_problems'] = models.Window.active() and team and team.can_view_problems()
+    result['can_view_problems'] = result['is_active_window'] and team and team.can_view_problems()
+    result['can_submit_flags'] = result['can_view_problems'] and team.has_active_timer()
     return result
 
 

@@ -28,7 +28,7 @@
 
           <label for="flag-{{ prob.id }}">Flag: </label>
           <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-          <input type="submit" value="Submit!" {% if not is_active_window %} disabled {% endif %}/>
+          <input type="submit" value="Submit!" {% if not can_submit_flags %} disabled {% endif %}/>
           {% csrf_token %}
         </form>
         <br/>

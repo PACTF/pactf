@@ -95,6 +95,7 @@ class Competitor(models.Model):
 
 # region Problem Models
 
+# FIXME(Yatharth): Consider simplifying
 class CtfProblem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
@@ -123,6 +124,7 @@ class CtfProblem(models.Model):
             return False, "Empty flag"
 
         grader_path = join(settings.PROBLEMS_DIR, self.grader)
+        # FIXME(Yatharth): Handle FileNotFound
         grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
         correct, message = grader.grade(team, flag)
         return correct, message
@@ -146,18 +148,14 @@ class CtfProblem(models.Model):
     def process_html(self, html):
         return self.markdown_to_html(self.link_static(html))
 
-    def save(self, **kwargs):
+    def clean(self):
         if not self.dynamic:
             if not self.description:
                 raise ValidationError('Description must be provided for non-dynamic problems!')
             self.description_html = self.process_html(self.description)
         elif self.description:
             raise ValidationError('Description should be blank for dynamic problems')
-        #self.description_html = self.process_html(self.description)
         self.hint_html = self.process_html(self.hint)
-
-        self.full_clean()
-        super().save(**kwargs)
 
     def generate_desc(self, team):
         if not self.dynamic:
