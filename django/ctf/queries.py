@@ -18,11 +18,15 @@ def window_active(team):
     return team.window_active()
 
 def viewable_problems(team):
-    result = models.CtfProblem.objects.all()
+    result = filter(partial(problem_unlocked, team), models.CtfProblem.objects.all())
     return map(partial(format_problem, team), result)
 
 def problem_unlocked(team, problem):
-    if not problem.threshold: return True
+    if not problem.deps: return True
+    total = 0
+    solved_probs = models.Submission.objects.filter(team=team, correct=True)
+    total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
+    return total >= problem.deps['total']
 
 # XXX(Cam) - this is really hacky
 def format_problem(team, problem):
