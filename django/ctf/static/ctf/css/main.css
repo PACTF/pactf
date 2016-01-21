@@ -30,6 +30,22 @@ body {
     content: "Error!"
 }
 
+.messages .warning {
+    background-color: yellow;
+}
+
+.messages .warning:before {
+    content: "Warning: "
+}
+
+.messages .info {
+    background-color: blue;
+}
+
+.messages .info:before {
+    content: "Info: "
+}
+
 
 /* Header */
 

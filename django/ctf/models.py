@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.contrib.postgres import fields as psql
 
 import markdown2
 
@@ -115,6 +116,8 @@ class CtfProblem(models.Model):
         path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
         blank=True, null=True
     )
+    # dict function instead of {} because of mutability
+    # threshold = psql.JSONField(default=dict)
 
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)
@@ -238,6 +241,8 @@ print_time = lambda time: time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
 
 
 class Window(models.Model):
+    id = models.AutoField(primary_key=True)
+
     start = models.DateTimeField()
     end = models.DateTimeField()
 

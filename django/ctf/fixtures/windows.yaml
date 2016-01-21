@@ -1,0 +1,6 @@
+- model: ctf.window
+  pk: 1
+  fields:
+    start: !!timestamp '2016-01-19 14:42:21+00:00'
+    end: !!timestamp '2016-01-21 14:42:24+00:00'
+    personal_timer_duration: '01:00:00'

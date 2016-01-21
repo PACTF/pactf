@@ -1,9 +1,10 @@
 import os
 import re
 import sys
+import errno
+import shutil
 import textwrap
 import traceback
-import shutil
 from os.path import join, isfile, isdir
 
 from django.conf import settings
@@ -56,9 +57,10 @@ class Command(BaseCommand):
                 raise CommandError("Loading problems cancelled.")
             write("Deleting all files in the intermediate location\n\n")
             shutil.rmtree(PROBLEMS_STATIC_DIR)
+        os.makedirs(PROBLEMS_STATIC_DIR, exist_ok=True)
 
+        # Rotate over problem folders, storing errors for later
         errors = []
-
         write("Walking '{}'".format(PROBLEMS_DIR))
         for root in os.listdir(PROBLEMS_DIR):
             write("")
@@ -157,8 +159,9 @@ class Command(BaseCommand):
             # We made it!
             write("Successfully imported problem for '{}'".format(root))
 
-        # Print the stack traces from before
+        # Print the stack traces from before, and error out
         if errors:
             write("\nPrinting stacktraces of encountered exceptions")
             for err in errors:
                 write(''.join(traceback.format_exception(*err)))
+            raise RuntimeError("Exceptions encountered")

@@ -25,7 +25,11 @@ def viewable_problems(team):
     return [format_problem(team, problem) for problem in result]
 
 
-# FIXME(Cam): this is really hacky
+def problem_unlocked(team, problem):
+    if not problem.threshold:
+        return True
+
+
 def format_problem(team, problem):
     data = problem.__dict__
     # FIXME(Yatharth): Is the first condition necessary?
