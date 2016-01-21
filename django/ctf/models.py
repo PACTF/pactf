@@ -88,7 +88,7 @@ class Competitor(models.Model):
     email = models.EmailField("Email", unique=True)
 
     def __str__(self):
-        return "<Competitor #{} {!r}>".format(self.id, self.user.name)
+        return "<Competitor #{} {!r}>".format(self.id, self.user.username)
 
 
 # endregion
@@ -117,7 +117,7 @@ class CtfProblem(models.Model):
         blank=True, null=True
     )
     # dict function instead of {} because of mutability
-    # threshold = psql.JSONField(default=dict)
+    deps = psql.JSONField(default=dict, blank=True)
 
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)

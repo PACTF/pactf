@@ -1,3 +1,5 @@
+from functools import partial
+
 from ctf import models
 
 
@@ -21,13 +23,16 @@ def window_active(team):
 
 
 def viewable_problems(team):
-    result = models.CtfProblem.objects.all()
-    return [format_problem(team, problem) for problem in result]
+    result = filter(partial(problem_unlocked, team), models.CtfProblem.objects.all())
+    return map(partial(format_problem, team), result)
 
 
 def problem_unlocked(team, problem):
-    if not problem.threshold:
-        return True
+    if not problem.deps: return True
+    total = 0
+    solved_probs = models.Submission.objects.filter(team=team, correct=True)
+    total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
+    return total >= problem.deps['total']
 
 
 def format_problem(team, problem):
