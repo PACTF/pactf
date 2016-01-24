@@ -1,4 +1,4 @@
-- model: ctf.window
+- model: ctflex.window
   pk: 1
   fields:
     start: !!timestamp '2016-01-19 14:42:21+00:00'

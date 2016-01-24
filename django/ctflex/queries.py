@@ -1,6 +1,6 @@
 from functools import partial
 
-from ctf import models
+from ctflex import models
 
 
 # General queries

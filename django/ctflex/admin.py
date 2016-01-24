@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from ctf import models
+from ctflex import models
 
 
 class CompetitorInline(admin.StackedInline):
