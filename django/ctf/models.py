@@ -1,5 +1,6 @@
 import re
 import uuid
+import random, string
 from os.path import join
 import importlib.machinery
 
@@ -28,6 +29,9 @@ def pre_save_validate(sender, instance, *args, **kwargs):
     instance.full_clean()
 
 
+def gen_key(chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(20))
+
 # region User Models (by wrapping)
 
 class Team(models.Model):
@@ -36,9 +40,10 @@ class Team(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
     score = models.IntegerField(default=0)
+    key = models.CharField(max_length=30, default=gen_key)
 
     # Extra data
-    school = models.CharField(max_length=40, blank=True, default='None')
+    school = models.CharField(max_length=20, blank=True, default='None')
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)

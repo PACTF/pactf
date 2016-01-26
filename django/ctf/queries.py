@@ -1,5 +1,7 @@
 from functools import partial
 
+from django.core.exceptions import ValidationError
+
 from ctf import models
 
 
@@ -15,6 +17,19 @@ def create_object(model, **kwargs):
 
 def query_get(model, **kwargs):
     return model.objects.get(**kwargs)
+
+# Note to self: might be worth catching this here
+def create_competitor(handle, pswd, email, team):
+    try:
+        u = models.User.objects.create_user(handle, None, pswd)
+        c = models.Competitor(user=u, team=team, email=email)
+        c.full_clean()
+    except ValidationError:
+        u.delete()
+        raise
+    else:
+        c.save()
+        return c
 
 
 # CTFlex-specific queries
