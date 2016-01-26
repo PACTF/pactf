@@ -1,5 +1,6 @@
 import re
 import uuid
+import random, string
 from os.path import join
 import importlib.machinery
 
@@ -39,7 +40,6 @@ def unique_receiver(*args, **kwargs):
 def pre_save_validate(sender, instance, *args, **kwargs):
     instance.full_clean()
 
-
 # class Config(models.Model):
 #     default_category = models.ForeignKey(Category)
 #
@@ -53,6 +53,9 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 
 # region User Models (by wrapping)
 
+# def gen_key(chars=string.ascii_uppercase + string.digits):
+#     return ''.join(random.choice(chars) for _ in range(20))
+
 class Team(models.Model):
     """Represent essence of a team"""
 
@@ -60,6 +63,8 @@ class Team(models.Model):
     # Essential data
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
+
+    # key = models.CharField(max_length=30, default=gen_key)
 
     # Extra data
     school = models.CharField(max_length=40, blank=True, default='None')

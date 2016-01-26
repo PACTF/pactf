@@ -212,8 +212,8 @@ class CurrentTeam(Team):
 
 # TODO(Cam): Write
 # @single_http_method('POST')
-# def register(request, handle, password):
-#     pass
+# def register_competitor(handle, pswd, team=None):
+#    pass
 
 
 @single_http_method('POST')
