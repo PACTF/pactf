@@ -1,10 +1,10 @@
 from django.conf.urls import url
 
-from ctf.constants import UUID_REGEX
-from ctf import views
+from ctflex.constants import UUID_REGEX
+from ctflex import views
 
 
-app_name = 'ctf'
+app_name = 'ctflex'
 
 urlpatterns = [
     url('^$', views.index, name='index'),

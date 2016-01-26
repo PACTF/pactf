@@ -13,8 +13,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 import yaml
 
-from ctf.models import CtfProblem
-from ctf.constants import UUID_REGEX
+from ctflex.models import CtfProblem
+from ctflex.constants import UUID_REGEX
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
 PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR

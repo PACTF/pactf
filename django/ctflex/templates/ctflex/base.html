@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
 
-  <link href="{% static "ctf/css/main.css" %}" rel="stylesheet">
+  <link href="{% static "ctflex/css/main.css" %}" rel="stylesheet">
 
   {% block css %}{% endblock %}
 
@@ -56,14 +56,14 @@
 
 <header>
   <ul class="pull-left">
-    <li><a href="{% url 'ctf:index' %}">Home</a></li>
-    <li><a href="{% url 'ctf:game' %}">Game</a></li>
-    <li><a href="{% url 'ctf:scoreboard' %}">Board</a></li>
+    <li><a href="{% url 'ctflex:index' %}">Home</a></li>
+    <li><a href="{% url 'ctflex:game' %}">Game</a></li>
+    <li><a href="{% url 'ctflex:scoreboard' %}">Board</a></li>
   </ul>
   <ul class="pull-right">
     {% if user.is_authenticated %}
       <li>Score: {{ team.score }}</li>
-      <li><a href="{% url 'ctf:current_team' %}">Team</a></li>
+      <li><a href="{% url 'ctflex:current_team' %}">Team</a></li>
       <li><a href="{% url 'logout' %}">Logout</a></li>
     {% else %}
       <li><a href="{% url 'login' %}">Login</a></li>

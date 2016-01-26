@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
-from ctf import models, queries
+from ctflex import models, queries
 
 
 # region Helper Methods
@@ -93,7 +93,7 @@ def active_window_only():
         def decorated(request, *args, **kwargs):
             if not models.Window.active():
                 messages.warning(request, "No window is currently active.")
-                return redirect('ctf:index')
+                return redirect('ctflex:index')
 
             return view(request, *args, **kwargs)
 
@@ -109,7 +109,7 @@ def active_window_only():
 
 @single_http_method('GET')
 def index(request):
-    return render(request, 'ctf/index.html', get_default_dict(request))
+    return render(request, 'ctflex/index.html', get_default_dict(request))
 
 
 @single_http_method('GET')
@@ -118,7 +118,7 @@ def index(request):
 def game(request):
     params = get_default_dict(request)
     params['prob_list'] = queries.viewable_problems(request.user.competitor.team)
-    return render(request, 'ctf/game.html', params)
+    return render(request, 'ctflex/game.html', params)
 
 
 @single_http_method('GET')
@@ -126,12 +126,12 @@ def game(request):
 def board(request):
     params = get_default_dict(request)
     params['teams'] = enumerate(models.Team.objects.order_by('-score'))
-    return render(request, 'ctf/board.html', params)
+    return render(request, 'ctflex/board.html', params)
 
 @single_http_method('GET')
 class Team(DetailView):
     model = models.Team
-    template_name = 'ctf/team.html'
+    template_name = 'ctflex/team.html'
 
     def get_context_data(self, **kwargs):
         context = super(Team, self).get_context_data(**kwargs)
@@ -170,13 +170,13 @@ def start_window(request):
     if team.has_timer():
         if team.has_active_timer():
             messages.warning("Your timer has already started.")
-            return redirect('ctf:game')
+            return redirect('ctflex:game')
         else:
             messages.error("Your timer for this window has expired.")
-            return redirect('ctf:index')
+            return redirect('ctflex:index')
 
     team.start_timer()
-    return redirect('ctf:game')
+    return redirect('ctflex:game')
 
 
 @single_http_method('POST')
@@ -196,7 +196,7 @@ def submit_flag(request, problem_id):
             message = "Start your timer before submitting flags."
         messages.error(request, message)
 
-        return redirect('ctf:index')
+        return redirect('ctflex:index')
 
     # Check if problem exists
     try:
@@ -231,6 +231,6 @@ def submit_flag(request, problem_id):
 
     # Flash message and redirect
     messenger(request, message)
-    return redirect('ctf:game')
+    return redirect('ctflex:game')
 
 # endregion

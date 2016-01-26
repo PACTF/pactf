@@ -1,13 +1,13 @@
-{% extends 'ctf/base.html' %}
+{% extends 'ctflex/base.html' %}
 {% load static %}
-{% load ctf %}
+{% load ctflex %}
 
 {% block title %}
   Game — {{ block.super }}
 {% endblock %}
 
 {% block css %}
-  <link href="{% static "ctf/css/game.css" %}" rel="stylesheet">
+  <link href="{% static "ctflex/css/game.css" %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
     {% endif %}
     <div id="problems">
       {% for prob in prob_list %}
-        <form action="{% url 'ctf:submit_flag' prob.id|str %}" method="post">
+        <form action="{% url 'ctflex:submit_flag' prob.id|str %}" method="post">
           <div class="problem-header">
             <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
           </div>
@@ -36,7 +36,7 @@
     </div>
   {% else %}
     <div id="start-button">
-      <form action="{% url 'ctf:start_window' %}" method="post">
+      <form action="{% url 'ctflex:start_window' %}" method="post">
         <input type="submit" value="Start!"/>
         {% csrf_token %}
       </form>

@@ -51,7 +51,7 @@ DATABASES = {
 
 # Security settings
 
-# Whether Django and the CTF framework should display helpful but potentially sensitive debugging info
+# Whether Django and the CTFLEX framework should display helpful but potentially sensitive debugging info
 DEBUG = True
 
 # (Change this value before going into production.)

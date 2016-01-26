@@ -1,4 +1,4 @@
-- model: "ctf.Competitor"
+- model: "ctflex.Competitor"
   pk: 101
   fields:
     user: 101
@@ -7,7 +7,7 @@
     last_name: "Last"
     email: "example1@example.com"
 
-- model: "ctf.Competitor"
+- model: "ctflex.Competitor"
   pk: 102
   fields:
     user: 102
@@ -16,7 +16,7 @@
     last_name: "Team 2"
     email: "example2@example.com"
 
-- model: "ctf.Competitor"
+- model: "ctflex.Competitor"
   pk: 103
   fields:
     user: 103

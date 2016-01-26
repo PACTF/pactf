@@ -18,33 +18,33 @@
   fields: {app_label: sessions, model: session}
 - model: contenttypes.contenttype
   pk: 7
-  fields: {app_label: ctf, model: team}
+  fields: {app_label: ctflex, model: team}
 - model: contenttypes.contenttype
   pk: 8
-  fields: {app_label: ctf, model: competitor}
+  fields: {app_label: ctflex, model: competitor}
 - model: contenttypes.contenttype
   pk: 9
-  fields: {app_label: ctf, model: ctfproblem}
+  fields: {app_label: ctflex, model: ctflexproblem}
 - model: contenttypes.contenttype
   pk: 10
-  fields: {app_label: ctf, model: submission}
+  fields: {app_label: ctflex, model: submission}
 - model: contenttypes.contenttype
   pk: 11
-  fields: {app_label: ctf, model: window}
+  fields: {app_label: ctflex, model: window}
 - model: contenttypes.contenttype
   pk: 12
-  fields: {app_label: ctf, model: timer}
+  fields: {app_label: ctflex, model: timer}
 - model: sessions.session
   pk: j4dc5j7uf8n5bta9n9epz3gcrnj7n0yk
   fields: {session_data: MGM3OTcwODZkNGRkNmUyOTI4M2EzNjU3MmQxYzc0Njk0M2M2YzBiMzp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6IjEwMSIsIl9hdXRoX3VzZXJfaGFzaCI6Ijk1OWMwOThlZmNmYWEwZmMxZGZkOGYyNDFmOTBiMTVlZjZjMjI3NjEifQ==,
     expire_date: !!timestamp '2016-02-02 14:38:07.296601+00:00'}
-- model: ctf.team
+- model: ctflex.team
   pk: 101
   fields: {name: Team 1, score: 101, school: None}
-- model: ctf.team
+- model: ctflex.team
   pk: 102
   fields: {name: Team 2, score: 0, school: None}
-- model: ctf.ctfproblem
+- model: ctflex.ctflexproblem
   pk: 29a5abcc-54af-4073-8434-e3382dc8019c
   fields: {name: problem4, points: 40, description: '#### this is desc4
 
@@ -61,7 +61,7 @@
       ', hint_html: '<p>hint3</p>
 
       ', grader: test4/grader.py, dynamic: null}
-- model: ctf.ctfproblem
+- model: ctflex.ctflexproblem
   pk: 7013a854-1119-4a89-928e-0b72cc6fa176
   fields: {name: problem3, points: 10, description: "#### this is desc3\n\ndo we have\
       \ **markdown** _working_?\n\n```python\ndef foo():\n  pass\n```\n", description_html: "<h4>this\
@@ -71,19 +71,19 @@
       ', hint_html: '<p>hint3</p>
 
       ', grader: test3/grader.py, dynamic: null}
-- model: ctf.ctfproblem
+- model: ctflex.ctflexproblem
   pk: c1a2b8c2-6316-4266-b3c3-9e3aa6f1ab98
   fields: {name: problem6, points: 40, description: null, description_html: '', hint: 'hint6
 
       ', hint_html: '<p>hint6</p>
 
       ', grader: test6/grader.py, dynamic: test6/generator.py}
-- model: ctf.ctfproblem
+- model: ctflex.ctflexproblem
   pk: e336045a-b9cc-4e6b-ade4-d893e102f3fc
-  fields: {name: problem5, points: 40, description: '[Static files]({% ctfstatic ''static.txt''
+  fields: {name: problem5, points: 40, description: '[Static files]({% ctflexstatic ''static.txt''
       %}) should work
 
-      ', description_html: '<p><a href="/static/ctfproblems/e336045a-b9cc-4e6b-ade4-d893e102f3fc/static.txt">Static
+      ', description_html: '<p><a href="/static/ctflexproblems/e336045a-b9cc-4e6b-ade4-d893e102f3fc/static.txt">Static
       files</a> should work</p>
 
       ', hint: 'hint5
@@ -91,11 +91,11 @@
       ', hint_html: '<p>hint5</p>
 
       ', grader: test5/grader.py, dynamic: null}
-- model: ctf.window
+- model: ctflex.window
   pk: 1
   fields: {start: !!timestamp '2016-01-19 14:42:21+00:00', end: !!timestamp '2016-01-21
       14:42:24+00:00', personal_timer_duration: '01:00:00'}
-- model: ctf.timer
+- model: ctflex.timer
   pk: 1
   fields: {window: 1, team: 101, start: !!timestamp '2016-01-19 14:42:54.581323+00:00',
     end: !!timestamp '2016-01-19 15:42:54.575410+00:00'}
@@ -173,13 +173,13 @@
   fields: {name: Can delete competitor, content_type: 8, codename: delete_competitor}
 - model: auth.permission
   pk: 25
-  fields: {name: Can add ctf problem, content_type: 9, codename: add_ctfproblem}
+  fields: {name: Can add ctflex problem, content_type: 9, codename: add_ctflexproblem}
 - model: auth.permission
   pk: 26
-  fields: {name: Can change ctf problem, content_type: 9, codename: change_ctfproblem}
+  fields: {name: Can change ctflex problem, content_type: 9, codename: change_ctflexproblem}
 - model: auth.permission
   pk: 27
-  fields: {name: Can delete ctf problem, content_type: 9, codename: delete_ctfproblem}
+  fields: {name: Can delete ctflex problem, content_type: 9, codename: delete_ctflexproblem}
 - model: auth.permission
   pk: 28
   fields: {name: Can add submission, content_type: 10, codename: add_submission}
@@ -282,13 +282,13 @@
     date_joined: 2015-12-30 07:32:56.341000+00:00
     groups: []
     user_permissions: []
-- model: ctf.competitor
+- model: ctflex.competitor
   pk: 101
   fields: {user: 101, team: 101, first_name: User 1, last_name: Last, email: example1@example.com}
-- model: ctf.competitor
+- model: ctflex.competitor
   pk: 102
   fields: {user: 102, team: 101, first_name: User 2, last_name: Team 2, email: example2@example.com}
-- model: ctf.competitor
+- model: ctflex.competitor
   pk: 103
   fields: {user: 103, team: 102, first_name: User 3, last_name: Team 2, email: example3@example.com}
 - model: admin.logentry

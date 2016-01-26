@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'yaml',
 
     # Ours
-    'ctf',
+    'ctflex',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -81,7 +81,7 @@ CONN_MAX_AGE = 60 * 60
 # Auth URLs
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'ctf:index'
+LOGIN_REDIRECT_URL = 'ctflex:index'
 
 
 # Internationalization

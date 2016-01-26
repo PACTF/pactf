@@ -17,15 +17,25 @@ from django.contrib.postgres import fields as psql
 
 import markdown2
 
+from ctflex.constants import APP_NAME
+
 
 # TODO(Yatharth): Write decorator to set dispatch_uid automatically
 # TODO(Yatharth): Write helper so error of clean returns all validationerrors
 
+def unique_receiver(*args, **kwargs):
+    """Wrap Django's `receiver` to set dispatch_uid automatically based on the function's name"""
 
-@receiver(pre_save, dispatch_uid='ctf.pre_save_validate')
+    def decorator(function):
+        default_dispatch_uid = '{}.{}'.format(APP_NAME, function.__name__)
+        kwargs.setdefault('dispatch_uid', default_dispatch_uid)
+        return receiver(*args, **kwargs)(function)
+
+    return decorator
+
+
+@unique_receiver(pre_save)
 def pre_save_validate(sender, instance, *args, **kwargs):
-    # validate only fixtures (`loaddata` causes `raw` to be True)"""
-    # if kwargs.get('raw', False):
     instance.full_clean()
 
 
@@ -35,7 +45,6 @@ def gen_key(chars=string.ascii_uppercase + string.digits):
 # region User Models (by wrapping)
 
 class Team(models.Model):
-
     # Essential data
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
@@ -173,6 +182,7 @@ class CtfProblem(models.Model):
         desc = gen.generate(team)
         return self.process_html(desc)
 
+
 class Submission(models.Model):
     """Records a flag submission attempt
 
@@ -215,27 +225,12 @@ class Submission(models.Model):
 
 # region Config Models
 
-# TODO: Consider dbsettings
-
-# class SingletonModel(models.Model):
-#     id = models.AutoField
-#
-#     class Meta:
-#         abstract = True
+# class Config(models.Model):
+#     max_team_size = models.PositiveSmallIntegerField(default=5)
 #
 #     def save(self, *args, **kwargs):
-#         self.__class__.objects.exclude(id=self.id).delete()
-#         super(SingletonModel, self).save(*args, **kwargs)
-#
-#     @classmethod
-#     def load(cls):
-#         try:
-#             return cls.objects.get()
-#         except cls.DoesNotExist:
-#             return cls()
-#
-# class Config():
-#     passs
+#         self.id = 1
+#         super().save(*args, **kwargs)
 
 # endregion
 
@@ -313,7 +308,7 @@ class Timer(models.Model):
         self.sync_end()
 
 
-@receiver(post_save, sender=Window, dispatch_uid='ctf.window_post_save_update_timers')
+@receiver(post_save, sender=Window, dispatch_uid='ctflex.window_post_save_update_timers')
 def window_post_save_update_timers(sender, instance, **kwargs):
     """Make timers update their end timers per changes in their window"""
     for timer in instance.timer_set.all():
@@ -344,14 +339,14 @@ def window_post_save_update_timers(sender, instance, **kwargs):
 #         self.content_type = content_type
 #         super().save(*args, **kwargs)
 #
-# @receiver(post_save, sender=Competitor, dispatch_uid='ctf.competitor_post_save_add_to_group')
+# @receiver(post_save, sender=Competitor, dispatch_uid='ctflex.competitor_post_save_add_to_group')
 # def competitor_post_save_add_to_group(sender, instance, created, **kwargs):
 #     if created:
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
 #         instance.user.groups.add(competitorGroup)
 #
 #
-# @receiver(post_delete, sender=Competitor, dispatch_uid='ctf.competitor_post_delete_remove_from_group')
+# @receiver(post_delete, sender=Competitor, dispatch_uid='ctflex.competitor_post_delete_remove_from_group')
 # def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs):
 #     if created:
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)

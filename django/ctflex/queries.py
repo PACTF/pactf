@@ -2,7 +2,7 @@ from functools import partial
 
 from django.core.exceptions import ValidationError
 
-from ctf import models
+from ctflex import models
 
 
 # General queries
