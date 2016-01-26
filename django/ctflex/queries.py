@@ -20,7 +20,7 @@ def query_get(model, **kwargs):
 # CTFlex-specific queries
 
 def get_window(window_id):
-    return models.Window.objects.get(pk=window_id)
+    return models.Window.objects.get(pk=window_id) if window_id else models.Window.current()
 
 def window_active(team):
     return team.window_active()

@@ -150,11 +150,6 @@ def index(request):
     return render(request, 'ctflex/index.html', get_default_dict(request))
 
 @single_http_method('GET')
-def no_window_redirect(request, path):
-    # XXX(Yatharth): Write
-    pass
-
-@single_http_method('GET')
 @windowed()
 def inactive(request, *, window_id):
     return render(request, 'ctflex/waiting.html', get_window_dict(request, get_window(window_id)))
@@ -162,7 +157,6 @@ def inactive(request, *, window_id):
 @single_http_method('GET')
 @windowed()
 def waiting(request, *, window_id):
-    # XXX(Yatharth): Remove code to do this from game
     return render(request, 'ctflex/inactive.html', get_window_dict(request, get_window(window_id)))
 
 @single_http_method('GET')

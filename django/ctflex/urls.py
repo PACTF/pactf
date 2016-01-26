@@ -7,7 +7,6 @@ from ctflex import views
 app_name = 'ctflex'
 
 
-# XXX(Yatharth): Make window_id position
 # TODO(Yatharth): Look into changing links everywhere to pass window if it is there
 # TODO(Yatharth): Remember last selected window in a session?
 
@@ -30,5 +29,5 @@ windowed_urls = [
 urlpatterns = [
     url('^$', views.index, name='index'),
     url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
-    url(r'^(?!window)(?P<path>.+)$', views.no_window_redirect, name='no_window_redirect')
+    url(r'^', include(windowed_urls), {'window_id': None})
 ]
