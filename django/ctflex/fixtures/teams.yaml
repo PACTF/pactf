@@ -2,7 +2,6 @@
   pk: 101
   fields:
     name: "Team 1"
-    score: 101
 
 - model: "ctflex.Team"
   pk: 102

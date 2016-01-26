@@ -2,32 +2,46 @@ import inspect
 from functools import wraps
 
 from django.contrib.auth.decorators import user_passes_test
+from django.core.urlresolvers import resolve
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
-from ctflex import models, queries
+from ctflex import models
+from ctflex import queries
+from ctflex.models import Window
 
 
 # region Helper Methods
+from ctflex.queries import get_window
+
 
 def is_competitor(user):
     return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
 
 
 def get_default_dict(request):
-    result = {}
-    result['production'] = not settings.DEBUG
+    params = {}
+    params['production'] = not settings.DEBUG
     team = request.user.competitor.team if is_competitor(request.user) else None
-    result['team'] = team
-    result['is_active_window'] = models.Window.active()
-    result['can_view_problems'] = result['is_active_window'] and team and team.can_view_problems()
-    result['can_submit_flags'] = result['can_view_problems'] and team.has_active_timer()
-    return result
+    params['team'] = team
+    return params
 
+
+def get_window_dict(request, window):
+    params = get_default_dict(request)
+    params['window'] = window
+    params['is_active_window'] = window.start
+    return params
+
+def warn_historic(request, window):
+    """Flash info if in a historic state"""
+    if window.ended():
+        messages.info(request, "This window has ended. You may solve problems still, but the scoreboard has been frozen.")
 
 # endregion
 
@@ -85,46 +99,96 @@ def single_http_method(method):
 def competitors_only():
     return user_passes_test(is_competitor)
 
-
-@universal_decorator(methodname='get')
-def active_window_only():
+def windowed():
     def decorator(view):
         @wraps(view)
-        def decorated(request, *args, **kwargs):
-            if not models.Window.active():
-                messages.warning(request, "No window is currently active.")
-                return redirect('ctflex:index')
+        def decorated(request, *args, window_id, **kwargs):
+            window = get_window(window_id)
+            view_name = resolve(request.path_info).view_name
+            original_view = lambda: view(request, *args, window_id=window_id, **kwargs)
 
-            return view(request, *args, **kwargs)
+            print(window.start, timezone.now(), window.start <= timezone.now(), window.started())
+            if not window.started():
+                if view_name == 'ctflex:inactive':
+                     return original_view()
+                else:
+                    return redirect('ctflex:inactive', window_id=window.id)
+            # Window has started
+
+            if window.ended():
+                return original_view()
+            # Window has not ended
+
+            team = request.user.competitor.team
+            if not team.has_timer(window):
+                if view_name in ['ctflex:waiting', 'ctflex:start_timer']:
+                    return original_view()
+                else:
+                    return redirect('ctflex:waiting', window_id=window.id)
+            # There is/was a timer
+
+            if not team.timer(window).active():
+                if view_name == 'ctflex:done':
+                    return original_view()
+                else:
+                    return redirect('ctflex:done', window_id=window.id)
+            # There is a timer
+
+            return original_view()
 
         return decorated
-
     return decorator
-
 
 # endregion
 
 
 # region GETs
 
+
 @single_http_method('GET')
 def index(request):
     return render(request, 'ctflex/index.html', get_default_dict(request))
 
 @single_http_method('GET')
+def no_window_redirect(request, path):
+    # XXX(Yatharth): Write
+    pass
+
+@single_http_method('GET')
+@windowed()
+def inactive(request, *, window_id):
+    return render(request, 'ctflex/waiting.html', get_window_dict(request, get_window(window_id)))
+
+@single_http_method('GET')
+@windowed()
+def waiting(request, *, window_id):
+    # XXX(Yatharth): Remove code to do this from game
+    return render(request, 'ctflex/inactive.html', get_window_dict(request, get_window(window_id)))
+
+@single_http_method('GET')
+@windowed()
+def done(request, *, window_id):
+    return render(request, 'ctflex/done.html', get_window_dict(request, get_window(window_id)))
+
+
+@single_http_method('GET')
 @competitors_only()
-@active_window_only()
-def game(request):
-    params = get_default_dict(request)
-    params['prob_list'] = queries.viewable_problems(request.user.competitor.team)
+@windowed()
+def game(request, *, window_id):
+    window = get_window(window_id)
+    params = get_window_dict(request, window)
+    params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
+    warn_historic(request, window)
     return render(request, 'ctflex/game.html', params)
 
 
 @single_http_method('GET')
-@active_window_only()
-def board(request):
-    params = get_default_dict(request)
-    params['teams'] = enumerate(models.Team.objects.order_by('-score'))
+@windowed()
+def board(request, *, window_id):
+    window = get_window(window_id)
+    params = get_window_dict(request, window)
+    params['teams'] = enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))
+    warn_historic(request, window)
     return render(request, 'ctflex/board.html', params)
 
 @single_http_method('GET')
@@ -132,9 +196,11 @@ class Team(DetailView):
     model = models.Team
     template_name = 'ctflex/team.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, window_id, **kwargs):
+        # TODO: use windowed decorator somehow?
+        window = get_window(window_id)
         context = super(Team, self).get_context_data(**kwargs)
-        context.update(get_default_dict(self.request))
+        context.update(get_window_dict(self.request, window))
         return context
 
 
@@ -158,31 +224,34 @@ class CurrentTeam(Team):
 
 @single_http_method('POST')
 @competitors_only()
-@active_window_only()
-def start_window(request):
+@windowed()
+def start_timer(request, *, window_id):
+    window = get_window(window_id)
     team = request.user.competitor.team
 
-    if team.has_timer():
-        if team.has_active_timer():
-            messages.warning("Your timer has already started.")
-            return redirect('ctflex:game')
+    if team.has_timer(window):
+        if team.has_active_timer(window):
+            messages.warning(request, "Your timer has already started.")
+            return redirect('ctflex:game', window_id=window.id)
         else:
-            messages.error("Your timer for this window has expired.")
+            messages.error(request, "Your timer for this window has expired.")
             return redirect('ctflex:index')
 
-    team.start_timer()
-    return redirect('ctflex:game')
+    team.start_timer(window)
+    return redirect('ctflex:game', window_id=window.id)
 
 
 @single_http_method('POST')
 @competitors_only()
-@active_window_only()
+@windowed()
 # XXX(Cam): Move all of this elsewhere
-def submit_flag(request, problem_id):
+def submit_flag(request, *, window_id, prob_id):
+
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
     team = competitor.team
+    window = get_window(window_id)
 
     if not team.has_active_timer():
         if team.has_timer():
@@ -195,9 +264,9 @@ def submit_flag(request, problem_id):
 
     # Check if problem exists
     try:
-        problem = queries.query_get(models.CtfProblem, id=problem_id)
+        problem = queries.query_get(models.CtfProblem, id=prob_id)
     except models.CtfProblem.DoesNotExist:
-        return HttpResponseNotFound("Problem with id {} not found".format(problem_id))
+        return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
 
     # Check if problem has already been solved
     if queries.query_filter(models.Submission, problem=problem, team=team, correct=True):
@@ -206,7 +275,7 @@ def submit_flag(request, problem_id):
         correct = None
 
     # Check if that flag had already been tried
-    elif queries.query_filter(models.Submission, problem_id=problem_id, team=team, flag=flag):
+    elif queries.query_filter(models.Submission, problem_id=prob_id, team=team, flag=flag):
         messenger = messages.error
         message = "You or someone on your team has already tried this flag!"
         correct = None
@@ -217,7 +286,7 @@ def submit_flag(request, problem_id):
 
         if correct:
             messenger = messages.success
-            queries.update_score(team, problem)
+            queries.update_score(competitor=competitor, problem=problem, flag=flag)
         else:
             messenger = messages.error
 
@@ -226,6 +295,6 @@ def submit_flag(request, problem_id):
 
     # Flash message and redirect
     messenger(request, message)
-    return redirect('ctflex:game')
+    return redirect('ctflex:game', window_id=window.id)
 
 # endregion

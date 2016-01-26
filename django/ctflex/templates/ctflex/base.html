@@ -1,6 +1,5 @@
 {% load static %}
-
-<!-- TODO(Yatharth): Outsource base.html, or allow overriding it -->
+{% load ctflex %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,6 +21,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
 
   <link href="{% static "ctflex/css/main.css" %}" rel="stylesheet">
+  <link href="{% static "ctflex/css/header.css" %}" rel="stylesheet">
 
   {% block css %}{% endblock %}
 
@@ -57,21 +57,64 @@
 <body>
 
 <header>
-  <ul class="pull-left">
-    <li><a href="{% url 'ctflex:index' %}">Home</a></li>
-    <li><a href="{% url 'ctflex:game' %}">Game</a></li>
-    <li><a href="{% url 'ctflex:scoreboard' %}">Board</a></li>
-  </ul>
-  <ul class="pull-right">
-    {% if user.is_authenticated %}
-      <li>Score: {{ team.score }}</li>
-      <li><a href="{% url 'ctflex:current_team' %}">Team</a></li>
-      <li><a href="{% url 'logout' %}">Logout</a></li>
-    {% else %}
-      <li><a href="{% url 'login' %}">Login</a></li>
-    {% endif %}
-  </ul>
-  <div style="clear: both"></div>
+
+{# TODO(Yatharth): Put this in the context to enable easy testing #}
+{% if not window %}
+  {% current_window as window %}
+{% endif %}
+{% other_windows as other_windows %}
+
+<div class="menu-wrap">
+    <nav class="menu">
+        <ul class="clearfix">
+          <ul class="pull-left">
+              <li><a href="{% url 'ctflex:index' %}">Home</a></li>
+              <li>
+                <a href="#">{{ window.name }}<span class="arrow">&#9660;</span></a>
+                <ul class="sub-menu">
+                  {% for other_window in other_windows %}
+                    <li><a href="{% switch_window window=other_window resolver_match=request.resolver_match %}">{{ other_window.name }}</a></li>
+                  {% endfor %}
+                </ul>
+              </li>
+              <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>
+              <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
+          </ul>
+          <ul class="pull-right">
+            {% if user.is_authenticated %}
+              <li><span >Score: {% teamscore %}</span></li>
+              <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
+              <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+              <li><a href="{% url 'login' %}">Login</a></li>
+          {% endif %}
+          </ul>
+          <div style="clear: both"></div>
+        </ul>
+    </nav>
+</div>
+
+{#  <ul class="pull-left">#}
+{#    <li><a href="{% url 'ctflex:index' %}">Home</a></li>#}
+{#    <a href="#">{{ window.name }}<span class="arrow">&#9660;</span></a>#}
+{#    <ul class="sub-menu">#}
+{#      {% for other_window in other_windows %}#}
+{#        <li><a href="#">{{ other_window.name }}</a></li>#}
+{#      {% endfor %}#}
+{#    </ul>#}
+{#    <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>django.core.serializers.base.DeserializationError: Problem installing fixture#}
+{#    <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>#}
+{#  </ul>#}
+{#  <ul class="pull-right">#}
+{#    {% if user.is_authenticated %}#}
+{#      <li>Score: {% teamscore %}</li>#}
+{#      <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>#}
+{#      <li><a href="{% url 'logout' %}">Logout</a></li>#}
+{#    {% else %}#}
+{#      <li><a href="{% url 'login' %}">Login</a></li>#}
+{#    {% endif %}#}
+{#  </ul>#}
+{#  <div style="clear: both"></div>#}
 </header>
 
 <div id="body">

@@ -1,0 +1,25 @@
+{% extends 'ctflex/base.html' %}
+{% load ctflex %}
+
+{% block title %}
+  Inactive - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <p>
+    {# TODO(Yatharth): Write JS to take min and show countdown #}
+    The window is active!! You can start your personal timer until {{ window.end }}. You will have up
+    to {{ window.personal_timer_duration }} hours to work on it, or until the end of the Contest Window, whichever comes
+    earlier. Bon courage.
+  </p>
+
+  <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
+    <input type="submit" value="Start!"/>
+    {% csrf_token %}
+  </form>
+  <br/>
+
+  <p>
+    <img src="https://s-media-cache-ak0.pinimg.com/236x/e6/87/c5/e687c54549f9d27ee807d2dbaf1fd991.jpg"/>
+  </p>
+{% endblock %}

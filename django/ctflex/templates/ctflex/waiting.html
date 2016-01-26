@@ -1,0 +1,15 @@
+{% extends 'ctflex/base.html' %}
+{% load ctflex %}
+
+{% block title %}
+     Waiting - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <p>
+        The window isn't yet active. It will be so at {{ window.start }}. Come back then. kthxbai
+    </p>
+    <p>
+      <img src="http://cilisos.my/wp-content/uploads/2015/04/kthxbai.jpg?8f2c00"/>
+    </p>
+{% endblock %}

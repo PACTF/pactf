@@ -17,8 +17,12 @@ import markdown2
 from ctflex.constants import APP_NAME
 
 
-# TODO(Yatharth): Split this file up
 # TODO(Yatharth): Write helper so error of clean returns all validationerrors
+
+
+# region Helpers and General
+
+print_time = lambda time: time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
 
 def unique_receiver(*args, **kwargs):
     """Wrap Django's `receiver` to set dispatch_uid automatically based on the function's name"""
@@ -36,13 +40,26 @@ def pre_save_validate(sender, instance, *args, **kwargs):
     instance.full_clean()
 
 
+# class Config(models.Model):
+#     default_category = models.ForeignKey(Category)
+#
+#     def save(self, *args, **kwargs):
+#         self.id = 1
+#         super().save(*args, **kwargs)
+
+
+# endregion
+
+
 # region User Models (by wrapping)
 
 class Team(models.Model):
+    """Represent essence of a team"""
+
+
     # Essential data
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
-    score = models.IntegerField(default=0)
 
     # Extra data
     school = models.CharField(max_length=40, blank=True, default='None')
@@ -50,10 +67,19 @@ class Team(models.Model):
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
+    # XXX(Yatharth): Put into queries or sth
+    def score(self, window):
+        score = 0
+        for competitor in self.competitor_set.all():
+            for solve in competitor.solve_set.filter(problem__window=window):
+                score += solve.problem.points
+        return score
+
+    # XXX(Yatharth): Remove default params
     def timer(self, window=None):
         if window is None:
             window = Window.current()
-        return Timer.objects.get(window=window, team=self)
+        return self.timer_set.get(window=window)
 
     def has_timer(self, window=None):
         try:
@@ -63,16 +89,16 @@ class Team(models.Model):
         else:
             return True
 
-    def has_active_timer(self):
-        return self.has_timer() and self.timer().active()
+    def has_active_timer(self, window=None):
+        return self.has_timer(window) and self.timer(window).active()
 
     def can_view_problems(self, window=None):
         return self.has_timer(window=window) and self.timer(window=window).start <= timezone.now()
 
-    def start_timer(self):
+    def start_timer(self, window):
         assert not self.has_timer()
 
-        timer = Timer(window=Window.current(), team=self)
+        timer = Timer(window=window, team=self)
         timer.save()
 
 
@@ -101,12 +127,102 @@ class Competitor(models.Model):
 # endregion
 
 
+# region Timer Models
+
+
+class Window(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=40, blank=False)
+
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    personal_timer_duration = models.DurationField()
+
+    def __str__(self):
+        return "<Window #{} {} – {}>".format(self.id, print_time(self.start), print_time(self.end))
+
+    """ Properties """
+
+    def started(self):
+        return self.start <= timezone.now()
+
+    def ended(self):
+        return self.end < timezone.now()
+
+    """ Class methods """
+
+    @staticmethod
+    def current():
+        now = timezone.now()
+        try:
+            return Window.objects.get(start__lte=now, end__gte=now)
+        except Window.DoesNotExist:
+            return Window.objects.filter(start__gte=now).order_by('start').first() or \
+                     Window.objects.order_by('-start').first()
+
+    """ Validation """
+
+    def validate_windows_dont_overlap(self):
+        for window in Window.objects.exclude(id=self.id):
+            if window.start <= self.end and self.start <= window.end:
+                raise ValidationError("Window overlaps with {}".format(window))
+
+    def validate_positive_timedelta(self):
+        if self.start >= self.end:
+            raise ValidationError("End is not after start")
+
+    def clean(self):
+        self.validate_positive_timedelta()
+        self.validate_windows_dont_overlap()
+        super().clean()
+
+
+class Timer(models.Model):
+    """Represent the time period in which a team can, for example, submit flags"""
+
+    class Meta:
+        unique_together = ('window', 'team',)
+
+    id = models.AutoField(primary_key=True)
+
+    window = models.ForeignKey(Window, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(editable=False, blank=True)
+
+    def __str__(self):
+        return "<Timer #{} window=#{} team=#{} {} – {}>".format(
+            self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
+
+    def active(self):
+        return self.start <= timezone.now() <= self.end
+
+    def sync_end(self):
+        self.end = timezone.now() + self.window.personal_timer_duration
+
+    def clean(self):
+        super().clean()
+        self.sync_end()
+
+
+@unique_receiver(post_save, sender=Window)
+def window_post_save_update_timers(sender, instance, **kwargs):
+    """Make timers update their end timers per changes in their window"""
+    for timer in instance.timer_set.all():
+        timer.save()
+
+# endregion
+
+
 # region Problem Models
 
-# FIXME(Yatharth): Consider simplifying
+# XXX(Yatharth): Move stuff out
 class CtfProblem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
+    window = models.ForeignKey(Window)
 
     points = models.IntegerField()
     description = models.TextField(blank=True, null=True)
@@ -134,7 +250,7 @@ class CtfProblem(models.Model):
             return False, "Empty flag"
 
         grader_path = join(settings.PROBLEMS_DIR, self.grader)
-        # FIXME(Yatharth): Handle FileNotFound
+        # XXX(Yatharth): Handle FileNotFound
         grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
         correct, message = grader.grade(team, flag)
         return correct, message
@@ -174,6 +290,18 @@ class CtfProblem(models.Model):
         gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
         desc = gen.generate(team)
         return self.process_html(desc)
+
+
+class Solve(models.Model):
+
+    class Meta:
+        unique_together = ('problem', 'competitor')
+
+    problem = models.ForeignKey(CtfProblem)
+    competitor = models.ForeignKey(Competitor)
+
+    date = models.DateTimeField(auto_now=True)
+    flag = models.CharField(max_length=100, blank=False)
 
 
 class Submission(models.Model):
@@ -216,101 +344,7 @@ class Submission(models.Model):
 # endregion
 
 
-# region Config Models
-
-# class Config(models.Model):
-#     max_team_size = models.PositiveSmallIntegerField(default=5)
-#
-#     def save(self, *args, **kwargs):
-#         self.id = 1
-#         super().save(*args, **kwargs)
-
-# endregion
-
-
-# region Timer Models
-
-print_time = lambda time: time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
-
-
-class Window(models.Model):
-    id = models.AutoField(primary_key=True)
-
-    start = models.DateTimeField()
-    end = models.DateTimeField()
-
-    personal_timer_duration = models.DurationField()
-
-    def __str__(self):
-        return "<Window #{} {} – {}>".format(self.id, print_time(self.start), print_time(self.end))
-
-    @staticmethod
-    def active():
-        try:
-            Window.current()
-        except Window.DoesNotExist:
-            return False
-        else:
-            return True
-
-    @staticmethod
-    def current():
-        now = timezone.now()
-        return Window.objects.get(start__lte=now, end__gte=now)
-
-    def validate_windows_dont_overlap(self):
-        for window in Window.objects.exclude(id=self.id):
-            if window.start <= self.end and self.start <= window.end:
-                raise ValidationError("Window overlaps with {}".format(window))
-
-    def validate_positive_timedelta(self):
-        if self.start >= self.end:
-            raise ValidationError("End is not after start")
-
-    def clean(self):
-        self.validate_positive_timedelta()
-        self.validate_windows_dont_overlap()
-        super().clean()
-
-
-class Timer(models.Model):
-    """Represent the time period in which a team can, for example, submit flags"""
-
-    class Meta:
-        unique_together = ('window', 'team',)
-
-    id = models.AutoField(primary_key=True)
-
-    window = models.ForeignKey(Window, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-
-    start = models.DateTimeField(auto_now=True)
-    end = models.DateTimeField(editable=False, blank=True)
-
-    def __str__(self):
-        return "<Timer #{} window=#{} team=#{} {} – {}>".format(
-            self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
-
-    def active(self):
-        return self.start <= timezone.now() <= self.end
-
-    def sync_end(self):
-        self.end = timezone.now() + self.window.personal_timer_duration
-
-    def clean(self):
-        self.sync_end()
-
-
-@unique_receiver(post_save, sender=Window)
-def window_post_save_update_timers(sender, instance, **kwargs):
-    """Make timers update their end timers per changes in their window"""
-    for timer in instance.timer_set.all():
-        timer.save()
-
-# endregion
-
-
-# region Permissions and Groups
+# region Permissions and Groups (old)
 #
 # class GlobalPermissionManager(models.Manager):
 #     def get_query_set(self):
@@ -345,10 +379,10 @@ def window_post_save_update_timers(sender, instance, **kwargs):
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
 #         instance.user.groups.remove(competitorGroup)
 #
-# endregion
+# endregion (o (old)
 
 
-# region User Models (by substitution)
+# region User Models (by substitution) (old)
 #
 # class CompetitorManager(BaseUserManager):
 #     def create_user(username, fullname, email, team, password=None):

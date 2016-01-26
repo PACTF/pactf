@@ -11,35 +11,24 @@
 {% endblock %}
 
 {% block content %}
-  {% if can_view_problems %}
-    {% if not is_active_window %}
-    This round is over!
-    {% endif %}
-    <div id="problems">
-      {% for prob in prob_list %}
-        <form action="{% url 'ctflex:submit_flag' prob.id|str %}" method="post">
-          <div class="problem-header">
-            <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
-          </div>
+  <div id="problems">
+    {% for prob in prob_list %}
+      <form action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
+        <div class="problem-header">
+          <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
+        </div>
 
-          <div class="problem-description">
-            {{ prob.description_html|safe }}
-          </div>
+        <div class="problem-description">
+          {{ prob.description_html|safe }}
+        </div>
 
-          <label for="flag-{{ prob.id }}">Flag: </label>
-          <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-          <input type="submit" value="Submit!" {% if not can_submit_flags %} disabled {% endif %}/>
-          {% csrf_token %}
-        </form>
-        <br/>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div id="start-button">
-      <form action="{% url 'ctflex:start_window' %}" method="post">
-        <input type="submit" value="Start!"/>
+        <label for="flag-{{ prob.id }}">Flag: </label>
+        <input id="flag-{{ prob.id }}" type="text" name="flag"/>
+        {# Disable submit button and change text to indicate having solved the problem #}
+        <input type="submit" value="Submit!" />
         {% csrf_token %}
       </form>
-    </div>
-  {% endif %}
+      <br/>
+    {% endfor %}
+  </div>
 {% endblock %}

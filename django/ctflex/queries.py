@@ -18,12 +18,16 @@ def query_get(model, **kwargs):
 
 
 # CTFlex-specific queries
+
+def get_window(window_id):
+    return models.Window.objects.get(pk=window_id)
+
 def window_active(team):
     return team.window_active()
 
 
-def viewable_problems(team):
-    result = filter(partial(problem_unlocked, team), models.CtfProblem.objects.all())
+def viewable_problems(team, window):
+    result = filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window))
     return map(partial(format_problem, team), result)
 
 
@@ -37,7 +41,7 @@ def problem_unlocked(team, problem):
 
 def format_problem(team, problem):
     data = problem.__dict__
-    # FIXME(Yatharth): Is the first condition necessary?
+    # XXX(Yatharth): Is the first condition necessary?
     if 'dynamic' in data and not problem.dynamic:
         return problem
 
@@ -50,11 +54,7 @@ def format_problem(team, problem):
     return result
 
 
-def start_window(team):
-    team.start_window()
-
-
-def update_score(team, problem):
-    # FIXME(Yatharth): Use F() to avoid races
-    team.score += problem.points
-    team.save()
+def update_score(*, competitor, problem, flag):
+    # XXX(Yatharth): Use F() to avoid races?
+    solve = models.Solve(competitor=competitor, problem=problem, flag=flag)
+    solve.save()

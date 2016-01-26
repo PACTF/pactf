@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 import yaml
 
-from ctflex.models import CtfProblem
+from ctflex.models import CtfProblem, Window
 from ctflex.constants import UUID_REGEX
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
@@ -112,6 +112,10 @@ class Command(BaseCommand):
 
             if 'dynamic' not in data:
                 data['dynamic'] = None
+
+            # Attach to current window
+            # FIXME(Yatharth): Allow loading into a different window
+            data['window'] = Window.current()
 
             query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
             try:

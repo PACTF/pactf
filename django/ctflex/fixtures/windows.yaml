@@ -1,6 +1,25 @@
+# XXX(Yatharth): Create Solves fixtures
+
+- model: ctflex.window
+  pk: 10
+  fields:
+    name: BinExp
+    start: '2015-01-19T14:42:21+00:00'
+    end: '2015-01-30T14:42:24+00:00'
+    personal_timer_duration: '36:00:00'
+
 - model: ctflex.window
   pk: 1
   fields:
-    start: !!timestamp '2016-01-19 14:42:21+00:00'
-    end: !!timestamp '2016-01-21 14:42:24+00:00'
-    personal_timer_duration: '01:00:00'
+    name: BinExp
+    start: '2016-01-19T14:42:21+00:00'
+    end: '2016-01-30T14:42:24+00:00'
+    personal_timer_duration: '36:00:00'
+
+- model: ctflex.window
+  pk: 2
+  fields:
+    name: Crypto
+    start: '2016-01-30T14:43:21+00:00'
+    end: '2016-02-07T14:42:24+00:00'
+    personal_timer_duration: '36:00:00'

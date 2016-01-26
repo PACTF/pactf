@@ -4,7 +4,7 @@ from django.core import management
 from django.core.management.base import BaseCommand
 
 BASE_DIR = 'ctflex/fixtures'
-FIXTURES = ['users.yaml', 'teams.yaml', 'competitors.yaml']
+FIXTURES = ['users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml']
 
 
 class Command(BaseCommand):

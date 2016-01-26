@@ -1,10 +1,11 @@
 {% extends 'ctflex/base.html' %}
+{% load ctflex %}
 
 {% block content %}
     <p>
         Welcome to {% include 'ctflex/title.html' %}!
     </p>
     <p>
-        Go to the <a href="{% url 'ctflex:game' %}">Game</a>.
+        Go to the <a href="{% url 'ctflex:game' window_id='1' %}">Game</a>.
     </p>
 {% endblock %}

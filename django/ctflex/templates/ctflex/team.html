@@ -1,4 +1,5 @@
 {% extends 'ctflex/base.html' %}
+{% load ctflex %}
 
 {% block title %}
   Team — {{ block.super }}
@@ -9,6 +10,6 @@
         Name: {{ object.name }}
     </p>
     <p>
-        Score: {{ object.score }}
+        Score: {% with team=object %} {% teamscore %} {% endwith %}
     </p>
 {% endblock %}
