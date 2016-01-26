@@ -28,6 +28,7 @@ from ctflex.constants import APP_NAME
 
 class CtflexConfig(AppConfig):
     name = APP_NAME
+    verbose_name = 'CTFlex'
 
     # def ready(self):
     #     post_migrate.connect(add_group_permissions, sender=self)

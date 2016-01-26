@@ -1,10 +1,16 @@
 #!/usr/bin/env python
-import os
+
 import sys
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pactf_web.settings")
+import envdir
 
-    from django.core.management import execute_from_command_line
+from pactf.constants import ENVDIR_PATH
+
+
+if __name__ == "__main__":
+
+    envdir.open(ENVDIR_PATH)
+
+    from configurations.management import execute_from_command_line
 
     execute_from_command_line(sys.argv)

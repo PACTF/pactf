@@ -7,15 +7,25 @@
 - Use the [Fish shell](http://fishshell.com)
 - Activate a virtual environment with Python 3.5+
 - Install the requirements using `pip install -r requirements.txt`
-- Create pactf_web/local_settings.py and .env
+- Create a database using`initializedb.sql`
+- Configure environment variables in `pactf/envdir` (you can find out which ones are required by seeing what error messages you get)
 - Prep using `manage.py prep`
 - (Optional:) Load fixtures using `manage.py reloaddata`
-- Serve site from Gunicorn directly using `run_gunicorn.fish`
+- Serve site from Gunicorn directly using `manage.py runsever_gunicorn`
 - (Optional:) Serve site using nginx (specifically, reverse proxy via a sockfile)
-    - Toggle `PACTF_USE_SOCKETFILE` in `.env`
+    - Set `DJANGO_USE_SOCKETFILE` to `True` in `envdir`
     - Create an nginx configuration file
     - Update nginx as in the Updating section
 - (Optional:) Serve the site via Supervisor
+
+### Throwing away current database during development
+
+1. Delete all files from migrations
+1. Run `manage.py reset_db`
+1. Run `manage.py prep`
+1. Run `manage.py reloaddata`
+
+In dire circumstances, use `initializedb.sql`.
 
 
 ### Updating remote servers

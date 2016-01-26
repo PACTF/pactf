@@ -9,17 +9,15 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.postgres import fields as psql
-
 import markdown2
 
 from ctflex.constants import APP_NAME
 
 
-# TODO(Yatharth): Write decorator to set dispatch_uid automatically
+# TODO(Yatharth): Split this file up
 # TODO(Yatharth): Write helper so error of clean returns all validationerrors
 
 def unique_receiver(*args, **kwargs):
@@ -150,7 +148,7 @@ class CtfProblem(models.Model):
         return html
 
     def link_static(self, old_text):
-        PATTERN = re.compile(r'''{% \s* ctfstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
+        PATTERN = re.compile(r'''{% \s* ctflexstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
         REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, self.id)
         REPLACER = lambda match: static(REPLACEMENT.format(match.group('basename')))
 
@@ -303,7 +301,7 @@ class Timer(models.Model):
         self.sync_end()
 
 
-@receiver(post_save, sender=Window, dispatch_uid='ctflex.window_post_save_update_timers')
+@unique_receiver(post_save, sender=Window)
 def window_post_save_update_timers(sender, instance, **kwargs):
     """Make timers update their end timers per changes in their window"""
     for timer in instance.timer_set.all():
@@ -334,14 +332,14 @@ def window_post_save_update_timers(sender, instance, **kwargs):
 #         self.content_type = content_type
 #         super().save(*args, **kwargs)
 #
-# @receiver(post_save, sender=Competitor, dispatch_uid='ctflex.competitor_post_save_add_to_group')
+# @unique_receiver(post_save, sender=Competitor)
 # def competitor_post_save_add_to_group(sender, instance, created, **kwargs):
 #     if created:
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
 #         instance.user.groups.add(competitorGroup)
 #
 #
-# @receiver(post_delete, sender=Competitor, dispatch_uid='ctflex.competitor_post_delete_remove_from_group')
+# @unique_receiver(post_delete, sender=Competitor)
 # def competitor_post_delete_remove_from_group(sender, instance, created, **kwargs):
 #     if created:
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)

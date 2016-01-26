@@ -1,6 +1,5 @@
 # Local config
-/.env
-/django/pactf_web/local_settings.py
+/django/pactf/envdir
 /static/
 /logs/
 /pactf_nginx.conf
@@ -13,5 +12,5 @@
 __pycache__/
 /.venv
 
-# Other things
+# Cam's things
 /conv

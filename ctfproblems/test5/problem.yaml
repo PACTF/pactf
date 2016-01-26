@@ -1,6 +1,6 @@
 name: 'problem5'
 points: 40
 description: |
-  [Static files]({% ctfstatic 'static.txt' %}) should work
+  [Static files]({% ctflexstatic 'static.txt' %}) should work
 hint: |
   hint5

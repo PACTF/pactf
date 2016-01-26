@@ -111,7 +111,6 @@ def active_window_only():
 def index(request):
     return render(request, 'ctflex/index.html', get_default_dict(request))
 
-
 @single_http_method('GET')
 @competitors_only()
 @active_window_only()

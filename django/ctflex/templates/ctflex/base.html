@@ -1,5 +1,7 @@
 {% load static %}
 
+<!-- TODO(Yatharth): Outsource base.html, or allow overriding it -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +11,7 @@
 
   <title>
     {% block title %}
-      PACTF
+      {% include 'ctflex/title.html' %}
     {% endblock %}
   </title>
 
