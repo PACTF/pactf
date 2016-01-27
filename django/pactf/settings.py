@@ -8,7 +8,6 @@ from pactf.constants import BASE_DIR
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
 
 class Django(Configuration):
-
     INSTALLED_APPS = [
         # Django Defaults
         'django.contrib.admin',
@@ -80,10 +79,9 @@ class Django(Configuration):
     LOGOUT_URL = 'logout'
     LOGIN_REDIRECT_URL = 'ctflex:index'
 
-
     # Internationalization
     LANGUAGE_CODE = 'en-us'
-    TIME_ZONE = 'UTC'
+    TIME_ZONE = 'America/New_York'
     USE_I18N = True
     USE_L10N = True
     USE_TZ = True
@@ -91,7 +89,6 @@ class Django(Configuration):
     # Database
     # (Postgres is recommended.)
     DATABASES = values.DatabaseURLValue(environ_required=True)
-
 
     # Where to finally collect static files to
     # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
@@ -104,7 +101,6 @@ class Django(Configuration):
 
 
 class Gunicorn:
-
     # As whom Gunicorn should run the server
     USER = values.Value()
     GROUP = values.Value()
@@ -141,7 +137,7 @@ class CTFlex(Django):
     @classmethod
     def add_staticfiles_dir(cls):
         cls.STATICFILES_DIRS.append(
-            (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
+                (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
         )
 
     @classmethod
@@ -153,8 +149,8 @@ class CTFlex(Django):
 class Base(CTFlex, Gunicorn, Django):
     pass
 
-class Dev(Base):
 
+class Dev(Base):
     # Security
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG  # TODO(Yatharth): Eliminate warning about TEMPLATE_* deprecation
@@ -162,8 +158,10 @@ class Dev(Base):
 
 
 class Prod(Base):
-
     # Security
     DEBUG = False
     TEMPLATE_DEBUG = DEBUG
-    ALLOWED_HOSTS = []
+    SESSION_COOKIE_SECURE = True  # Only if HTTPS
+    CSRF_COOKIE_SECURE = True  # Only if HTTPS
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') # Only if nginx is properly configured
+    ALLOWED_HOSTS = ['.pactf.com', '.pactf.cf']
