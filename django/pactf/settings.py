@@ -21,6 +21,7 @@ class Django(Configuration):
         'django.contrib.postgres',
 
         # Django 3rd-party
+        'django_countries',
         'django_extensions',
         'debug_toolbar',
 

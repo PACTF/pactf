@@ -40,7 +40,7 @@ In dire circumstances, use `initializedb.sql`.
         collectstatic
     
 1. Restart Gunicorn via Supervisor or yourself (using `supervisorctl restart <projectname>`)
-1. (If needed:) Validate and update ngxinx configuration using: `sudo nginx -t; and sudo service nginx restart`
+1. (If needed:) Validate and update nginx configuration using: `sudo nginx -t; and sudo service nginx restart`
 
 
 ## Problem Writer Documentation

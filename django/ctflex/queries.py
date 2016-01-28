@@ -18,6 +18,7 @@ def create_object(model, **kwargs):
 def query_get(model, **kwargs):
     return model.objects.get(**kwargs)
 
+
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
     try:
@@ -37,6 +38,7 @@ def create_competitor(handle, pswd, email, team):
 def get_window(window_id):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.current()
 
+
 def window_active(team):
     return team.window_active()
 
@@ -47,7 +49,8 @@ def viewable_problems(team, window):
 
 
 def problem_unlocked(team, problem):
-    if not problem.deps: return True
+    if not problem.deps:
+        return True
     total = 0
     solved_probs = models.Submission.objects.filter(team=team, correct=True)
     total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
@@ -60,10 +63,10 @@ def format_problem(team, problem):
     if 'dynamic' in data and not problem.dynamic:
         return problem
 
-    class dummy:
+    class Dummy:
         pass
 
-    result = dummy()
+    result = Dummy()
     data['description_html'] = problem.generate_desc(team)
     result.__dict__ = data
     return result

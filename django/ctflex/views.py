@@ -15,7 +15,6 @@ from ctflex import models
 from ctflex import queries
 from ctflex.models import Window
 
-
 # region Helper Methods
 from ctflex.queries import get_window
 
@@ -38,10 +37,13 @@ def get_window_dict(request, window):
     params['is_active_window'] = window.start
     return params
 
+
 def warn_historic(request, window):
     """Flash info if in a historic state"""
     if window.ended():
-        messages.info(request, "This window has ended. You may solve problems still, but the scoreboard has been frozen.")
+        messages.info(request,
+                      "This window has ended. You may still solve problems, but the scoreboard has been frozen.")
+
 
 # endregion
 
@@ -99,6 +101,7 @@ def single_http_method(method):
 def competitors_only():
     return user_passes_test(is_competitor)
 
+
 def windowed():
     def decorator(view):
         @wraps(view)
@@ -110,7 +113,7 @@ def windowed():
             print(window.start, timezone.now(), window.start <= timezone.now(), window.started())
             if not window.started():
                 if view_name == 'ctflex:inactive':
-                     return original_view()
+                    return original_view()
                 else:
                     return redirect('ctflex:inactive', window_id=window.id)
             # Window has started
@@ -137,7 +140,9 @@ def windowed():
             return original_view()
 
         return decorated
+
     return decorator
+
 
 # endregion
 
@@ -149,15 +154,18 @@ def windowed():
 def index(request):
     return render(request, 'ctflex/index.html', get_default_dict(request))
 
+
 @single_http_method('GET')
 @windowed()
 def inactive(request, *, window_id):
     return render(request, 'ctflex/waiting.html', get_window_dict(request, get_window(window_id)))
 
+
 @single_http_method('GET')
 @windowed()
 def waiting(request, *, window_id):
     return render(request, 'ctflex/inactive.html', get_window_dict(request, get_window(window_id)))
+
 
 @single_http_method('GET')
 @windowed()
@@ -184,6 +192,7 @@ def board(request, *, window_id):
     params['teams'] = enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))
     warn_historic(request, window)
     return render(request, 'ctflex/board.html', params)
+
 
 @single_http_method('GET')
 class Team(DetailView):
@@ -240,7 +249,6 @@ def start_timer(request, *, window_id):
 @windowed()
 # XXX(Cam): Move all of this elsewhere
 def submit_flag(request, *, window_id, prob_id):
-
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
@@ -285,10 +293,11 @@ def submit_flag(request, *, window_id, prob_id):
             messenger = messages.error
 
     # Create submission
-    queries.create_object(models.Submission, p_id=problem.id, problem=problem, team=team, competitor=competitor, flag=flag, correct=correct)
+    queries.create_object(models.Submission, p_id=problem.id, problem=problem, team=team, competitor=competitor,
+                          flag=flag, correct=correct)
 
     # Flash message and redirect
     messenger(request, message)
     return redirect('ctflex:game', window_id=window.id)
 
-# endregion
+    # endregion
