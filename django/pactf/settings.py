@@ -99,6 +99,38 @@ class Django(Configuration):
 
     SECRET_KEY = values.SecretValue()
 
+    # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
+    PASSWORD_HASHERS = ['ctflex.hashers.PBKDF2PasswordHasher4',
+                        'django.contrib.auth.hashers.PBKDF2PasswordHasher']
+
+    # Minimum password strength validation
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            'OPTIONS': {
+                'min_length': 12,
+            }
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+    ]
+
+    # Number of days that a password reset link is valid for
+    PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+    # Request modern browsers to block suspected XSS attacks. Not to be relied upon.
+    SECURE_BROWSER_XSS_FILTER = True
+
+    # Prevent browsers from guessing content types (reducing security risk).
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
 
 class Gunicorn:
     # As whom Gunicorn should run the server
