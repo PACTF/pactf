@@ -13,11 +13,9 @@ from django.conf import settings
 
 from ctflex import models
 from ctflex import queries
-from ctflex.models import Window
+
 
 # region Helper Methods
-from ctflex.queries import get_window
-
 
 def is_competitor(user):
     return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
@@ -106,7 +104,7 @@ def windowed():
     def decorator(view):
         @wraps(view)
         def decorated(request, *args, window_id, **kwargs):
-            window = get_window(window_id)
+            window = queries.get_window(window_id)
             view_name = resolve(request.path_info).view_name
             original_view = lambda: view(request, *args, window_id=window_id, **kwargs)
 
@@ -158,26 +156,26 @@ def index(request):
 @single_http_method('GET')
 @windowed()
 def inactive(request, *, window_id):
-    return render(request, 'ctflex/waiting.html', get_window_dict(request, get_window(window_id)))
+    return render(request, 'ctflex/waiting.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def waiting(request, *, window_id):
-    return render(request, 'ctflex/inactive.html', get_window_dict(request, get_window(window_id)))
+    return render(request, 'ctflex/inactive.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def done(request, *, window_id):
-    return render(request, 'ctflex/done.html', get_window_dict(request, get_window(window_id)))
+    return render(request, 'ctflex/done.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @competitors_only()
 @windowed()
 def game(request, *, window_id):
-    window = get_window(window_id)
+    window = queries.get_window(window_id)
     params = get_window_dict(request, window)
     params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
     warn_historic(request, window)
@@ -187,7 +185,7 @@ def game(request, *, window_id):
 @single_http_method('GET')
 @windowed()
 def board(request, *, window_id):
-    window = get_window(window_id)
+    window = queries.get_window(window_id)
     params = get_window_dict(request, window)
     params['teams'] = enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))
     warn_historic(request, window)
@@ -201,7 +199,7 @@ class Team(DetailView):
 
     def get_context_data(self, *, window_id, **kwargs):
         # TODO: use windowed decorator somehow?
-        window = get_window(window_id)
+        window = queries.get_window(window_id)
         context = super(Team, self).get_context_data(**kwargs)
         context.update(get_window_dict(self.request, window))
         return context
@@ -229,7 +227,7 @@ class CurrentTeam(Team):
 @competitors_only()
 @windowed()
 def start_timer(request, *, window_id):
-    window = get_window(window_id)
+    window = queries.get_window(window_id)
     team = request.user.competitor.team
 
     if team.has_timer(window):
@@ -253,7 +251,7 @@ def submit_flag(request, *, window_id, prob_id):
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
     team = competitor.team
-    window = get_window(window_id)
+    window = queries.get_window(window_id)
 
     if not team.has_active_timer():
         if team.has_timer():
@@ -300,4 +298,4 @@ def submit_flag(request, *, window_id, prob_id):
     messenger(request, message)
     return redirect('ctflex:game', window_id=window.id)
 
-    # endregion
+# endregion

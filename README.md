@@ -22,7 +22,8 @@
 
 1. Delete all files from migrations
 1. Run `manage.py reset_db`
-1. Run `manage.py prep` (this will fail while importing problems because there is no window; this is okay)
+1. Run `manage.py makemigrations`
+1. Run `manage.py migrate`
 1. Run `manage.py reloaddata`
 1. Run `manage.py prep`
 

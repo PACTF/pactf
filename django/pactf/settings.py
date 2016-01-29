@@ -7,7 +7,7 @@ from pactf.constants import BASE_DIR
 
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
 
-class Django(Configuration):
+class Django:
     INSTALLED_APPS = [
         # Django Defaults
         'django.contrib.admin',
@@ -98,6 +98,9 @@ class Django(Configuration):
     # Where all to collect static files from
     STATICFILES_DIRS = values.ListValue([])
 
+
+class Security:
+
     SECRET_KEY = values.SecretValue()
 
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
@@ -170,7 +173,7 @@ class CTFlex(Django):
     @classmethod
     def add_staticfiles_dir(cls):
         cls.STATICFILES_DIRS.append(
-                (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
+            (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
         )
 
     @classmethod
@@ -179,7 +182,7 @@ class CTFlex(Django):
         cls.add_staticfiles_dir()
 
 
-class Base(CTFlex, Gunicorn, Django):
+class Base(CTFlex, Gunicorn, Django, Security, Configuration):
     pass
 
 
@@ -194,7 +197,12 @@ class Prod(Base):
     # Security
     DEBUG = False
     TEMPLATE_DEBUG = DEBUG
-    SESSION_COOKIE_SECURE = True  # Only if HTTPS
-    CSRF_COOKIE_SECURE = True  # Only if HTTPS
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') # Only if nginx is properly configured
     ALLOWED_HOSTS = ['.pactf.com', '.pactf.cf']
+
+    https = True  # For settings that should only be true when using HTTPS
+    SESSION_COOKIE_SECURE = https
+    CSRF_COOKIE_SECURE = https
+
+    # Only if nginx is properly configured
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+

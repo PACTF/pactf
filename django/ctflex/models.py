@@ -60,22 +60,14 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 # def gen_key(chars=string.ascii_uppercase + string.digits):
 #     return ''.join(random.choice(chars) for _ in range(20))
 
-class State(models.Model):
-    """
-    The state of the framework
-    """
-    default_category = models.CharField()
-    in_lockdown = models.BooleanField(default=False)
-
-
+# TODO(Tony): Replace default model manager with one that filters by banned
 class Team(models.Model):
     """Represent essence of a team"""
 
     # Essential data
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40, unique=True)
-    password = models.CharField(max_length=80)
-    banned = models.BooleanField(default=False)
+    # password = models.CharField(max_length=80)
 
     # key = models.CharField(max_length=30, default=gen_key)
 
@@ -115,20 +107,13 @@ class Team(models.Model):
         return self.has_timer(window) and self.timer(window).active()
 
     def can_view_problems(self, window=None):
-        return self.has_timer(window=window) and self.timer(
-                window=window).start <= timezone.now() and not self.banned
+        return self.has_timer(window=window) and self.timer(window=window).start <= timezone.now()
 
     def start_timer(self, window):
         assert not self.has_timer()
 
         timer = Timer(window=window, team=self)
         timer.save()
-
-    def ban(self):
-        self.banned = True
-
-    def undo_ban(self):
-        self.banned = False
 
 
 class Competitor(models.Model):
@@ -223,7 +208,7 @@ class Timer(models.Model):
 
     def __str__(self):
         return "<Timer #{} window=#{} team=#{} {} – {}>".format(
-                self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
+            self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
     def active(self):
         return self.start <= timezone.now() <= self.end
@@ -261,13 +246,13 @@ class CtfProblem(models.Model):
     hint_html = models.TextField(editable=False, blank=True, null=True)
 
     grader = models.FilePathField(
-            help_text="Basename of the grading script from PROBLEM_DIR",
-            path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
+        help_text="Basename of the grading script from PROBLEM_DIR",
+        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
     dynamic = models.FilePathField(
-            help_text="Basename of the generator script in PROBLEM_DIR",
-            path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
-            blank=True, null=True
+        help_text="Basename of the generator script in PROBLEM_DIR",
+        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
+        blank=True, null=True
     )
     # dict function instead of {} because of mutability
     deps = psql.JSONField(default=dict, blank=True)
