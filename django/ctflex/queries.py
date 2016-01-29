@@ -44,32 +44,26 @@ def window_active(team):
 
 
 def viewable_problems(team, window):
-    result = filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window))
-    return map(partial(format_problem, team), result)
-
+    return filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window))
 
 def problem_unlocked(team, problem):
     if not problem.deps:
         return True
-    total = 0
+
     solved_probs = models.Submission.objects.filter(team=team, correct=True)
-    total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
+    if 'probs' in problem.deps:
+        # XXX(Yatharth): Figure out and rewrite using list comphrensions
+        # XXX(Yatharth): Use score
+        # total = (solve. for solve in solved_probs if str(solve.p_id) )
+        total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
+    else:
+        # XXX(Yatharth): Write this
+        total = 0
     return total >= problem.deps['total']
 
 
-def format_problem(team, problem):
-    data = problem.__dict__
-    # XXX(Yatharth): Is the first condition necessary?
-    if 'dynamic' in data and not problem.dynamic:
-        return problem
-
-    class Dummy:
-        pass
-
-    result = Dummy()
-    data['description_html'] = problem.generate_desc(team)
-    result.__dict__ = data
-    return result
+def solved(problem, team):
+    return query_filter(models.Submission, problem=problem, team=team, correct=True).exists()
 
 
 def update_score(*, competitor, problem, flag):

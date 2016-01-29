@@ -269,7 +269,7 @@ def submit_flag(request, *, window_id, prob_id):
         return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
 
     # Check if problem has already been solved
-    if queries.query_filter(models.Submission, problem=problem, team=team, correct=True):
+    if queries.solved(problem, team):
         messenger = messages.error
         message = "Your team has already solved this problem!"
         correct = None

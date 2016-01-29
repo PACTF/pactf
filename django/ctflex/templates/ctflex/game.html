@@ -12,7 +12,9 @@
 
 {% block content %}
   <div id="problems">
-    {% for prob in prob_list %}
+    {% for raw_prob in prob_list %}
+      {% format_problem raw_prob team as prob %}
+
       <form action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
         <div class="problem-header">
           <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
@@ -22,10 +24,15 @@
           {{ prob.description_html|safe }}
         </div>
 
-        <label for="flag-{{ prob.id }}">Flag: </label>
-        <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-        {# Disable submit button and change text to indicate having solved the problem #}
-        <input type="submit" value="Submit!" />
+        {% solved raw_prob team as has_solved %}
+        {% if has_solved %}
+          <p> You have already solved this problem.</p>
+        {% else %}
+          <label for="flag-{{ prob.id }}">Flag: </label>
+          <input id="flag-{{ prob.id }}" type="text" name="flag"/>
+          <input type="submit" value="Submit!" />
+        {% endif %}
+
         {% csrf_token %}
       </form>
       <br/>

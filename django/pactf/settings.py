@@ -158,7 +158,7 @@ class Gunicorn:
     NUM_WORKERS = values.IntegerValue(3)
 
 
-class CTFlex(Django):
+class CTFlex(Django, Configuration):
     # Where to import problems from
     PROBLEMS_DIR = join(BASE_DIR, 'ctfproblems')
 
@@ -182,7 +182,8 @@ class CTFlex(Django):
         cls.add_staticfiles_dir()
 
 
-class Base(CTFlex, Gunicorn, Django, Security, Configuration):
+# TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
+class Base(Security, CTFlex, Gunicorn, Django, Configuration):
     pass
 
 
@@ -205,4 +206,3 @@ class Prod(Base):
 
     # Only if nginx is properly configured
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
