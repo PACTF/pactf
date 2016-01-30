@@ -13,25 +13,11 @@ def query_filter(model, **kwargs):
 def create_object(model, **kwargs):
     result = model(**kwargs)
     result.save()
+    return result
 
 
 def query_get(model, **kwargs):
     return model.objects.get(**kwargs)
-
-
-# TODO(Cam): Consider catching 'this' here
-def create_competitor(handle, pswd, email, team):
-    try:
-        u = models.User.objects.create_user(handle, None, pswd)
-        c = models.Competitor(user=u, team=team, email=email)
-        c.full_clean()
-    except ValidationError:
-        u.delete()
-        raise
-    else:
-        c.save()
-        return c
-
 
 # CTFlex-specific queries
 
@@ -70,3 +56,27 @@ def update_score(*, competitor, problem, flag):
     # XXX(Yatharth): Use F() to avoid races?
     solve = models.Solve(competitor=competitor, problem=problem, flag=flag)
     solve.save()
+
+
+# TODO(Cam): Consider catching 'this' here
+def create_competitor(handle, pswd, email, team):
+    try:
+        u = models.User.objects.create_user(handle, None, pswd)
+        c = models.Competitor(user=u, team=team, email=email)
+        c.full_clean()
+    except ValidationError:
+        u.delete()
+        raise
+    else:
+        c.save()
+        return c
+
+def validate_team(name, key):
+    team = models.Team.objects.filter(name=name)
+    if team.exists():
+        if key == team[0].key:
+            return team, 'Success!'
+        return None, 'Team passphrase incorrect!'
+    team = Team(name=name, key=key)
+    team.save()
+    return team, 'Success!'

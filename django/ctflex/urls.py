@@ -17,9 +17,9 @@ windowed_urls = [
     url(r'^game$', views.game, name='game'),
     url(r'^board$', views.board, name='scoreboard'),
 
-    url(r'^waiting', views.waiting, name='waiting'),
-    url(r'^inactive', views.inactive, name='inactive'),
-    url(r'^done', views.done, name='done'),
+    url(r'^waiting$', views.waiting, name='waiting'),
+    url(r'^inactive$', views.inactive, name='inactive'),
+    url(r'^done$', views.done, name='done'),
 
     url(r'^submit_flag/(?P<prob_id>{})$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
     url(r'^start_timer$', views.start_timer, name='start_timer'),
@@ -27,7 +27,9 @@ windowed_urls = [
 
 
 urlpatterns = [
-    url('^$', views.index, name='index'),
     url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
-    url(r'^', include(windowed_urls), {'window_id': None})
+    url(r'^register_user$', views.register_user, name='register_user'),
+    url(r'^register$', views.register, name='register'),
+    url(r'^', include(windowed_urls), {'window_id': None}),
+    url('^$', views.index, name='index'),
 ]

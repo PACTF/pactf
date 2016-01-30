@@ -57,22 +57,17 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 
 # region User Models (by wrapping)
 
-# def gen_key(chars=string.ascii_uppercase + string.digits):
-#     return ''.join(random.choice(chars) for _ in range(20))
-
 # TODO(Tony): Replace default model manager with one that filters by banned
 class Team(models.Model):
     """Represent essence of a team"""
 
     # Essential data
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=40, unique=True)
-    # password = models.CharField(max_length=80)
-
-    # key = models.CharField(max_length=30, default=gen_key)
+    name = models.CharField(max_length=80, unique=True)
+    key = models.CharField(max_length=30, default='ASDF')
 
     # Extra data
-    country = CountryField()
+    country = CountryField(blank=True, default='US')
     state = models.CharField(max_length=40, blank=True)
     school = models.CharField(max_length=60, blank=True, default='None')
     adviser_name = models.CharField(max_length=40, blank=True)

@@ -1,8 +1,11 @@
 import inspect
 from functools import wraps
 
+from django import forms
+from django.contrib.auth import login
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import resolve
+from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -147,6 +150,13 @@ def windowed():
 
 # region GETs
 
+@single_http_method('GET')
+def register(request, form=None):
+    if form is None: form = RegistrationForm()
+    d = get_default_dict(request)
+    d['form'] = form
+    return render(request, 'registration/register.html', d)
+
 
 @single_http_method('GET')
 def index(request):
@@ -217,10 +227,27 @@ class CurrentTeam(Team):
 
 # region POSTs
 
-# TODO(Cam): Write
-# @single_http_method('POST')
-# def register_competitor(handle, pswd, team=None):
-#    pass
+@single_http_method('POST')
+def register_user(request):
+    form = RegistrationForm(request.POST)
+    if not form.is_valid():
+        print(form.errors)
+        return register(request, form)
+    # handle, pswd, email, team, team_pass = form.cleaned_data
+    team, msg = queries.validate_team(form.cleaned_data['team'], form.cleaned_data['team_pass'])
+    if team is None:
+        form.add_error('team', msg)
+        return register(request, form)
+    handle = form.cleaned_data['handle']
+    pswd = form.cleaned_data['pswd']
+    email = form.cleaned_data['email']
+    try:
+        c = queries.create_competitor(handle, pswd, email, team)
+        login(request, c.user)
+        return redirect('ctflex:index')
+    except ValidationError:
+        form.add_error('handle', "Can't create user")
+        return register(request, form)
 
 
 @single_http_method('POST')
@@ -297,5 +324,16 @@ def submit_flag(request, *, window_id, prob_id):
     # Flash message and redirect
     messenger(request, message)
     return redirect('ctflex:game', window_id=window.id)
+
+# endregion
+
+# region forms
+
+class RegistrationForm(forms.Form):
+    handle = forms.CharField(label='Username:', max_length=100)
+    pswd = forms.CharField(label='Password:', widget=forms.PasswordInput())
+    email = forms.EmailField(label='Email:')
+    team = forms.CharField(label='Team:', max_length=80)
+    team_pass = forms.CharField(label='Team passphrase:', max_length=30)
 
 # endregion
