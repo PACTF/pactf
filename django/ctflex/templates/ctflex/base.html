@@ -81,7 +81,7 @@
               <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
           </ul>
           <ul class="pull-right">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and competitor %}
               <li><span >Score: {% teamscore %}</span></li>
               <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
               <li><a href="{% url 'logout' %}">Logout</a></li>
