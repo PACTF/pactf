@@ -1,9 +1,9 @@
-from os.path import join
+from os.path import join, dirname, abspath
 
 from django.core import management
 from django.core.management.base import BaseCommand
 
-BASE_DIR = 'ctflex/fixtures'
+BASE_DIR =  join(dirname(dirname(dirname(abspath(__file__)))), 'fixtures')
 FIXTURES = ['users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml']
 
 
