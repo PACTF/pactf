@@ -20,5 +20,3 @@ class Command(BaseCommand):
         management.call_command('flush', *interactive_args)
         for fixture in FIXTURES:
             management.call_command('loaddata', join(BASE_DIR, fixture))
-        management.call_command('loadprobs', *interactive_args)
-        management.call_command('collectstatic', *interactive_args)
