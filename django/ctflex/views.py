@@ -158,15 +158,14 @@ def windowed():
 
 # endregion
 
-
-# region GETs
-
-@single_http_method('GET')
 def register(request, form=None):
     if form is None: form = RegistrationForm()
     d = get_default_dict(request)
     d['form'] = form
     return render(request, 'registration/register.html', d)
+
+# region GETs
+
 
 
 @single_http_method('GET')
@@ -261,7 +260,7 @@ def register_user(request):
     email = form.cleaned_data['email']
     try:
         c = queries.create_competitor(handle, pswd, email, team)
-        u = authenticate(handle, pswd)
+        u = authenticate(username=handle, password=pswd)
         login(request, u)
         return redirect('ctflex:index')
     except ValidationError:

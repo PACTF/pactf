@@ -47,8 +47,8 @@ def solved(problem, team):
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
+    u = models.User.objects.create_user(handle, None, pswd)
     try:
-        u = models.User.objects.create_user(handle, None, pswd)
         c = models.Competitor(user=u, team=team, email=email)
         c.full_clean()
     except ValidationError:
