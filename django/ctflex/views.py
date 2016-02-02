@@ -2,7 +2,7 @@ import inspect
 from functools import wraps
 
 from django import forms
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import resolve
 from django.core.exceptions import ValidationError
@@ -261,7 +261,8 @@ def register_user(request):
     email = form.cleaned_data['email']
     try:
         c = queries.create_competitor(handle, pswd, email, team)
-        login(request, c.user)
+        u = authenticate(handle, pswd)
+        login(request, u)
         return redirect('ctflex:index')
     except ValidationError:
         form.add_error('handle', "Can't create user")
