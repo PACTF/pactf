@@ -290,54 +290,28 @@ def start_timer(request, *, window_id):
 @single_http_method('POST')
 @competitors_only()
 @windowed()
-# XXX(Cam): Move all of this elsewhere
 def submit_flag(request, *, window_id, prob_id):
+
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
-    team = competitor.team
     window = queries.get_window(window_id)
 
-    if not team.has_active_timer():
-        if team.has_timer():
-            message = "Your timer for this window has already expired."
-        else:
-            message = "Start your timer before submitting flags."
-        messages.error(request, message)
-
-        return redirect('ctflex:index')
-
-    # Check if problem exists
+    # Grade
     try:
-        problem = queries.query_get(models.CtfProblem, id=prob_id)
+        correct, message = queries.submit_flag(prob_id, competitor, flag)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
-
-    # Check if problem has already been solved
-    if queries.solved(problem, team):
+    except queries.ProblemAlreadySolvedException:
         messenger = messages.error
         message = "Your team has already solved this problem!"
         correct = None
-
-    # Check if that flag had already been tried
-    elif queries.query_filter(models.Submission, problem_id=prob_id, team=team, flag=flag):
+    except queries.FlagAlreadyTriedException:
         messenger = messages.error
         message = "You or someone on your team has already tried this flag!"
         correct = None
-
-    # Grade
     else:
-        correct, message = problem.grade(flag, team)
-
-        if correct:
-            messenger = messages.success
-            queries.update_score(competitor=competitor, problem=problem, flag=flag)
-        else:
-            messenger = messages.error
-
-    # Create submission
-    queries.create_object(models.Submission, p_id=problem.id, problem=problem, team=team, competitor=competitor,
-                          flag=flag, correct=correct)
+        messenger = messages.success if correct else messages.error
 
     # Flash message and redirect
     messenger(request, message)

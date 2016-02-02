@@ -258,7 +258,7 @@ class CtfProblem(models.Model):
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
-    def grade(self, flag, team):
+    def grade(self, *, flag, team):
         if not flag:
             return False, "Empty flag"
 
@@ -328,9 +328,9 @@ class Submission(models.Model):
     id = models.AutoField(primary_key=True)
 
     p_id = models.UUIDField()
-    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True)
+    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True, blank=True)
     competitor = models.ForeignKey(Competitor, on_delete=models.SET_NULL, null=True)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
 
     time = models.DateTimeField(auto_now_add=True)
     flag = models.CharField(max_length=80)
