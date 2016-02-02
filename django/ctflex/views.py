@@ -225,9 +225,9 @@ class Team(DetailView):
     model = models.Team
     template_name = 'ctflex/team.html'
 
-    def get_context_data(self, *, window_id, **kwargs):
+    def get_context_data(self, **kwargs):
         # TODO: use windowed decorator somehow?
-        window = queries.get_window(window_id)
+        window = queries.get_window(self.kwargs['window_id'])
         context = super(Team, self).get_context_data(**kwargs)
         context.update(get_window_dict(self.request, window))
         return context
