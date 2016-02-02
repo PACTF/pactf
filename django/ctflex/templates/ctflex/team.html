@@ -6,10 +6,19 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-        Name: {{ object.name }}
-    </p>
-    <p>
-        Score: {% with team=object %} {% teamscore %} {% endwith %}
-    </p>
+  <p>
+    You are {{ user.username }} and part of team {{ object.name }}. You have
+    {% with team=object %} {% teamscore %} {% endwith %} points!
+  </p>
+  <p>
+    The members of your team are:
+  </p>
+  <ul>
+    {% for teammate in object.competitor_set.all %}
+      <li>{{ teammate.user.username }}</li>
+    {% endfor %}
+  </ul>
+  <p>
+    For new members to join, give them the passphrase {{ team.key }}.
+  </p>
 {% endblock %}
