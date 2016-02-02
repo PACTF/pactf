@@ -62,7 +62,7 @@ def validate_team(name, key):
     team = models.Team.objects.filter(name=name)
     if team.exists():
         if key == team[0].key:
-            return team, 'Success!'
+            return team[0], 'Success!'
         return None, 'Team passphrase incorrect!'
     team = models.Team(name=name, key=key)
     team.save()
