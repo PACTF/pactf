@@ -27,9 +27,12 @@ windowed_urls = [
 
 
 urlpatterns = [
-    url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
+
     url(r'^register_user$', views.register_user, name='register_user'),
     url(r'^register$', views.register, name='register'),
-    url(r'^', include(windowed_urls), {'window_id': None}),
+    url(r'^board$', views.board_overall, name='scoreboard_overall'),
     url('^$', views.index, name='index'),
+
+    url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
+    url(r'^', include(windowed_urls), {'window_id': None}),
 ]

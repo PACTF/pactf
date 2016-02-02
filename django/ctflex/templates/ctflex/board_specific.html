@@ -1,0 +1,6 @@
+{% extends 'ctflex/board.html' %}
+
+{% block board_message %}
+  This is the scoreboard for this particular Contest Window. For overall all-window rankings,
+  checkout out the <a href="{% url 'ctflex:scoreboard_overall' %}">all-time scoreboard</a>.
+{% endblock %}

@@ -30,33 +30,20 @@ def window_active(team):
 
 
 def viewable_problems(team, window):
-    return filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window))
+    return sorted(filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
+                  key=lambda problem: (problem.points, problem.name))
 
 def problem_unlocked(team, problem):
     if not problem.deps:
         return True
-
-    solved_probs = models.Submission.objects.filter(team=team, correct=True)
-    if 'probs' in problem.deps:
-        # XXX(Yatharth): Figure out and rewrite using list comphrensions
-        # XXX(Yatharth): Use score
-        # total = (solve. for solve in solved_probs if str(solve.p_id) )
-        total = sum(map(lambda s: str(s.p_id) in problem.deps['probs'], list(solved_probs)))
-    else:
-        # XXX(Yatharth): Write this
-        total = 0
-    return total >= problem.deps['total']
+    assert 'total' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
+    solves = models.Solve.objects.filter(competitor__team=team)
+    filtered_score = sum(solve.problem.points for solve in solves if solve.problem.id in problem.deps['probs'])
+    return filtered_score >= problem.deps['total']
 
 
 def solved(problem, team):
-    return query_filter(models.Submission, problem=problem, team=team, correct=True).exists()
-
-
-def update_score(*, competitor, problem, flag):
-    # XXX(Yatharth): Use F() to avoid races?
-    solve = models.Solve(competitor=competitor, problem=problem, flag=flag)
-    solve.save()
-
+    return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
@@ -71,12 +58,45 @@ def create_competitor(handle, pswd, email, team):
         c.save()
         return c
 
-def validate_team(name, key):
-    team = models.Team.objects.filter(name=name)
-    if team.exists():
-        if key == team[0].key:
-            return team, 'Success!'
-        return None, 'Team passphrase incorrect!'
-    team = Team(name=name, key=key)
-    team.save()
-    return team, 'Success!'
+# def validate_team(name, key):
+#     team = models.Team.objects.filter(name=name)
+#     if team.exists():
+#         if key == team[0].key:
+#             return team, 'Success!'
+#         return None, 'Team passphrase incorrect!'
+#     team = models.Team(name=name, key=key)
+#     team.save()
+#     return team, 'Success!'
+
+def board(window):
+    return enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))
+
+
+class ProblemAlreadySolvedException(Exception):
+    pass
+
+class FlagAlreadyTriedException(Exception):
+    pass
+
+
+# TODO: Test all these cases
+def submit_flag(prob_id, competitor, flag):
+    problem = models.CtfProblem.objects.get(pk=prob_id)
+
+    if models.Solve.objects.filter(problem=problem, competitor=competitor).exists():
+        raise ProblemAlreadySolvedException()
+    elif models.Submission.objects.filter(problem_id=prob_id, team=competitor.team, flag=flag).exists():
+        raise FlagAlreadyTriedException()
+
+    # Grade
+    correct, message = problem.grade(flag=flag, team=competitor.team)
+
+    if correct:
+        # This effectively updates the score too
+        models.Solve(problem=problem, competitor=competitor, flag=flag).save()
+
+    # For logging purposes, mainly
+    models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
+
+    return correct, message
+

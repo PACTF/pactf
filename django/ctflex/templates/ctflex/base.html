@@ -58,7 +58,7 @@
 
 <header>
 
-{# TODO(Yatharth): Put this in the context to enable easy testing #}
+{# TODO(Yatharth): Put this in the context to enable easy testing, but then the login page messes up, so create CTFlex's own view for that too #}
 {% if not window %}
   {% current_window as window %}
 {% endif %}
@@ -81,7 +81,7 @@
               <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
           </ul>
           <ul class="pull-right">
-            {% if user.is_authenticated and competitor %}
+            {% if user.is_authenticated and team %}
               <li><span >Score: {% teamscore %}</span></li>
               <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
               <li><a href="{% url 'logout' %}">Logout</a></li>
