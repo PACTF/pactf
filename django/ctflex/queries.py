@@ -30,7 +30,8 @@ def window_active(team):
 
 
 def viewable_problems(team, window):
-    return filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window))
+    return sorted(filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
+                  key=lambda problem: (problem.points, problem.name))
 
 def problem_unlocked(team, problem):
     if not problem.deps:
@@ -71,12 +72,15 @@ def create_competitor(handle, pswd, email, team):
         c.save()
         return c
 
-def validate_team(name, key):
-    team = models.Team.objects.filter(name=name)
-    if team.exists():
-        if key == team[0].key:
-            return team, 'Success!'
-        return None, 'Team passphrase incorrect!'
-    team = Team(name=name, key=key)
-    team.save()
-    return team, 'Success!'
+# def validate_team(name, key):
+#     team = models.Team.objects.filter(name=name)
+#     if team.exists():
+#         if key == team[0].key:
+#             return team, 'Success!'
+#         return None, 'Team passphrase incorrect!'
+#     team = models.Team(name=name, key=key)
+#     team.save()
+#     return team, 'Success!'
+
+def board(window):
+    return enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))

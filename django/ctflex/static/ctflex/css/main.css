@@ -39,7 +39,7 @@ body {
 }
 
 .messages .info {
-    background-color: blue;
+    background-color: aqua;
 }
 
 .messages .info:before {

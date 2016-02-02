@@ -80,7 +80,10 @@ class Team(models.Model):
     def score(self, window):
         score = 0
         for competitor in self.competitor_set.all():
-            for solve in competitor.solve_set.filter(problem__window=window):
+            solves = competitor.solve_set.filter()
+            if window is not None:
+                solves = solves.filter(problem__window=window)
+            for solve in solves:
                 score += solve.problem.points
         return score
 

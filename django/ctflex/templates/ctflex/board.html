@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block content %}
+  {% block board_message %}
+  {% endblock %}
   <div>
     I GUESS WE CAN PUT A GRAPH HERE
   </div>
@@ -22,7 +24,7 @@
     <tbody>
       {% for i, team in teams %}
         <tr>
-          <td>{{ i|add:"1" }}.</td>
+          <td>{{ i|add:'1' }}.</td>
           <td>{{ team.name }}</td>
           <td> SOME SCHOOL </td>
           <td> {% teamscore %} </td>

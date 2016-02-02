@@ -12,6 +12,7 @@ register = template.Library()
 def str_(element):
     return str(element)
 
+# TODO(Yatharth): Don't take team from context
 @register.simple_tag(takes_context=True)
 def teamscore(context):
     return context['team'].score(context['window'])
@@ -22,10 +23,16 @@ def current_window():
 
 @register.simple_tag()
 def switch_window(window, resolver_match):
-    kwargs = resolver_match.kwargs
-    if 'window_id' in kwargs:
+    if resolver_match.view_name == 'ctflex:index':
+        kwargs = {}
         kwargs['window_id'] = window.id
-    return reverse(resolver_match.view_name, args=resolver_match.args, kwargs=kwargs)
+        # TODO(Yatharth): Extract 'ctflex:game' from here and @windows to like DEFAULT_REDIRECTING_PLACE
+        return reverse('ctflex:game', kwargs=kwargs)
+    else:
+        kwargs = resolver_match.kwargs
+        if 'window_id' in kwargs:
+            kwargs['window_id'] = window.id
+        return reverse(resolver_match.view_name, args=resolver_match.args, kwargs=kwargs)
 
 @register.simple_tag(takes_context=True)
 def other_windows(context):
@@ -46,7 +53,7 @@ def format_problem(problem, team):
     data['description_html'] = problem.generate_desc(team)
     result.__dict__ = data
     return result
-#
+
 @register.simple_tag()
 def solved(problem, team):
     return queries.solved(problem, team)
