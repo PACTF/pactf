@@ -333,7 +333,7 @@ class Submission(models.Model):
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
 
     time = models.DateTimeField(auto_now_add=True)
-    flag = models.CharField(max_length=80)
+    flag = models.CharField(max_length=80, blank=True)
     correct = models.NullBooleanField()
 
     def __str__(self):
