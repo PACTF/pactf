@@ -13,6 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 import yaml
 
+from ctflex import queries
 from ctflex.models import CtfProblem, Window
 from ctflex.constants import UUID_REGEX
 
@@ -32,6 +33,8 @@ class Command(BaseCommand):
     help = "Adds/Updates problems from PROBLEM_DIR"
 
     def add_arguments(self, parser):
+        parser.add_argument('window', nargs='?', type=int, default=0,
+                            help="ID of window to load the problems in (current one by default)")
         parser.add_argument('--noinput', '--no-input', '-n',
                             action='store_false', dest='interactive', default=True,
                             help="Do NOT prompt the user for input of any kind.")
@@ -39,6 +42,11 @@ class Command(BaseCommand):
     def handle(self, **options):
 
         write = self.stdout.write
+
+        # Get window from options
+        window = queries.get_window(options['window'])
+        write("Loading problems into {}".format(window))
+        write()
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
@@ -110,38 +118,32 @@ class Command(BaseCommand):
             else:
                 uuid = None
 
-            if 'dynamic' not in data:
-                data['dynamic'] = None
+            # Add window and clean field `dynamic`
+            data['window'] = window
+            data.setdefault('dynamic', None)
 
-            # Attach to current window
-            # FIXME(Yatharth): Allow loading into a different window
-            data['window'] = Window.current()
-
+            # If problem exists, update it
             query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
-            try:
+            if uuid and query.exists():
+                write("Trying to update problem for '{}'".format(root))
+                problem = query.get()
+                for attr, value in data.items():
+                    setattr(problem, attr, value)
 
-                # If so, update the problem
-                if uuid and query.exists():
-                    write("Trying to update problem for '{}'".format(root))
-                    # XXX(Yatharth): Have single problem, keep problem.save() for later for  ValidationError
-                    # XXX(Yatharth): Consider using exception handling and __dict__.update or update_or_create)
-                    query.update(**data)
-                    for problem in query:
-                        problem.save()
+            # Otherwise, create a new problem
+            else:
+                write("Trying to create problem for '{}'".format(root))
+                problem = CtfProblem(**data)
 
-                # Otherwise, create a new one
-                else:
-                    write("Trying to create problem for '{}'".format(root))
-                    problem = CtfProblem(**data)
-                    problem.save()
-
-                    # Save the UUID to a file
-                    uuid = str(problem.id)
-                    write("Creating a UUID file for '{}'".format(root))
-                    with open(uuid_path, 'w') as uuid_file:
-                        uuid_file.write(uuid)
+                # Save the UUID to a file
+                uuid = str(problem.id)
+                write("Creating a UUID file for '{}'".format(root))
+                with open(uuid_path, 'w') as uuid_file:
+                    uuid_file.write(uuid)
 
             # Catch validation errors
+            try:
+                problem.save()
             except ValidationError:
                 write("Validation failed for '{}'".format(root))
                 errors.append(sys.exc_info())
