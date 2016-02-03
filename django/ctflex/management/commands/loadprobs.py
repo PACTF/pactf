@@ -46,7 +46,7 @@ class Command(BaseCommand):
         # Get window from options
         window = queries.get_window(options['window'])
         write("Loading problems into {}".format(window))
-        write()
+        write("")
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
