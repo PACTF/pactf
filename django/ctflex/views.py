@@ -170,25 +170,25 @@ def register(request, form=None):
 
 @single_http_method('GET')
 def index(request):
-    return render(request, 'ctflex/index.html', get_default_dict(request))
+    return render(request, 'ctflex/misc/index.html', get_default_dict(request))
 
 
 @single_http_method('GET')
 @windowed()
 def inactive(request, *, window_id):
-    return render(request, 'ctflex/waiting.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/waiting.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def waiting(request, *, window_id):
-    return render(request, 'ctflex/inactive.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/inactive.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def done(request, *, window_id):
-    return render(request, 'ctflex/done.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/done.html', get_window_dict(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
@@ -199,7 +199,7 @@ def game(request, *, window_id):
     params = get_window_dict(request, window)
     params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
     warn_historic(request, window)
-    return render(request, 'ctflex/game.html', params)
+    return render(request, 'ctflex/misc/game.html', params)
 
 
 @single_http_method('GET')
@@ -209,20 +209,20 @@ def board(request, *, window_id):
     # Move to queries
     params['teams'] = queries.board(window)
     warn_historic(request, window)
-    return render(request, 'ctflex/board_specific.html', params)
+    return render(request, 'ctflex/board/board_specific.html', params)
 
 @single_http_method('GET')
 def board_overall(request):
     params = get_default_dict(request)
     # Move to queries
     params['teams'] = queries.board(window=None)
-    return render(request, 'ctflex/board_overall.html', params)
+    return render(request, 'ctflex/board/board_overall.html', params)
 
 
 @single_http_method('GET')
 class Team(DetailView):
     model = models.Team
-    template_name = 'ctflex/team.html'
+    template_name = 'ctflex/misc/team.html'
 
     def get_context_data(self, **kwargs):
         # TODO: use windowed decorator somehow?

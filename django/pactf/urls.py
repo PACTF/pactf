@@ -5,7 +5,6 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    # TODO(Yatharth): Write custom templates (then move these rules to ctflex/urls.py)
     url(r'^login/$', auth_views.login),
     url(r'^logout/$', auth_views.logout, {'next_page': 'ctflex:index'}),
     url('^', include(auth_urls)),

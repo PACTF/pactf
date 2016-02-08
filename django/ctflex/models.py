@@ -1,6 +1,5 @@
 import re
 import uuid
-import random, string
 from os.path import join
 import importlib.machinery
 
@@ -10,10 +9,10 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.postgres import fields as psql
 from django_countries.fields import CountryField
+
 import markdown2
 
 from ctflex.constants import APP_NAME
@@ -124,7 +123,7 @@ class Competitor(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
 
     # Shunned fields

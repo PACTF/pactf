@@ -100,7 +100,6 @@ class Django:
 
 
 class Security:
-
     SECRET_KEY = values.SecretValue()
 
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
