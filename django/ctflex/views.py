@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
@@ -100,6 +99,7 @@ def single_http_method(method):
 
 @universal_decorator(methodname='dispatch')
 def competitors_only():
+    # FIXME(Yatharth): Handle non-user competitor, by overriding django-allauth stuff
     return user_passes_test(is_competitor)
 
 

@@ -24,6 +24,7 @@ class Django:
         'django_countries',
         'django_extensions',
         'debug_toolbar',
+        'email_log',
 
         # Python 3rd-party
         'yaml',
@@ -68,6 +69,11 @@ class Django:
             },
         },
     ]
+
+
+    ROOT_URLCONF = 'pactf.urls'
+
+    WSGI_APPLICATION = 'pactf.wsgi.application'
 
     # URL to serve static files at
     STATIC_URL = '/static/'
@@ -191,6 +197,9 @@ class Dev(Base):
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG  # TODO(Yatharth): Eliminate warning about TEMPLATE_* deprecation
     ALLOWED_HOSTS = ['*']
+
+    # Logging
+    EMAIL_BACKEND = 'email_log.backends.EmailBackend'
 
 
 class Prod(Base):
