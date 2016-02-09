@@ -1,3 +1,5 @@
+"""Define CTFlex's models"""
+
 import re
 import uuid
 from os.path import join
@@ -6,41 +8,109 @@ import importlib.machinery
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver
+from django.dispatch import receiver as _receiver
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.postgres import fields as psql
-from django_countries.fields import CountryField
+from django_countries.fields import CountryField, Country
 
 import markdown2
+from localflavor.us.models import USStateField
 
 from ctflex.constants import APP_NAME
-
-
-# TODO(Yatharth): Write helper so error of clean returns all validation errors
 
 
 # region Helpers and General
 
 def print_time(time):
+    """Format a datetime object to be human-readable"""
     return time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
 
 
 def unique_receiver(*args, **kwargs):
-    """Wrap Django's `receiver` to set dispatch_uid automatically based on the function's name"""
+    """Wrap django.dispatch.receiver to set dispatch_uid automatically based on the receiver's name
+
+    Purpose: This decorator eliminates the need to set dispatch_uid automatically. It is recommended to set dispatch_uid to prevent a receiver from being run twice.
+
+    Usage: This decorator should be always used instead of django.dispatch.receiver.
+    """
 
     def decorator(function):
         default_dispatch_uid = '{}.{}'.format(APP_NAME, function.__name__)
         kwargs.setdefault('dispatch_uid', default_dispatch_uid)
-        return receiver(*args, **kwargs)(function)
+        return _receiver(*args, **kwargs)(function)
 
     return decorator
 
 
 @unique_receiver(pre_save)
 def pre_save_validate(sender, instance, *args, **kwargs):
+    """Full clean an object before saving it
+
+    Purpose: This receiver ensures models are not accidentally manually modified and saved without being validated.
+
+    Drawbacks:
+    - This receiver means that full_clean is sometimes called twice for an object.
+    - Calling update() on a query does not trigger save() and thus still doesn't trigger full_clean().
+    """
     instance.full_clean()
+
+
+def mass_cleaned(cls):
+    """Call individual cleaning methods and collect all of their ValidationErrors
+
+    Usage: To use this decorator, you may define a) the list of methods MODEL_CLEANERS and/or b) the dictionary from field names to a list of methods FIELD_CLEANERS. The method signatures must be just 'self'.
+
+    Purpose: This decorator calls methods in FIELD_CLEANERS or MODEL_CLEANERS along with the super class's clean_fields() or clean() method. It collects any and all of the ValidationErrors and raises them as one big ValidationError. It excludes fields in clean_fields() based on the keys in FIELD_CLEANERS.
+
+    Drawbacks: This decorator will replace any defined clean_fields() and clean() methods instead of decorate them.
+    """
+
+    def clean(self):
+
+        errors = []
+        for validator in getattr(self, 'MODEL_CLEANERS', []):
+            try:
+                validator(self)
+            except ValidationError as error:
+                errors.append(error)
+
+        try:
+            super(cls, self).clean()
+        except ValidationError as error:
+            errors.append(error)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean_fields(self, exclude=None):
+
+        if exclude is None:
+            exclude = ()
+
+        errors = []
+        for field_name, validators in getattr(self, 'FIELD_CLEANERS', {}).items():
+            if field_name not in exclude:
+                for validator in validators:
+
+                    try:
+                        validator(self)
+                    except ValidationError as error:
+                        errors.append(error)
+
+        try:
+            super(cls, self).clean_fields(exclude=exclude)
+        except ValidationError as error:
+            errors.append(error)
+
+        if errors:
+            raise ValidationError(errors)
+
+    cls.clean_fields = clean_fields
+    cls.clean = clean
+
+    return cls
 
 
 # class Config(models.Model):
@@ -54,96 +124,116 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 # endregion
 
 
-# region User Models (by wrapping)
+# region User Models
 
-# TODO(Tony): Replace default model manager with one that filters by banned
+@mass_cleaned
 class Team(models.Model):
-    """Represent essence of a team"""
+    """Represent a team"""
 
-    # Essential data
+    ''' Structural Fields '''
+
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=80, unique=True)
-    key = models.CharField(max_length=30, default='ASDF')
+    name = models.CharField(max_length=30, unique=True)
+    password = models.CharField(max_length=30)
+    banned = models.BooleanField(default=False)
 
-    # Extra data
+    ''' Extra Data '''
+
     country = CountryField(blank=True, default='US')
-    state = models.CharField(max_length=40, blank=True)
-    school = models.CharField(max_length=60, blank=True, default='None')
-    adviser_name = models.CharField(max_length=40, blank=True)
-    adviser_email = models.EmailField(blank=True)
+    state = USStateField(blank=True)
+    school = models.CharField(max_length=60)
+
+    # advisor_name = models.CharField(max_length=40, blank=True)
+    # advisor_email = models.EmailField(blank=True)
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
-    # XXX(Yatharth): Put into queries or sth
-    def score(self, window):
-        score = 0
-        for competitor in self.competitor_set.all():
-            solves = competitor.solve_set.filter()
-            if window is not None:
-                solves = solves.filter(problem__window=window)
-            for solve in solves:
-                score += solve.problem.points
-        return score
+    ''' Properties '''
 
-    # XXX(Yatharth): Remove default params
-    def timer(self, window=None):
-        if window is None:
-            window = Window.current()
+    def timer(self, window):
         return self.timer_set.get(window=window)
 
-    def has_timer(self, window=None):
-        try:
-            self.timer(window=window)
-        except Timer.DoesNotExist:
-            return False
-        else:
-            return True
+    def has_timer(self, window):
+        return self.timer_set.filter(window=window).exists()
 
     def has_active_timer(self, window=None):
         return self.has_timer(window) and self.timer(window).active()
 
-    def can_view_problems(self, window=None):
-        return self.has_timer(window=window) and self.timer(window=window).start <= timezone.now()
+    ''' Cleaning '''
 
-    def start_timer(self, window):
-        assert not self.has_timer()
+    def validate_state_is_given_for_us(self):
+        if self.country == Country('US') and not self.state:
+            raise ValidationError("State is required if you are competing from the U.S.", code='state_is_given_for_us')
 
-        timer = Timer(window=window, team=self)
-        timer.save()
+    def sync_state_outside_us(self):
+        if self.country != Country('US'):
+            self.state = ''
+
+    FIELD_CLEANERS = {
+        'state': [validate_state_is_given_for_us],
+    }
+
+    MODEL_CLEANERS = [
+        sync_state_outside_us,
+    ]
 
 
 class Competitor(models.Model):
-    """Represents a competitor 'profile'
-
-    Django's User class's fields are shunned except for:
-
-        username, password, is_active, is_staff, date_joined
-
+    """Represent a competitor as a 'user profile' (in Django terminology)
     """
+
+    ''' Structural Fields '''
 
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
 
-    # Shunned fields
-    first_name = models.CharField("First name", max_length=40, blank=True)
-    last_name = models.CharField("Last name", max_length=40, blank=True)
-    email = models.EmailField("Email", unique=True)
+    ''' Extra Data '''
+
+    email = models.EmailField(unique=True)
 
     def __str__(self):
         return "<Competitor #{} {!r}>".format(self.id, self.user.username)
 
 
+@unique_receiver(post_save, sender=Competitor)
+def competitor_post_save_sync_email(sender, instance, **kwargs):
+    """Update User email field based on Competitor user field"""
+    instance.user.email = instance.email
+    instance.user.save()
+
+
 # endregion
 
 
-# region Timer Models
+# region Window Models
+
+class WindowManager(models.Manager):
+    def current(self):
+        """Return 'current' window
+
+        The 'current' window is defined as the window that fits the highest of the following criteria:
+        - The window is currently going on.
+        - The window is the next to begin.
+        - The window was the last to have ended.
+        """
+        now = timezone.now()
+        try:
+            return self.get(start__lte=now, end__gte=now)
+        except Window.DoesNotExist:
+            return self.filter(start__gte=now).order_by('start').first() or \
+                   self.order_by('-start').first()
 
 
+@mass_cleaned
 class Window(models.Model):
+    """Represent a Contest Window"""
+
+    objects = WindowManager()
+
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=40, blank=False)
+    name = models.CharField(max_length=30, blank=False)
 
     start = models.DateTimeField()
     end = models.DateTimeField()
@@ -153,7 +243,7 @@ class Window(models.Model):
     def __str__(self):
         return "<Window #{} {} – {}>".format(self.id, print_time(self.start), print_time(self.end))
 
-    """ Properties """
+    ''' Properties '''
 
     def started(self):
         return self.start <= timezone.now()
@@ -161,36 +251,41 @@ class Window(models.Model):
     def ended(self):
         return self.end < timezone.now()
 
-    """ Class methods """
-
-    @staticmethod
-    def current():
-        now = timezone.now()
-        try:
-            return Window.objects.get(start__lte=now, end__gte=now)
-        except Window.DoesNotExist:
-            return Window.objects.filter(start__gte=now).order_by('start').first() or \
-                   Window.objects.order_by('-start').first()
-
-    """ Validation """
+    ''' Cleaning '''
 
     def validate_windows_dont_overlap(self):
-        for window in Window.objects.exclude(id=self.id):
-            if window.start <= self.end and self.start <= window.end:
-                raise ValidationError("Window overlaps with {}".format(window))
+        for other_window in Window.objects.exclude(id=self.id):
+            if other_window.start <= self.end and self.start <= other_window.end:
+                raise ValidationError(
+                    "The window overlaps with another window: %(other_window)s",
+                    code='windows_dont_overlap',
+                    params={'other_window': other_window}
+                )
 
-    def validate_positive_timedelta(self):
+    def validate_timedelta_is_positive(self):
         if self.start >= self.end:
-            raise ValidationError("End is not after start")
+            raise ValidationError("The end is not after the start", code='timedelta_is_positive')
 
-    def clean(self):
-        self.validate_positive_timedelta()
-        self.validate_windows_dont_overlap()
-        super().clean()
+    def sync_timers(self):
+        """Make timers update their end times per changes in the personal window duration
+
+        This method achieves two goals:
+        - Make timers update their end based on the window's personal_timer_duration;
+        - Raise ValidationErrors if the timers would be outside the window if modified;
+        """
+        for timer in self.timer_set.all():
+            timer.save()
+
+    MODEL_CLEANERS = [
+        validate_windows_dont_overlap,
+        validate_timedelta_is_positive,
+        sync_timers,
+    ]
 
 
+@mass_cleaned
 class Timer(models.Model):
-    """Represent the time period in which a team can, for example, submit flags"""
+    """Represent a Personal Timer"""
 
     class Meta:
         unique_together = ('window', 'team',)
@@ -200,29 +295,41 @@ class Timer(models.Model):
     window = models.ForeignKey(Window, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
-    start = models.DateTimeField(auto_now=True)
-    end = models.DateTimeField(editable=False, blank=True)
+    start = models.DateTimeField(blank=True)
+    end = models.DateTimeField(blank=True)
 
     def __str__(self):
         return "<Timer #{} window=#{} team=#{} {} – {}>".format(
             self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
+    ''' Properties '''
+
     def active(self):
         return self.start <= timezone.now() <= self.end
+
+    ''' Cleaning '''
+
+    def sync_start(self):
+        """Set start to now if not already defined
+
+        We do not simply set auto_now=True on the start field because then we can't edit the field in th Django admin panel.
+        """
+        if not self.start:
+            self.start = timezone.now()
 
     def sync_end(self):
         self.end = timezone.now() + self.window.personal_timer_duration
 
-    def clean(self):
-        super().clean()
-        self.sync_end()
+    def validate_timer_is_within_window(self):
+        if self.start < self.window.start or self.end > self.window.end:
+            raise ValidationError("Timer does not lie within window", code='timer_is_within_window')
 
-
-@unique_receiver(post_save, sender=Window)
-def window_post_save_update_timers(sender, instance, **kwargs):
-    """Make timers update their end timers per changes in their window"""
-    for timer in instance.timer_set.all():
-        timer.save()
+    # (The order of the following methods matters.)
+    MODEL_CLEANERS = [
+        sync_start,
+        sync_end,
+        validate_timer_is_within_window,
+    ]
 
 
 # endregion

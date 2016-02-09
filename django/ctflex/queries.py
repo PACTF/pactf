@@ -1,6 +1,7 @@
 from functools import partial
 
 from django.core.exceptions import ValidationError
+from django_countries.fields import Country
 
 from ctflex import models
 
@@ -21,8 +22,11 @@ def query_get(model, **kwargs):
 
 # CTFlex-specific queries
 
+def eligible(team):
+    return not team.banned and team.country == Country('us')
+
 def get_window(window_id):
-    return models.Window.objects.get(pk=window_id) if window_id else models.Window.current()
+    return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
 
 
 def window_active(team):
@@ -61,15 +65,26 @@ def create_competitor(handle, pswd, email, team):
 def validate_team(name, key):
     team = models.Team.objects.filter(name=name)
     if team.exists():
-        if key == team[0].key:
+        if key == team[0].password:
             return team[0], 'Success!'
         return None, 'Team passphrase incorrect!'
     team = models.Team(name=name, key=key)
     team.save()
     return team, 'Success!'
 
+
+
 def board(window):
-    return enumerate(sorted(models.Team.objects.all(), key=lambda team: team.score(window), reverse=True))
+    return enumerate(
+        sorted(
+            filter(
+                eligible,
+                models.Team.objects.all()
+            ),
+            key=lambda team: score(team=team, window=window),
+            reverse=True,
+        )
+    )
 
 
 class ProblemAlreadySolvedException(Exception):
@@ -99,3 +114,14 @@ def submit_flag(prob_id, competitor, flag):
     models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
 
     return correct, message
+
+
+def score(*, team, window):
+    score = 0
+    for competitor in team.competitor_set.all():
+        solves = competitor.solve_set.filter()
+        if window is not None:
+            solves = solves.filter(problem__window=window)
+        for solve in solves:
+            score += solve.problem.points
+    return score

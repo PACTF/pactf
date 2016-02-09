@@ -15,11 +15,11 @@ def str_(element):
 # TODO(Yatharth): Don't take team from context
 @register.simple_tag(takes_context=True)
 def teamscore(context):
-    return context['team'].score(context['window'])
+    return queries.score(team=context['team'], window=context['window'])
 
 @register.simple_tag()
 def current_window():
-    return Window.current()
+    return Window.objects.current()
 
 @register.simple_tag()
 def switch_window(window, resolver_match):

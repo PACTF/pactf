@@ -15,6 +15,7 @@ from django.conf import settings
 
 from ctflex import models
 from ctflex import queries
+from ctflex import commands
 
 
 # region Helper Methods
@@ -283,7 +284,11 @@ def start_timer(request, *, window_id):
             messages.error(request, "Your timer for this window has expired.")
             return redirect('ctflex:index')
 
-    team.start_timer(window)
+    success, msgs = commands.start_timer(team=team, window=window)
+    if not success:
+        for msg in msgs:
+            messages.error(request, msg)
+
     return redirect('ctflex:game', window_id=window.id)
 
 

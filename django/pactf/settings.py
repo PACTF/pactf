@@ -3,6 +3,7 @@ from os.path import join
 from configurations import Configuration, values
 
 from pactf.constants import BASE_DIR
+import ctflex.constants
 
 
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
@@ -69,7 +70,6 @@ class Django:
             },
         },
     ]
-
 
     ROOT_URLCONF = 'pactf.urls'
 
@@ -163,16 +163,22 @@ class Gunicorn:
     NUM_WORKERS = values.IntegerValue(3)
 
 
-class CTFlex(Django, Configuration):
-    # Where to import problems from
-    PROBLEMS_DIR = join(BASE_DIR, 'ctfproblems')
+ctflex_prefix = ctflex.constants.APP_NAME.capitalize()
 
-    # Intermediate folder for problem static files
+class CTFlex(Django, Configuration):
+    """Configure CTFlex"""
+
+    # Directory containing problem folders
+    PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
+
+    ''' Static Files '''
+
+    # Intermediate folder for storing problem static files
     # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
     # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
-    PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR, '_static')
+    PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR.value, '_static')
 
-    # Subfolder for problem static files
+    # Subdirectory (of the directory to which static files are collected) for problems' static files
     PROBLEMS_STATIC_URL = 'ctfproblems'
 
     @classmethod
@@ -180,6 +186,8 @@ class CTFlex(Django, Configuration):
         cls.STATICFILES_DIRS.append(
             (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
         )
+
+    ''' General '''
 
     @classmethod
     def setup(cls):

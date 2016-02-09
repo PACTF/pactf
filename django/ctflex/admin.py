@@ -15,6 +15,10 @@ class UserAdmin(BaseUserAdmin):
     inlines = (CompetitorInline,)
 
 
+class TimerAdmin(admin.ModelAdmin):
+    readonly_fields = ('end',)
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(models.Team)
@@ -23,5 +27,5 @@ admin.site.register(models.CtfProblem)
 admin.site.register(models.Solve)
 admin.site.register(models.Submission)
 
-admin.site.register(models.Timer)
+admin.site.register(models.Timer, TimerAdmin)
 admin.site.register(models.Window)
