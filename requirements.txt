@@ -8,6 +8,7 @@ django-debug-toolbar==1.4
 django-email-log==0.2.0
 django-extensions==1.6.1
 django-jinja==2.1.1
+django-localflavor==1.2
 envdir==0.7
 gunicorn==19.4.1
 ipython==4.0.1

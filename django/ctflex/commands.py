@@ -1,3 +1,5 @@
+"""Allow views to manipulate models"""
+
 from django.core.exceptions import ValidationError
 
 from ctflex import models

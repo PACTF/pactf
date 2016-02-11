@@ -50,7 +50,7 @@
       <ul class="clearfix">
 
         <ul class="pull-left">
-          <li><a href="{% url 'ctflex:index' %}">Home</a></li>
+          <li><a href="{% url 'ctflex:index' %}">{%  include 'ctflex/title.txt' %}</a></li>
           <li>
             <a href="#">{{ window.verbose_name }}<span class="arrow">&#9660;</span></a>
             <ul class="sub-menu">
@@ -67,7 +67,7 @@
         <ul class="pull-right">
           {% if user.is_authenticated %}
             {% if team %}
-              <li><span>Score: {% teamscore %}</span></li>
+              <li><span>Score: {% score team %}</span></li>
               <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
             {% else %}
               <li><span>Y u no be competitor</span></li>

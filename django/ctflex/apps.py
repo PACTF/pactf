@@ -1,8 +1,12 @@
 from django.apps import AppConfig
 
-from ctflex.constants import APP_NAME
+from ctflex.constants import APP_NAME, VERBOSE_NAME
 
 
+
+# COMPETE_PERMISSION_CODENAME = 'compete'
+# COMPETITOR_GROUP_NAME = 'ctflex.competitors'
+#
 # def add_group_permissions(sender, **kwargs):
 #     """Configure groups and permissions for the app (meant to be called after flushing)"""
 #
@@ -28,7 +32,7 @@ from ctflex.constants import APP_NAME
 
 class CtflexConfig(AppConfig):
     name = APP_NAME
-    verbose_name = 'CTFlex'
+    verbose_name = VERBOSE_NAME
 
     # def ready(self):
     #     post_migrate.connect(add_group_permissions, sender=self)

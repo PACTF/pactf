@@ -1,5 +1,6 @@
-from os.path import abspath, dirname, join
+"""Hold constants for the project"""
 
+from os.path import abspath, dirname, join
 
 #  TODO(Yatharth): Actually use this in places
 PROJECT_NAME = 'pactf'

@@ -1,12 +1,10 @@
-"""WSGI config
-"""
+"""Configure WSGI app"""
 
 from os.path import dirname, join, abspath
 
 import envdir
 
 from pactf.constants import ENVDIR_PATH
-
 
 envdir.open(ENVDIR_PATH)
 

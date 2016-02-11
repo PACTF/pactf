@@ -1,14 +1,13 @@
+"""Route URLs to Views"""
+
 from django.conf.urls import url, include
 
-from ctflex.constants import UUID_REGEX
+from ctflex.constants import APP_NAME, UUID_REGEX
 from ctflex import views
 
-
-app_name = 'ctflex'
-
+app_name = APP_NAME
 
 # TODO(Yatharth): Look into changing links everywhere to pass window if it is there
-# TODO(Yatharth): Remember last selected window in a session?
 
 windowed_urls = [
     url(r'^team$', views.CurrentTeam.as_view(), name='current_team'),
@@ -25,14 +24,13 @@ windowed_urls = [
     url(r'^start_timer$', views.start_timer, name='start_timer'),
 ]
 
-
 urlpatterns = [
-
-    url(r'^register_user$', views.register_user, name='register_user'),
+    url('^$', views.index, name='index'),
     url(r'^register$', views.register, name='register'),
     url(r'^board$', views.board_overall, name='scoreboard_overall'),
-    url('^$', views.index, name='index'),
+    
+    url(r'^register_user$', views.register_user, name='register_user'),
 
     url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
-    url(r'^', include(windowed_urls), {'window_id': None}),
+    # url(r'^', include(windowed_urls), {'window_id': None}),
 ]

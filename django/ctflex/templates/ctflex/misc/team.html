@@ -8,7 +8,7 @@
 {% block content %}
   <p>
     You are {{ user.username }} and part of team {{ object.name }}. You have
-    {% with team=object %} {% teamscore %} {% endwith %} points!
+    {% score object %} points!
   </p>
   <p>
     The members of your team are:

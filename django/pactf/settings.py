@@ -1,3 +1,5 @@
+"""Define (default) configuration for the project"""
+
 from os.path import join
 
 from configurations import Configuration, values
@@ -31,7 +33,7 @@ class Django:
         'yaml',
 
         # Local
-        # Note: pactf_web comes before ctflex to override the latter's templates
+        # (pactf_web comes before ctflex to override the latter's templates.)
         'pactf_web',
         'ctflex',
     ]
@@ -165,6 +167,7 @@ class Gunicorn:
 
 ctflex_prefix = ctflex.constants.APP_NAME.capitalize()
 
+
 class CTFlex(Django, Configuration):
     """Configure CTFlex"""
 
@@ -220,5 +223,5 @@ class Prod(Base):
     SESSION_COOKIE_SECURE = https
     CSRF_COOKIE_SECURE = https
 
-    # Only if nginx is properly configured
+    # (Only enable this if nginx is properly configured.)
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
