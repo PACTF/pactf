@@ -1,22 +1,49 @@
+import sys
 from os.path import join, dirname, abspath
+
+from IPython.core import ultratb
 
 from django.core import management
 from django.core.management.base import BaseCommand
 
-BASE_DIR =  join(dirname(dirname(dirname(abspath(__file__)))), 'fixtures')
-FIXTURES = ['users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml']
+from ctflex.management.commands._common import add_no_input, add_debug, pass_through_argument, add_clear
+
+BASE_DIR = join(dirname(dirname(dirname(abspath(__file__)))), 'fixtures')
+PRE_PROBLEMS_FIXTURES = ('users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml',)
+POST_PROBLEMS_FIXTURES = ('solves.yaml',)
 
 
 class Command(BaseCommand):
-    help = "Flushes and reloads fixtures and problems"
+    help = "Flush and reload fixtures and problems"
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput', '--no-input', '-n',
-                            action='store_false', dest='interactive', default=True,
-                            help="Do NOT prompt the user for input of any kind.")
+        add_no_input(parser)
+        add_debug(parser)
+        add_clear(parser)
+
+    @staticmethod
+    def load_fixture(fixture):
+        print("Loading from {}".format(fixture))
+        management.call_command('loaddata', join(BASE_DIR, fixture))
+
 
     def handle(self, **options):
-        interactive_args = () if options['interactive'] else ('--no-input',)
-        management.call_command('flush', *interactive_args)
-        for fixture in FIXTURES:
-            management.call_command('loaddata', join(BASE_DIR, fixture))
+        management.call_command('flush', *pass_through_argument({
+            '--no-input': not options['interactive'],
+        }))
+
+        if options['debug']:
+            sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
+
+        for fixture in PRE_PROBLEMS_FIXTURES:
+            self.load_fixture(fixture)
+
+        management.call_command('loadprobs', *pass_through_argument({
+            '--no-input': not options['interactive'],
+            '--debug': options['debug'],
+            '--clear': options['clear']
+        }))
+        self.stdout.write('')
+
+        for fixture in POST_PROBLEMS_FIXTURES:
+            self.load_fixture(fixture)

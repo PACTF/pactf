@@ -1,1 +1,0 @@
-static.txt for problem 5

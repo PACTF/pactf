@@ -7,3 +7,15 @@
     background-color: darkblue;
     color: white;
 }
+
+.problem {
+    margin-bottom: 10px;
+}
+
+.hint-content {
+    display: none;
+}
+
+.hint-button {
+    margin-bottom: 10px;
+}

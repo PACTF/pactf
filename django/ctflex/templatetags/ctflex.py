@@ -50,7 +50,7 @@ def format_problem(problem, team):
         pass
 
     result = Dummy()
-    data['description_html'] = problem.generate_desc(team)
+    data['description_html'] = queries.get_desc(problem, team)
     result.__dict__ = data
     return result
 

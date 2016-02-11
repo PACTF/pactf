@@ -2,8 +2,6 @@
 
 import re
 import uuid
-from os.path import join
-import importlib.machinery
 
 from django.db import models
 from django.conf import settings
@@ -57,7 +55,7 @@ def pre_save_validate(sender, instance, *args, **kwargs):
     instance.full_clean()
 
 
-def mass_cleaned(cls):
+def cleaned(cls):
     """Call individual cleaning methods and collect all of their ValidationErrors
 
     Usage: To use this decorator, you may define a) the list of methods MODEL_CLEANERS and/or b) the dictionary from field names to a list of methods FIELD_CLEANERS. The method signatures must be just 'self'.
@@ -126,7 +124,7 @@ def mass_cleaned(cls):
 
 # region User Models
 
-@mass_cleaned
+@cleaned
 class Team(models.Model):
     """Represent a team"""
 
@@ -174,9 +172,9 @@ class Team(models.Model):
         'state': [validate_state_is_given_for_us],
     }
 
-    MODEL_CLEANERS = [
+    MODEL_CLEANERS = (
         sync_state_outside_us,
-    ]
+    )
 
 
 class Competitor(models.Model):
@@ -226,14 +224,17 @@ class WindowManager(models.Manager):
                    self.order_by('-start').first()
 
 
-@mass_cleaned
+@cleaned
 class Window(models.Model):
     """Represent a Contest Window"""
 
     objects = WindowManager()
 
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30, blank=False)
+    code = models.CharField(max_length=30, unique=True,
+                            help_text="Non-user-facing human-readable identifier for window")
+    verbose_name = models.CharField(max_length=30, unique=True, blank=False,
+                                    help_text="User-facing title of window")
 
     start = models.DateTimeField()
     end = models.DateTimeField()
@@ -241,7 +242,7 @@ class Window(models.Model):
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
-        return "<Window #{} {} – {}>".format(self.id, print_time(self.start), print_time(self.end))
+        return "<Window #{} {!r} {} – {}>".format(self.id, self.code, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
 
@@ -276,14 +277,14 @@ class Window(models.Model):
         for timer in self.timer_set.all():
             timer.save()
 
-    MODEL_CLEANERS = [
+    MODEL_CLEANERS = (
         validate_windows_dont_overlap,
         validate_timedelta_is_positive,
         sync_timers,
-    ]
+    )
 
 
-@mass_cleaned
+@cleaned
 class Timer(models.Model):
     """Represent a Personal Timer"""
 
@@ -325,11 +326,11 @@ class Timer(models.Model):
             raise ValidationError("Timer does not lie within window", code='timer_is_within_window')
 
     # (The order of the following methods matters.)
-    MODEL_CLEANERS = [
+    MODEL_CLEANERS = (
         sync_start,
         sync_end,
         validate_timer_is_within_window,
-    ]
+    )
 
 
 # endregion
@@ -337,81 +338,120 @@ class Timer(models.Model):
 
 # region Problem Models
 
-# XXX(Yatharth): Move stuff out
+@cleaned
 class CtfProblem(models.Model):
+    """Represent a CTF Problem"""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=60)
     window = models.ForeignKey(Window)
 
     points = models.IntegerField()
-    description = models.TextField(blank=True, null=True)
-    description_html = models.TextField(editable=False)
-    hint = models.TextField(default='')
-    hint_html = models.TextField(editable=False, blank=True, null=True)
+    description = models.TextField(default='', blank=True)
+    description_html = models.TextField(editable=False, default='', blank=True)
+    hint = models.TextField(default='', blank=True)
+    hint_html = models.TextField(editable=False, default='', blank=True)
 
     grader = models.FilePathField(
-        help_text="Basename of the grading script from PROBLEM_DIR",
-        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
+        help_text="Basename of the problem's grading script in PROBLEMS_DIR",
+        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
     dynamic = models.FilePathField(
-        help_text="Basename of the generator script in PROBLEM_DIR",
-        path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
-        blank=True, null=True
+        help_text="Basename of the problem's generator script in PROBLEMS_DIR",
+        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
+        blank=True, null=True,
     )
-    # dict function instead of {} because of mutability
+
+    # Dictionary for problem dependencies in format specified in README
+    # (`dict` is used instead of `{}` because all objects would share dict otherwise.)
     deps = psql.JSONField(default=dict, blank=True)
 
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
-    def grade(self, *, flag, team):
-        if not flag:
-            return False, "Empty flag"
+    ''' Helpers '''
 
-        grader_path = join(settings.PROBLEMS_DIR, self.grader)
-        # XXX(Yatharth): Handle FileNotFound
-        grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
-        correct, message = grader.grade(team, flag)
-        return correct, message
-
-    # TODO(Cam): Markdown's safe_mode is deprecated; research safety
     @staticmethod
     def markdown_to_html(markdown):
+        """Convert Markdown to HTML, quoting any existing HTML """
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
+        return markdown2.markdown(markdown, extras=EXTRAS, safe_mode='escape')
 
-        html = markdown2.markdown(markdown, extras=EXTRAS, safe_mode='escape')
-        return html
+    @staticmethod
+    def link_static(old_text, id):
+        """Replace {% ctflexstatic %} directives with the appropriate static file link"""
 
-    def link_static(self, old_text):
         PATTERN = re.compile(r'''{% \s* ctflexstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
-        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, self.id)
+        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, id)
         REPLACER = lambda match: static(REPLACEMENT.format(match.group('basename')))
 
-        new_text = PATTERN.sub(REPLACER, old_text)
-        return new_text
+        return PATTERN.sub(REPLACER, old_text)
 
     def process_html(self, html):
-        return self.markdown_to_html(self.link_static(html))
+        return self.markdown_to_html(self.link_static(html, self.id))
 
-    def clean(self):
+    ''' Cleaning '''
+
+    def validate_deps(self):
+        if self.deps is not None:
+
+            if not tuple(self.deps.keys()) in ('score', 'probs'):
+                raise ValidationError(
+                    "The field deps can only contain the keys score and probs",
+                    code='deps',
+                )
+
+            if 'score' in self.deps:
+                score = self.deps['score']
+                if type(score) != int or score <= 0:
+                    raise ValidationError(
+                        "The field score must be a positive integer",
+                        code='deps',
+                    )
+
+            if 'probs' in self.deps:
+                probs = self.deps['probs']
+                if type(probs) != list:
+                    raise ValidationError(
+                        "The field probs must be an array",
+                        code='deps',
+                    )
+
+    def validate_desc_and_hint_exist_or_not(self):
+        if self.dynamic and (self.description or self.hint):
+            raise ValidationError(
+                "Description and hints should not be statically provided for dynamic problems",
+                code='desc_and_hint_exist_or_not'
+            )
+        elif not self.dynamic and not self.description:
+            raise ValidationError(
+                "Description must be provided statically for simple problems",
+                code='desc_and_hint_exist_or_not'
+            )
+
+    def sync_html(self):
         if not self.dynamic:
-            if not self.description:
-                raise ValidationError('Description must be provided for non-dynamic problems!')
             self.description_html = self.process_html(self.description)
-        elif self.description:
-            raise ValidationError('Description should be blank for dynamic problems')
-        self.hint_html = self.process_html(self.hint)
+            self.hint_html = self.process_html(self.hint)
 
-    def generate_desc(self, team):
-        if not self.dynamic:
-            return self.description_html
-        gen_path = join(settings.PROBLEMS_DIR, self.dynamic)
-        gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-        desc = gen.generate(team)
-        return self.process_html(desc)
+    FIELD_CLEANERs = {
+        'deps': (validate_deps,),
+    }
+
+    # (The order matters here.)
+    MODEL_CLEANERS = (
+        validate_desc_and_hint_exist_or_not,
+        sync_html,
+    )
 
 
+@cleaned
 class Solve(models.Model):
+    """Record currently applicable solves of a problem
+
+    This model is used to compute the score, among other things.
+    """
+
     class Meta:
         unique_together = ('problem', 'competitor')
 
@@ -421,29 +461,61 @@ class Solve(models.Model):
     date = models.DateTimeField(auto_now=True)
     flag = models.CharField(max_length=100, blank=False)
 
+    def __str__(self):
+        return "<Solve prob={} team={}>".format(self.problem, self.competitor.team)
 
+    ''' Cleaning '''
+
+    def validate_teams_are_unique(self):
+        if Solve.objects.filter(problem=self.problem, competitor__team=self.competitor.team).exclude(
+                pk=self.id).exists():
+            raise ValidationError(
+                "A team can solve a problem only once",
+                code='teams_are_unique',
+            )
+
+    def validate_time_inside_window(self):
+        date = self.date
+        window = self.problem.window
+        team = self.competitor.team
+
+        if date:
+            if date < window.start or (team.has_timer(window) and date < team.timer(window).start):
+                raise ValidationError("Solve happened before window or timer began", code='time_inside_window')
+
+    def validate_time_not_in_future(self):
+        if self.date and self.date > timezone.now():
+            raise ValidationError("Solve occurs in future", code='time_not_in_future')
+
+    MODEL_CLEANERS = (
+        validate_teams_are_unique,
+        validate_time_inside_window,
+        validate_time_not_in_future,
+    )
+
+
+@cleaned
 class Submission(models.Model):
-    """Records a flag submission attempt
+    """Log a flag submission attempt
 
-    The `p_id` field exists in addition to the `problem` foreign key.
-    This is so in order to handle deletion of problems while not deleting Submissions for historical reasons.
-    This is not done with competitor and team as 1) IDs are less useful for deleted objects of such types and 2) they are linked with Users, which have an is_active property which is used instead of deletion.
+    This model serves only as a log and is not part of the truth (as defined in the Design Doc). The one other purpose t is used for is telling a competitor they already tried a particular flag.
 
-    `team` exists for quick querying of whether someone in a particular competitor's team has solved a particular problem.
+    There is a `p_id` field in addition to the `problem` foreign key. This enables deleting problems while not deleting Submissions. This doubling of fields is not done with the competitor field as 1) IDs are less useful for deleted competitors and 2) competitor objects are less likely to be deleter since users and usually simply have the is_active flag set to False instead of having themselves deleted.
     """
-    id = models.AutoField(primary_key=True)
 
+    id = models.AutoField(primary_key=True)
     p_id = models.UUIDField()
-    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True, blank=True)
+    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True, blank=True, editable=False)
     competitor = models.ForeignKey(Competitor, on_delete=models.SET_NULL, null=True)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
 
     time = models.DateTimeField(auto_now_add=True)
-    flag = models.CharField(max_length=80, blank=True)
+    flag = models.CharField(max_length=100, blank=True)
     correct = models.NullBooleanField()
 
     def __str__(self):
         return "<Submission @{} problem={} competitor={}>".format(self.time, self.problem, self.competitor)
+
+    ''' Cleaning '''
 
     def sync_problem(self):
         try:
@@ -451,12 +523,9 @@ class Submission(models.Model):
         except CtfProblem.DoesNotExist:
             pass
 
-    def sync_team(self):
-        self.team = self.competitor.team
-
-    def clean(self):
-        self.sync_problem()
-        self.sync_team()
+    MODEL_CLEANERS = (
+        sync_problem,
+    )
 
 # endregion
 
@@ -496,7 +565,7 @@ class Submission(models.Model):
 #         competitorGroup = Group.objects.get(name=COMPETITOR_GROUP_NAME)
 #         instance.user.groups.remove(competitorGroup)
 #
-# endregion (o (old)
+# endregion
 
 
 # region User Models (by substitution) (old)

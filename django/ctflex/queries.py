@@ -1,5 +1,8 @@
+import importlib.machinery
 from functools import partial
+from os.path import join
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django_countries.fields import Country
 
@@ -7,6 +10,7 @@ from ctflex import models
 
 
 # General queries
+
 def query_filter(model, **kwargs):
     return model.objects.filter(**kwargs)
 
@@ -23,9 +27,9 @@ def query_get(model, **kwargs):
 # CTFlex-specific queries
 
 def eligible(team):
-    return not team.banned and team.country == Country('us')
+    return not team.banned and team.country == Country('US')
 
-def get_window(window_id):
+def get_window(window_id=None):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
 
 
@@ -87,6 +91,18 @@ def board(window):
     )
 
 
+def grade(*, problem, flag, team):
+    if not flag:
+        return False, "Empty flag"
+
+    grader_path = join(settings.PROBLEMS_DIR, problem.grader)
+    # XXX(Yatharth): Handle FileNotFound
+    grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
+    # extract key
+    correct, message = grader.grade(hash(str(team.id) + "grading" + settings.SECRET_KEY), flag)
+    return correct, message
+
+
 class ProblemAlreadySolvedException(Exception):
     pass
 
@@ -94,21 +110,24 @@ class FlagAlreadyTriedException(Exception):
     pass
 
 
-# TODO: Test all these cases
 def submit_flag(prob_id, competitor, flag):
     problem = models.CtfProblem.objects.get(pk=prob_id)
 
-    if models.Solve.objects.filter(problem=problem, competitor=competitor).exists():
+    # Check if the problem has already been solved
+    if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
         raise ProblemAlreadySolvedException()
-    elif models.Submission.objects.filter(problem_id=prob_id, team=competitor.team, flag=flag).exists():
-        raise FlagAlreadyTriedException()
 
     # Grade
-    correct, message = problem.grade(flag=flag, team=competitor.team)
+    correct, message = grade(problem=problem, flag=flag, team=competitor.team)
 
     if correct:
         # This effectively updates the score too
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
+
+    # Inform the user if they had already tried the same flag
+    # (This check must come after actually grading as a team might have submitted a flag that later becomes correct on a problem's being updated.)
+    elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
+            raise FlagAlreadyTriedException()
 
     # For logging purposes, mainly
     models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
@@ -125,3 +144,12 @@ def score(*, team, window):
         for solve in solves:
             score += solve.problem.points
     return score
+
+
+def get_desc(problem, team):
+    if not problem.dynamic:
+        return problem.description_html
+    gen_path = join(settings.PROBLEMS_DIR, problem.dynamic)
+    gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
+    desc = gen.generate(hash(str(team.id) + "grading" + settings.SECRET_KEY))
+    return problem.process_html(desc)

@@ -6,6 +6,7 @@
 /pactf_supervisor.conf
 /django/*/migrations/
 /ctfproblems/_static
+/django/ctflex/fixtures/dump.yaml
 
 # Python
 *.pyc

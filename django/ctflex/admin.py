@@ -18,6 +18,9 @@ class UserAdmin(BaseUserAdmin):
 class TimerAdmin(admin.ModelAdmin):
     readonly_fields = ('end',)
 
+class SubmissionAdmin(admin.ModelAdmin):
+    readonly_fields = ('time',)
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

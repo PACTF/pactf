@@ -10,7 +10,7 @@
 
   <title>
     {% block title %}
-      {% include 'ctflex/title.html' %}
+      {% include 'ctflex/title.txt' %}
     {% endblock %}
   </title>
 
@@ -28,35 +28,14 @@
 
   <!-- JavaScript -->
 
-  {% if production %}
-    {% include "analytics.html" %}
-  {% else %}
-    <script language="javascript">
-      var ga = function (a, b, c, d) {
-      }
-    </script>
-  {% endif %}
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-
-  <script src="{% static "js/libs/notify.min.js" %}"></script>
-  <script src="{% static "js/dependencies.js" %}"></script>
-  <script src="{% static "js/navbar.js" %}"></script>
 
   {% block js %}{% endblock %}
 
 </head>
 <body>
-
-<header>
 
 {# TODO(Yatharth): Put this in the context to enable easy testing, but then the login page messes up, so create CTFlex's own view for that too #}
 {% if not window %}
@@ -64,61 +43,50 @@
 {% endif %}
 {% other_windows as other_windows %}
 
-<div class="menu-wrap">
-    <nav class="menu">
-        <ul class="clearfix">
-          <ul class="pull-left">
-              <li><a href="{% url 'ctflex:index' %}">Home</a></li>
-              <li>
-                <a href="#">{{ window.name }}<span class="arrow">&#9660;</span></a>
-                <ul class="sub-menu">
-                  {% for other_window in other_windows %}
-                    <li><a href="{% switch_window window=other_window resolver_match=request.resolver_match %}">{{ other_window.name }}</a></li>
-                  {% endfor %}
-                </ul>
-              </li>
-              <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>
-              <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
-          </ul>
-          <ul class="pull-right">
-            {% if user.is_authenticated and team %}
-              <li><span >Score: {% teamscore %}</span></li>
-              <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
-              <li><a href="{% url 'logout' %}">Logout</a></li>
-            {% else %}
-              <li><a href="{% url 'login' %}">Login</a></li>
-              <li><a href="{% url 'ctflex:register' %}">Register</a></li>
-          {% endif %}
-          </ul>
-          <div style="clear: both"></div>
-        </ul>
-    </nav>
-</div>
 
-{#  <ul class="pull-left">#}
-{#    <li><a href="{% url 'ctflex:index' %}">Home</a></li>#}
-{#    <a href="#">{{ window.name }}<span class="arrow">&#9660;</span></a>#}
-{#    <ul class="sub-menu">#}
-{#      {% for other_window in other_windows %}#}
-{#        <li><a href="#">{{ other_window.name }}</a></li>#}
-{#      {% endfor %}#}
-{#    </ul>#}
-{#    <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>django.core.serializers.base.DeserializationError: Problem installing fixture#}
-{#    <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>#}
-{#  </ul>#}
-{#  <ul class="pull-right">#}
-{#    {% if user.is_authenticated %}#}
-{#      <li>Score: {% teamscore %}</li>#}
-{#      <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>#}
-{#      <li><a href="{% url 'logout' %}">Logout</a></li>#}
-{#    {% else %}#}
-{#      <li><a href="{% url 'login' %}">Login</a></li>#}
-{#    {% endif %}#}
-{#  </ul>#}
-{#  <div style="clear: both"></div>#}
+<header>
+  <div class="menu-wrap">
+    <nav class="menu">
+      <ul class="clearfix">
+
+        <ul class="pull-left">
+          <li><a href="{% url 'ctflex:index' %}">Home</a></li>
+          <li>
+            <a href="#">{{ window.verbose_name }}<span class="arrow">&#9660;</span></a>
+            <ul class="sub-menu">
+              {% for other_window in other_windows %}
+                <li><a
+                    href="{% switch_window window=other_window resolver_match=request.resolver_match %}">{{ other_window.verbose_name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+          <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>
+          <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
+        </ul>
+        <ul class="pull-right">
+          {% if user.is_authenticated %}
+            {% if team %}
+              <li><span>Score: {% teamscore %}</span></li>
+              <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
+            {% else %}
+              <li><span>Y u no be competitor</span></li>
+            {% endif %}
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'ctflex:register' %}">Register</a></li>
+          {% endif %}
+        </ul>
+
+        <div style="clear: both"></div>
+      </ul>
+    </nav>
+  </div>
 </header>
 
 <div id="body">
+
   {% if messages %}
     <ul class="messages">
       {% for message in messages %}
@@ -130,6 +98,7 @@
   {% endif %}
 
   {% block content %}{% endblock %}
+
 </div>
 
 </body>

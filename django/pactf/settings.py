@@ -94,7 +94,7 @@ class Django:
     USE_TZ = True
 
     # Database
-    # (Postgres is recommended.)
+    # (Postgres is required for CtfProblem's JSONField.)
     DATABASES = values.DatabaseURLValue(environ_required=True)
 
     # Where to finally collect static files to

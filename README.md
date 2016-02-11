@@ -35,16 +35,22 @@ In dire circumstances, use `initializedb.sql`.
 
 ## Problem Writer Documentation
 
-Set variables in `local_settings.py` appropriately. In `PROBLEMS_DIR`, place ‘problem folders’. Each such folder contains `problem.yaml`, `grader.py`, (optionally) a `static` folder, and (recommendedly) a `.uuid` file.
+Configure relevant settings in pactf/envdir.
 
-The `grader.py` file must have a `grade(team_id, submission)` function.
+It is recommended to structure `PROBLEMS_DIR` as so: Have directories whose names are Contest Window 'codes'. Then, in each such directory, have 'problem folders'.  Problem folders whose name begins with an underscore are ignored. In a problem folder, you must have the file `problem.yaml`, the Python script `grader.py`, (optionally) the folder `static`folder, and (recommendedly) a `.uuid` file.
 
-The `problem.yaml` file must have `name`, `point`, `description` and `hint` fields. The `description` and `hint` fields are to be written in non-HTML markdown.
+The `problem.yaml` file must always have the `name` and `point` fields. It may have a `deps` field. Simple problems must contain the `description` and `hint` fields. Non-simple problems, called, dynamic problems, must contain the `dynamic` field.
 
-The `id` field is ~~deprecated~~ obsolete. Instead, if a `.uuid` file exists, it will be used to create or update a problem. If such a file doesn't exist, one will be created by `manage.py loadprobs`.
+The `grader.py` file must have a `grade(key, submission)` function. The parameter `key` is a hash of the team id and a salt.
 
-**Static files** will be copied automatically from the problem `static` folder to the `ctfproblems/<problem-uuid>` deployment static folder. Static files can be linked to using the `{% ctfstatic 'filename.ext' %}` tag.
+For dynamic problems, the `dynamic` field is a string to a Python script called a 'generator'. It must contain a `gen(key)` function that returns a 2-tuple of a description and a hint. It must be deterministic upon the `key` so that `manage.py loadprobs` is an idempotent command. Currently, the output is not even cached to the database for (admittedly untested) performance reasons.
 
-`loadprobs` creates or updates problems, but it doesn't delete them. To delete a problem, remove it from the database manually, and get rid of its now redundant static files by running `collectstatic --clear`.  
+The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `problems` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `problems` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `score` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `score` is not provided, it defaults to 1. 
+
+If a `.uuid` file exists, then if a problem with the same UUID already exists, that problem will be updated; else, a new problem will be created with the gien UUID. If a `.uuid` file does not exist, one will be created on running `manage.py loadprobs`.
+
+Static files can be linked to in the description and hint using the `{% ctfstatic '<basename>' %}` tag. Any files in the `static` folder (if it exists) to the `ctfproblems/<problem-uuid>` deployment static folder, though this implementation is irrelevant to using the feature and may change.
+
+`loadprobs` creates or updates problems, but it doesn't delete them. To delete a problem, remove it from the database manually, and get rid of its now redundant static files by running `collectstatic --clear`. 
  
  

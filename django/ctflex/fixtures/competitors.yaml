@@ -1,26 +1,20 @@
 - model: "ctflex.Competitor"
-  pk: 101
+  pk: 11
   fields:
-    user: 101
-    team: 101
-    first_name: "User 1"
-    last_name: "Last"
-    email: "example1@example.com"
+    user: 11
+    team: 1
+    email: "example11@mailinator.com"
 
 - model: "ctflex.Competitor"
-  pk: 102
+  pk: 12
   fields:
-    user: 102
-    team: 101
-    first_name: "User 2"
-    last_name: "Team 2"
-    email: "example2@example.com"
+    user: 12
+    team: 1
+    email: "example12@mailinator.com"
 
 - model: "ctflex.Competitor"
-  pk: 103
+  pk: 21
   fields:
-    user: 103
-    team: 102
-    first_name: "User 3"
-    last_name: "Team 2"
-    email: "example3@example.com"
+    user: 21
+    team: 2
+    email: "example21@example.com"

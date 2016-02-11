@@ -1,7 +1,10 @@
-name: 'problem3'
+name: 'problem2'
 points: 10
 description: |
-  #### this is desc3
+  #### this is desc2
+
+  <b>htmlbold<b> **bold**
+  <span style="color: red;">span</span>
 
   do we have **markdown** _working_?
 
@@ -11,4 +14,4 @@ description: |
   ```
 
 hint: |
-  hint3
+  hint2

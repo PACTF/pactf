@@ -1,5 +1,5 @@
-def grade(team_id, submission):
-    if 'flag5' in submission:
+def grade(key, submission):
+    if submission.startswith('5'):
         return True, "You did it!"
     else:
         return False, "Try again…"

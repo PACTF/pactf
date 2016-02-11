@@ -1,4 +1,4 @@
-def grade(team_id, submission):
+def grade(key, submission):
     if 'flag7' in submission:
         return True, "It works!"
     else:

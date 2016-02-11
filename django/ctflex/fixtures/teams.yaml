@@ -1,9 +1,19 @@
 - model: "ctflex.Team"
-  pk: 101
+  pk: 1
   fields:
     name: "Team 1"
+    password: password
+
+    country: US
+    state: MA
+    school: PA
 
 - model: "ctflex.Team"
-  pk: 102
+  pk: 2
   fields:
     name: "Team 2"
+    password: password
+
+    country: US
+    state: NY
+    school: TJ

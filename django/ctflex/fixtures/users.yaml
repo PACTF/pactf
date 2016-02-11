@@ -3,7 +3,7 @@
 # Super-users
 
 - model: "auth.user"
-  pk: 100
+  pk: 101
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
@@ -20,12 +20,12 @@
 # Staff
 
 - model: "auth.user"
-  pk: 99
+  pk: 201
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
     is_superuser: false
-    username: "admin2"
+    username: "staff1"
     email: "yatharth999@gmail.com"
     is_staff: true
     is_active: true
@@ -37,40 +37,46 @@
 # Competitors
 
 - model: "auth.user"
-  pk: 101
+  pk: 11
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
-    username: "user1"
-    is_staff: true
+    is_superuser: false
+    username: "user11"
+    is_staff: false
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
     user_permissions: []
+    first_name: "User 1"
+    last_name: "Team 1"
 
 - model: "auth.user"
-  pk: 102
+  pk: 12
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
-    username: "user2"
-    is_staff: true
+    is_superuser: false
+    username: "user12"
+    is_staff: false
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
     user_permissions: []
+    first_name: "User 2"
+    last_name: "Team 1"
 
 - model: "auth.user"
-  pk: 103
+  pk: 21
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
-    username: "user3"
-    is_staff: true
+    is_superuser: false
+    username: "user21"
+    is_staff: false
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
     user_permissions: []
+    first_name: "User 1"
+    last_name: "Team 2"

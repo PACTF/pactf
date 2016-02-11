@@ -1,4 +1,4 @@
-/* TODO(Yatharth): Write in LESS and make it compile automatically */
+/* Body */
 
 body {
     margin: 0;
@@ -9,6 +9,8 @@ body {
 
 #body {
     padding: 10px;
+    max-width: 50em;
+    margin: 0 auto;
 }
 
 

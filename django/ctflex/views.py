@@ -216,7 +216,7 @@ def board(request, *, window_id):
 def board_overall(request):
     params = get_default_dict(request)
     # Move to queries
-    params['teams'] = queries.board(window=None)
+    params['teams'] = queries.board(window=queries.get_window())
     return render(request, 'ctflex/board/board_overall.html', params)
 
 
