@@ -3,7 +3,7 @@ from subprocess import call
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from pactf.constants import PROJECT_NAME
+from pactf import constants
 
 
 class Command(BaseCommand):
@@ -11,10 +11,9 @@ class Command(BaseCommand):
 
     def handle(self, **options):
 
-        DJANGO_WSGI_MODULE = '{}.wsgi'.format(PROJECT_NAME)
+        DJANGO_WSGI_MODULE = '{}.wsgi'.format(constants.PROJECT_NAME)
 
-
-        print("Trying to launch Gunicorn for project '{}'".format(PROJECT_NAME))
+        print("Trying to launch Gunicorn for project '{}'".format(constants.PROJECT_NAME))
 
         if settings.USE_SOCKFILE:
             bind = 'unix:{}'.format(settings.SOCKFILE)
@@ -25,7 +24,7 @@ class Command(BaseCommand):
         call(((
             settings.GUNICORN,
             '{}:application'.format(DJANGO_WSGI_MODULE),
-            '--name {}'.format(PROJECT_NAME),
+            '--name {}'.format(constants.PROJECT_NAME),
             '--workers {}'.format(settings.NUM_WORKERS),
             '--user={}'.format(settings.USER),
             '--group={}'.format(settings.GROUP),

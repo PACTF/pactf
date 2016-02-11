@@ -39,6 +39,7 @@ class Django:
     ]
 
     MIDDLEWARE_CLASSES = (
+        # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,12 +48,18 @@ class Django:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
+
+        # Django 3rd-party
+        'whitenoise.middleware.WhiteNoiseMiddleware',
     )
 
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
+
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
     ROOT_URLCONF = 'pactf.urls'
 
@@ -206,8 +213,7 @@ class Base(Security, CTFlex, Gunicorn, Django, Configuration):
 class Dev(Base):
     # Security
     DEBUG = True
-    TEMPLATE_DEBUG = DEBUG  # TODO(Yatharth): Eliminate warning about TEMPLATE_* deprecation
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = values.ListValue(['*'])
 
     # Logging
     EMAIL_BACKEND = 'email_log.backends.EmailBackend'
@@ -216,8 +222,7 @@ class Dev(Base):
 class Prod(Base):
     # Security
     DEBUG = False
-    TEMPLATE_DEBUG = DEBUG
-    ALLOWED_HOSTS = ['.pactf.com', '.pactf.cf']
+    ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
     https = True  # For settings that should only be true when using HTTPS
     SESSION_COOKIE_SECURE = https
