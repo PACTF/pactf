@@ -49,6 +49,9 @@ def problem_unlocked(team, problem):
     filtered_score = sum(solve.problem.points for solve in solves if solve.problem.id in problem.deps['probs'])
     return filtered_score >= problem.deps['total']
 
+# This solely exists for the purpose of rate limiting decorators
+def get_team(request):
+    return request.user.competitor.team
 
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()

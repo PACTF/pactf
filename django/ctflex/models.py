@@ -468,7 +468,7 @@ class CtfProblem(models.Model):
             self.description_html = self.process_html(self.description)
             self.hint_html = self.process_html(self.hint)
 
-    FIELD_CLEANERs = {
+    FIELD_CLEANERS = {
         'deps': (validate_deps,),
     }
 

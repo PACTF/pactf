@@ -5,8 +5,11 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from ratelimit.decorators import ratelimit
+
+
 urlpatterns = [
-    url(r'^login/$', auth_views.login),
+    url(r'^login/$', ratelimit(key='ip', rate='5/m')(auth_views.login)),
     url(r'^logout/$', auth_views.logout, {'next_page': 'ctflex:index'}),
     url('^', include(auth_urls)),
 

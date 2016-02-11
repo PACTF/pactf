@@ -15,6 +15,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
+from ratelimit.decorators import ratelimit
+
 from ctflex import models
 from ctflex import queries
 from ctflex import commands
@@ -250,6 +252,7 @@ def board_overall(request):
 @single_http_method('POST')
 @competitors_only()
 @windowed()
+@ratelimit(key=queries.get_team, rate='10/m')
 def submit_flag(request, *, window_id, prob_id):
     # Process data from the request
     flag = request.POST.get('flag', '')
@@ -309,6 +312,7 @@ class CurrentTeam(Team):
 
 @single_http_method('POST')
 @sensitive_post_parameters()
+@ratelimit(key='ip', rate='5/m')
 def register_user(request):
     form = forms.RegistrationForm(request.POST)
     if not form.is_valid():
