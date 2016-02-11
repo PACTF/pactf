@@ -22,6 +22,7 @@ In dire circumstances, use `initializedb.sql`.
 ### Updating remote servers
 
 1. Pull from your origin repo using `git pull`
+1. Install new Python packages using `pip install -r requirements.txt`
 1. Prep for deployment using `manage.py prep`, which runs the following commands for you:
 
         makemigrations
