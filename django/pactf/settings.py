@@ -39,7 +39,6 @@ class Django:
     ]
 
     MIDDLEWARE_CLASSES = (
-        # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -48,9 +47,6 @@ class Django:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
-
-        # Django 3rd-party
-        'whitenoise.middleware.WhiteNoiseMiddleware',
     )
 
     STATICFILES_FINDERS = (
@@ -58,8 +54,7 @@ class Django:
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
 
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
     ROOT_URLCONF = 'pactf.urls'
 
