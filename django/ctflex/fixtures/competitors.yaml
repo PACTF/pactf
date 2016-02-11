@@ -4,6 +4,8 @@
     user: 11
     team: 1
     email: "example11@mailinator.com"
+    country: US
+    state: MA
 
 - model: "ctflex.Competitor"
   pk: 12
@@ -11,6 +13,8 @@
     user: 12
     team: 1
     email: "example12@mailinator.com"
+    country: US
+    state: NY
 
 - model: "ctflex.Competitor"
   pk: 21
@@ -18,3 +22,5 @@
     user: 21
     team: 2
     email: "example21@example.com"
+    country: US
+    state: TX

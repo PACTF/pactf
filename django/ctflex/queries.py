@@ -66,13 +66,13 @@ def create_competitor(handle, pswd, email, team):
         c.save()
         return c
 
-def validate_team(name, key):
+def validate_team(name, password):
     team = models.Team.objects.filter(name=name)
     if team.exists():
-        if key == team[0].password:
+        if password == team[0].password:
             return team[0], 'Success!'
         return None, 'Team passphrase incorrect!'
-    team = models.Team(name=name, key=key)
+    team = models.Team(name=name, password=password)
     team.save()
     return team, 'Success!'
 
@@ -138,16 +138,12 @@ def submit_flag(prob_id, competitor, flag):
 
 def score(*, team, window):
     score = 0
-    print(team)
     for competitor in team.competitor_set.all():
         solves = competitor.solve_set.filter()
-        print(competitor)
         if window is not None:
             solves = solves.filter(problem__window=window)
         for solve in solves:
-            print(solve.problem.id)
             score += solve.problem.points
-            print(score)
     return score
 
 
@@ -156,5 +152,19 @@ def get_desc(problem, team):
         return problem.description_html
     gen_path = join(settings.PROBLEMS_DIR, problem.dynamic)
     gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-    desc = gen.generate(hash(str(team.id) + "grading" + settings.SECRET_KEY))
-    return problem.process_html(desc)
+    desc, hint = gen.generate(hash(str(team.id) + "grading" + settings.SECRET_KEY))
+    return problem.process_html(desc), problem.process_html(hint)
+
+
+def format_problem(problem, team):
+    data = problem.__dict__
+    if not problem.dynamic:
+        return problem
+
+    class Dummy:
+        pass
+
+    result = Dummy()
+    data['description_html'], data['hint_html'] = queries.get_desc(problem, team)
+    result.__dict__ = data
+    return result

@@ -3,17 +3,10 @@
   fields:
     name: "Team 1"
     password: password
-
-    country: US
-    state: MA
-    school: PA
+    affiliation: PA
 
 - model: "ctflex.Team"
   pk: 2
   fields:
     name: "Team 2"
     password: password
-
-    country: US
-    state: NY
-    school: TJ

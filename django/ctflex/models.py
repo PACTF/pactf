@@ -124,7 +124,6 @@ def cleaned(cls):
 
 # region User Models
 
-@cleaned
 class Team(models.Model):
     """Represent a team"""
 
@@ -137,9 +136,7 @@ class Team(models.Model):
 
     ''' Extra Data '''
 
-    country = CountryField(blank=True, default='US')
-    state = USStateField(blank=True)
-    school = models.CharField(max_length=60)
+    affiliation = models.CharField(max_length=60, blank=True)
 
     # advisor_name = models.CharField(max_length=40, blank=True)
     # advisor_email = models.EmailField(blank=True)
@@ -158,27 +155,12 @@ class Team(models.Model):
     def has_active_timer(self, window=None):
         return self.has_timer(window) and self.timer(window).active()
 
-    ''' Cleaning '''
 
-    def validate_state_is_given_for_us(self):
-        if self.country == Country('US') and not self.state:
-            raise ValidationError("State is required if you are competing from the U.S.", code='state_is_given_for_us')
-
-    def sync_state_outside_us(self):
-        if self.country != Country('US'):
-            self.state = ''
-
-    FIELD_CLEANERS = {
-        'state': [validate_state_is_given_for_us],
-    }
-
-    MODEL_CLEANERS = (
-        sync_state_outside_us,
-    )
-
-
+@cleaned
 class Competitor(models.Model):
     """Represent a competitor as a 'user profile' (in Django terminology)
+
+    Some of Django's User model's fields are shunned, like first_name, last_name and email. We shun the email field for easier enforcement of uniqueness. We shun Django's User model's fields in general to reduce our dependency on it for data fields. This way, the only data fields stored primarily in in Django's User model are username and password. These are few enough fields to be able to manually hack on to a ModelForm for Competitor instead of needing to combine ModelForm each for Competitor and User, for example.
     """
 
     ''' Structural Fields '''
@@ -190,15 +172,64 @@ class Competitor(models.Model):
     ''' Extra Data '''
 
     email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+
+    country = CountryField(default='US')
+    state = USStateField(blank=True, null=True)
+
+    MIDDLESCHOOL = 'M'
+    HIGHSCHOOL = 'H'
+    HOMESCHOOLED = 'E'
+    UNDERGRAD = 'U'
+    GRADUATE = 'G'
+    TEACHER = 'T'
+    PROFESSIONAL = 'P'
+    HOBBYIST = 'Y'
+    OTHER = 'O'
+    BACKGROUND_CHOICES = (
+        (MIDDLESCHOOL, "Middle School Student"),
+        (HIGHSCHOOL, "High School Student"),
+        (HOMESCHOOLED, "Homeschooled"),
+        (UNDERGRAD, "Undergraduate"),
+        (GRADUATE, "Graduate Student"),
+        (TEACHER, "Teacher"),
+        (PROFESSIONAL, "Security Professional"),
+        (HOBBYIST, "CTF Hobbyist"),
+        (OTHER, "Other"),
+    )
+    background = models.CharField(max_length=1, choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
 
     def __str__(self):
         return "<Competitor #{} {!r}>".format(self.id, self.user.username)
 
+    ''' Cleaning '''
+
+    def validate_state_is_given_for_us(self):
+        if self.country == Country('US') and not self.state:
+            raise ValidationError("State is required if you are competing from the U.S.", code='state_is_given_for_us')
+
+    def sync_state_outside_us(self):
+        if self.country != Country('US'):
+            self.state = None
+
+    FIELD_CLEANERS = {
+        'state': [validate_state_is_given_for_us],
+    }
+
+    MODEL_CLEANERS = (
+        sync_state_outside_us,
+    )
+
 
 @unique_receiver(post_save, sender=Competitor)
-def competitor_post_save_sync_email(sender, instance, **kwargs):
-    """Update User email field based on Competitor user field"""
+def competitor_post_save_sync_to_user(sender, instance, **kwargs):
+    """Update User fields based on Competitor fields"""
+
+    instance.user.first_name = instance.first_name
+    instance.user.last_name = instance.last_name
     instance.user.email = instance.email
+
     instance.user.save()
 
 
@@ -222,6 +253,9 @@ class WindowManager(models.Manager):
         except Window.DoesNotExist:
             return self.filter(start__gte=now).order_by('start').first() or \
                    self.order_by('-start').first()
+
+    def other(self, window):
+        return self.exclude(pk=window.id)
 
 
 @cleaned
