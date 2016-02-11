@@ -7,29 +7,31 @@
 {% endblock %}
 
 {% block content %}
-  {% block board_message %}
-  {% endblock %}
-  <div>
+  <p>
+    {% block board_message %}
+    {% endblock %}
+  </p>
+  <p>
     I GUESS WE CAN PUT A GRAPH HERE
-  </div>
+  </p>
   <table class="table">
     <thead>
-      <tr>
-        <th></th>
-        <th>Team Name</th>
-        <th>School</th>
-        <th>Score</th>
-      </tr>
+    <tr>
+      <th></th>
+      <th>Team Name</th>
+      <th>School</th>
+      <th>Score</th>
+    </tr>
     </thead>
     <tbody>
-      {% for i, team in teams %}
-        <tr>
-          <td>{{ i|add:'1' }}.</td>
-          <td>{{ team.name }}</td>
-          <td>{{ team.school }}</td>
-          <td> {% score team%} </td>
-        </tr>
-      {% endfor %}
+    {% for i, score_team in teams %}
+      <tr>
+        <td>{{ i|add:'1' }}.</td>
+        <td>{{ score_team.1.name }}</td>
+        <td>{{ score_team.1.school }}</td>
+        <td>{{ score_team.0 }}</td>
+      </tr>
+    {% endfor %}
     </tbody>
   </table>
 {% endblock %}

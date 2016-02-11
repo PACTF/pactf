@@ -78,14 +78,15 @@ def validate_team(name, key):
 
 
 
-def board(window):
+def board(window=None):
     return enumerate(
         sorted(
+            map(lambda team: (score(team=team, window=window), team),
             filter(
                 eligible,
                 models.Team.objects.all()
-            ),
-            key=lambda team: score(team=team, window=window),
+            )),
+            key=lambda item: item[0],
             reverse=True,
         )
     )
@@ -137,12 +138,16 @@ def submit_flag(prob_id, competitor, flag):
 
 def score(*, team, window):
     score = 0
+    print(team)
     for competitor in team.competitor_set.all():
         solves = competitor.solve_set.filter()
+        print(competitor)
         if window is not None:
             solves = solves.filter(problem__window=window)
         for solve in solves:
+            print(solve.problem.id)
             score += solve.problem.points
+            print(score)
     return score
 
 
