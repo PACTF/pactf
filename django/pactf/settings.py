@@ -212,6 +212,29 @@ class Dev(Base):
 
     # Logging
     EMAIL_BACKEND = 'email_log.backends.EmailBackend'
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '~/.virtualenvs/pactf/debug.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'ctflex.queries': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }
 
 
 class Prod(Base):
@@ -223,5 +246,5 @@ class Prod(Base):
     SESSION_COOKIE_SECURE = https
     CSRF_COOKIE_SECURE = https
 
-    # (Only enable this if nginx is properly configured.)
+    # (Only enable this if nginx is properly configured with HTTPS.)
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -1,4 +1,6 @@
 import importlib.machinery
+import logging
+
 from functools import partial
 from os.path import join
 
@@ -8,6 +10,8 @@ from django_countries.fields import Country
 from django.contrib.auth.password_validation import validate_password
 
 from ctflex import models
+
+logger = logging.getLogger('ctflex.queries')
 
 
 # General queries
@@ -67,9 +71,11 @@ def create_competitor(handle, pswd, email, team):
         c.full_clean()
     except ValidationError:
         u.delete()
+        logger.warning('create_competitor: Competitor creation failed: "' + handle + '".')
         raise
     else:
         c.save()
+        logger.info('create_competitor: New competitor created: "' + handle + '".')
         return c
 
 
@@ -77,10 +83,13 @@ def validate_team(name, password):
     team = models.Team.objects.filter(name=name)
     if team.exists():
         if password == team[0].password:
+            logger.info('validate_team: Team credentials validated for "' + name + '".')
             return team[0], 'Success!'
+        logger.warning('validate_team: Team credentials incorrect for "' + name + '".')
         return None, 'Team passphrase incorrect!'
     team = models.Team(name=name, password=password)
     team.save()
+    logger.info('validate_team: New team created: "' + name + '".')
     return team, 'Success!'
 
 
@@ -99,7 +108,11 @@ def board(window=None):
 
 
 def grade(*, problem, flag, team):
+    logger.debug(
+        'grade: Grading problem ' + problem.id + ' (' + problem.name + ') for team ' + team.id +
+        ' (' + team.name + ') with flag "' + flag + '".')
     if not flag:
+        logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is empty.')
         return False, "Empty flag"
 
     grader_path = join(settings.PROBLEMS_DIR, problem.grader)
@@ -107,6 +120,7 @@ def grade(*, problem, flag, team):
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
     # extract key
     correct, message = grader.grade(hash(str(team.id) + "grading" + settings.SECRET_KEY), flag)
+    logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
     return correct, message
 
 
@@ -123,6 +137,7 @@ def submit_flag(prob_id, competitor, flag):
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
+        logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
         raise ProblemAlreadySolvedException()
 
     # Grade
@@ -131,10 +146,14 @@ def submit_flag(prob_id, competitor, flag):
     if correct:
         # This effectively updates the score too
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
+        logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
 
     # Inform the user if they had already tried the same flag
-    # (This check must come after actually grading as a team might have submitted a flag that later becomes correct on a problem's being updated.)
+    # (This check must come after actually grading as a team might have submitted a flag
+    # that later becomes correct on a problem's being updated.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
+        logger.info('submit_flag: Team ' + competitor.team.id +
+                    ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
         raise FlagAlreadyTriedException()
 
     # For logging purposes, mainly
