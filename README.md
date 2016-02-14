@@ -1,22 +1,15 @@
 # PACTF (Beta)
 
-# Host Documentation
+## Documentation for Everyone
+
+Do make sure to read the (parts of the) Glossary (relevant to you). It's in a Google Doc somewhere. 
+ 
+
+## Host Documentation
 
 ### Installation
 
 Get access to our top-secret Google Doc called "Deployment Instructions" and follow those steps.
-
-
-### Throwing away current database during development
-
-1. Delete all files from migrations
-1. Run `manage.py reset_db`
-1. Run `manage.py makemigrations`
-1. Run `manage.py migrate`
-1. Run `manage.py reloaddata`
-1. Run `manage.py prep`
-
-In dire circumstances, use `initializedb.sql`.
 
 
 ### Updating remote servers
@@ -32,6 +25,24 @@ In dire circumstances, use `initializedb.sql`.
     
 1. Restart Gunicorn via Supervisor or yourself (using `supervisorctl restart pactf`)
 1. (If needed:) Validate and update nginx configuration using: `sudo nginx -t; and sudo service nginx restart`
+
+
+## Developer Documentation
+
+### Figuring out what is what
+
+Get access to our other top-secret Google Doc called "Design Doc".
+
+### Throwing away current database during development
+
+1. Delete all files from migrations
+1. Run `manage.py reset_db`
+1. Run `manage.py makemigrations`
+1. Run `manage.py migrate`
+1. Run `manage.py reloaddata`
+1. Run `manage.py prep`
+
+In dire circumstances, use `initializedb.sql`.
 
 
 ## Problem Writer Documentation
