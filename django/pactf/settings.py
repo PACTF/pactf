@@ -54,6 +54,8 @@ class Django:
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
 
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
     ROOT_URLCONF = 'pactf.urls'
 
     WSGI_APPLICATION = 'pactf.wsgi.application'
@@ -206,22 +208,43 @@ class Base(Security, CTFlex, Gunicorn, Django, Configuration):
 class Dev(Base):
     # Security
     DEBUG = True
-    TEMPLATE_DEBUG = DEBUG  # TODO(Yatharth): Eliminate warning about TEMPLATE_* deprecation
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = values.ListValue(['*'])
 
     # Logging
     EMAIL_BACKEND = 'email_log.backends.EmailBackend'
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '~/.virtualenvs/pactf/debug.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'ctflex.queries': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }
 
 
 class Prod(Base):
     # Security
     DEBUG = False
-    TEMPLATE_DEBUG = DEBUG
-    ALLOWED_HOSTS = ['.pactf.com', '.pactf.cf']
+    ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
     https = True  # For settings that should only be true when using HTTPS
     SESSION_COOKIE_SECURE = https
     CSRF_COOKIE_SECURE = https
 
-    # (Only enable this if nginx is properly configured.)
+    # (Only enable this if nginx is properly configured with HTTPS.)
     # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

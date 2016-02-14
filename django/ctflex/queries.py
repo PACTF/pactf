@@ -1,12 +1,17 @@
 import importlib.machinery
+import logging
+
 from functools import partial
 from os.path import join
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django_countries.fields import Country
+from django.contrib.auth.password_validation import validate_password
 
 from ctflex import models
+
+logger = logging.getLogger('ctflex.queries')
 
 
 # General queries
@@ -24,10 +29,12 @@ def create_object(model, **kwargs):
 def query_get(model, **kwargs):
     return model.objects.get(**kwargs)
 
+
 # CTFlex-specific queries
 
 def eligible(team):
     return not team.banned and team.country == Country('US')
+
 
 def get_window(window_id=None):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
@@ -40,6 +47,7 @@ def window_active(team):
 def viewable_problems(team, window):
     return sorted(filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
                   key=lambda problem: (problem.points, problem.name))
+
 
 def problem_unlocked(team, problem):
     if not problem.deps:
@@ -56,39 +64,46 @@ def get_team(request):
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
+
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
     u = models.User.objects.create_user(handle, None, pswd)
     try:
+        validate_password(pswd, user=u)
         c = models.Competitor(user=u, team=team, email=email)
         c.full_clean()
     except ValidationError:
         u.delete()
+        logger.warning('create_competitor: Competitor creation failed: "' + handle + '".')
         raise
     else:
         c.save()
+        logger.info('create_competitor: New competitor created: "' + handle + '".')
         return c
+
 
 def validate_team(name, password):
     team = models.Team.objects.filter(name=name)
     if team.exists():
         if password == team[0].password:
+            logger.info('validate_team: Team credentials validated for "' + name + '".')
             return team[0], 'Success!'
+        logger.warning('validate_team: Team credentials incorrect for "' + name + '".')
         return None, 'Team passphrase incorrect!'
     team = models.Team(name=name, password=password)
     team.save()
+    logger.info('validate_team: New team created: "' + name + '".')
     return team, 'Success!'
-
 
 
 def board(window=None):
     return enumerate(
         sorted(
             map(lambda team: (score(team=team, window=window), team),
-            filter(
-                eligible,
-                models.Team.objects.all()
-            )),
+                filter(
+                    eligible,
+                    models.Team.objects.all()
+                )),
             key=lambda item: item[0],
             reverse=True,
         )
@@ -96,7 +111,11 @@ def board(window=None):
 
 
 def grade(*, problem, flag, team):
+    logger.debug(
+        'grade: Grading problem ' + problem.id + ' (' + problem.name + ') for team ' + team.id +
+        ' (' + team.name + ') with flag "' + flag + '".')
     if not flag:
+        logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is empty.')
         return False, "Empty flag"
 
     grader_path = join(settings.PROBLEMS_DIR, problem.grader)
@@ -104,11 +123,13 @@ def grade(*, problem, flag, team):
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
     # extract key
     correct, message = grader.grade(hash(str(team.id) + "grading" + settings.SECRET_KEY), flag)
+    logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
     return correct, message
 
 
 class ProblemAlreadySolvedException(Exception):
     pass
+
 
 class FlagAlreadyTriedException(Exception):
     pass
@@ -119,6 +140,7 @@ def submit_flag(prob_id, competitor, flag):
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
+        logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
         raise ProblemAlreadySolvedException()
 
     # Grade
@@ -127,11 +149,15 @@ def submit_flag(prob_id, competitor, flag):
     if correct:
         # This effectively updates the score too
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
+        logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
 
     # Inform the user if they had already tried the same flag
-    # (This check must come after actually grading as a team might have submitted a flag that later becomes correct on a problem's being updated.)
+    # (This check must come after actually grading as a team might have submitted a flag
+    # that later becomes correct on a problem's being updated.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
-            raise FlagAlreadyTriedException()
+        logger.info('submit_flag: Team ' + competitor.team.id +
+                    ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
+        raise FlagAlreadyTriedException()
 
     # For logging purposes, mainly
     models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
