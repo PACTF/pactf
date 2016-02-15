@@ -93,7 +93,6 @@ class Django:
     LOGIN_URL = 'ctflex:login'
     LOGOUT_URL = 'ctflex:logout'
     LOGIN_REDIRECT_URL = 'ctflex:index'
-    LOGOUT_REDIRECT_URL = 'ctflex:index'  # not standard, but used by CTFlex
 
     # Internationalization
     LANGUAGE_CODE = 'en-us'
@@ -112,6 +111,16 @@ class Django:
 
     # Where all to collect static files from
     STATICFILES_DIRS = values.ListValue([])
+
+    # Email
+    EMAIL_HOST = values.Value('smtp.gmail.com')
+    EMAIL_PORT = values.IntegerValue(587)
+    DEFAULT_FROM_EMAIL = values.Value('ctflex2@gmail.com')
+    SERVER_EMAIL = values.Value('ctflex2@gmail.com')
+    EMAIL_HOST_USER = values.Value('ctflex2@gmail.com')
+    EMAIL_HOST_PASSWORD = values.SecretValue()
+    EMAIL_USE_TLS = values.BooleanValue(True)
+    SUPPORT_EMAIL = 'ctflex2+support@gmail.com'  # not standard, but used by CTFlex
 
 
 class Security:
