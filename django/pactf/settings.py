@@ -86,9 +86,10 @@ class Django:
     CONN_MAX_AGE = 60 * 60
 
     # Auth URLs
-    LOGIN_URL = 'login'
-    LOGOUT_URL = 'logout'
+    LOGIN_URL = 'ctflex:login'
+    LOGOUT_URL = 'ctflex:logout'
     LOGIN_REDIRECT_URL = 'ctflex:index'
+    LOGOUT_REDIRECT_URL = 'ctflex:index'
 
     # Internationalization
     LANGUAGE_CODE = 'en-us'

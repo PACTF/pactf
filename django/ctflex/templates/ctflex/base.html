@@ -23,7 +23,7 @@
   <link href="{% static "ctflex/css/main.css" %}" rel="stylesheet">
   <link href="{% static "ctflex/css/header.css" %}" rel="stylesheet">
 
-  {% block css %}{% endblock %}
+  {% block extra_css %}{% endblock %}
 
 
   <!-- JavaScript -->
@@ -32,7 +32,7 @@
   <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
-  {% block js %}{% endblock %}
+  {% block extra_js %}{% endblock %}
 
 </head>
 <body>
@@ -72,9 +72,9 @@
             {% else %}
               <li><span>Y u no be competitor</span></li>
             {% endif %}
-            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
           {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'ctflex:login' %}">Login</a></li>
             <li><a href="{% url 'ctflex:register' %}">Register</a></li>
           {% endif %}
         </ul>

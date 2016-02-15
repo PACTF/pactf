@@ -1,0 +1,8 @@
+{% if form.errors %}
+  <p class="errornote">
+    Please correct the
+    {% if form.errors.items|length == 1 %}error{% else %}errors{% endif %}
+    below.
+  </p>
+  {{ form.non_field_errors }}
+{% endif %}
