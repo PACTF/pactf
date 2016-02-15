@@ -14,9 +14,15 @@ class CompetitorInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (CompetitorInline,)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        personal_info = self.fieldsets[1][1]  # mutable, so we can modify it in the next line
+        personal_info['fields'] = tuple(field for field in personal_info['fields'] if field != 'email')
+
 
 class TimerAdmin(admin.ModelAdmin):
     readonly_fields = ('end',)
+
 
 class SubmissionAdmin(admin.ModelAdmin):
     readonly_fields = ('time',)
