@@ -10,8 +10,9 @@ from django_countries.fields import Country
 from django.contrib.auth.password_validation import validate_password
 
 from ctflex import models
+from ctflex import constants
 
-logger = logging.getLogger('ctflex.queries')
+logger = logging.getLogger(constants.QUERY_LOGGER)
 
 
 # General queries

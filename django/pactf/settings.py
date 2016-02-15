@@ -1,5 +1,5 @@
 """Define (default) configuration for the project"""
-
+import os
 from os.path import join
 
 from configurations import Configuration, values
@@ -216,20 +216,23 @@ class Dev(Base):
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '~/.virtualenvs/pactf/debug.log',
+            # 'file': {
+            #     'level': 'DEBUG',
+            #     'class': 'logging.FileHandler',
+            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
+            # },
+            'console': {
+                'class': 'logging.StreamHandler',
             },
         },
         'loggers': {
             'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': True,
             },
-            'ctflex.queries': {
-                'handlers': ['file'],
+            ctflex.constants.QUERY_LOGGER: {
+                'handlers': ['console'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
