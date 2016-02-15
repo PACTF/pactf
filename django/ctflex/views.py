@@ -1,7 +1,6 @@
 import inspect
 from functools import wraps
 
-from django.contrib.auth.views import login as auth_login, logout as auth_logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -20,6 +19,7 @@ from ctflex import models
 from ctflex import queries
 from ctflex import commands
 from ctflex import forms
+from ctflex import constants
 
 
 # region Helper Methods
@@ -28,15 +28,20 @@ def is_competitor(user):
     return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
 
 
-def get_default_dict(request):
+def default_context(request):
+    """Return default CTFlex context
+
+    This context processor is included as the global context processor in settings.py; therefore, it should not be manually included.
+    """
     params = {}
     params['production'] = not settings.DEBUG
     params['team'] = request.user.competitor.team if is_competitor(request.user) else None
     return params
 
 
-def get_window_dict(request, window):
-    params = get_default_dict(request)
+def windowed_context(request, window):
+    """Return context for windowed URLs"""
+    params = {}
     params['window'] = window
     params['is_active_window'] = window.start
     return params
@@ -170,19 +175,19 @@ def windowed():
 @single_http_method('GET')
 @windowed()
 def inactive(request, *, window_id):
-    return render(request, 'ctflex/states/inactive.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/inactive.html', windowed_context(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def waiting(request, *, window_id):
-    return render(request, 'ctflex/states/waiting.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/waiting.html', windowed_context(request, queries.get_window(window_id)))
 
 
 @single_http_method('GET')
 @windowed()
 def done(request, *, window_id):
-    return render(request, 'ctflex/states/done.html', get_window_dict(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/done.html', windowed_context(request, queries.get_window(window_id)))
 
 
 @single_http_method('POST')
@@ -208,7 +213,7 @@ def start_timer(request, *, window_id):
 
 @single_http_method('GET')
 def index(request):
-    return render(request, 'ctflex/misc/index.html', get_default_dict(request))
+    return render(request, 'ctflex/misc/index.html')
 
 
 @single_http_method('GET')
@@ -217,7 +222,7 @@ def index(request):
 def game(request, *, window_id):
     window = queries.get_window(window_id)
 
-    params = get_window_dict(request, window)
+    params = windowed_context(request, window)
     params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
 
     warn_historic(request, window)
@@ -230,7 +235,7 @@ def game(request, *, window_id):
 def board(request, *, window_id):
     window = queries.get_window(window_id)
 
-    params = get_window_dict(request, window)
+    params = windowed_context(request, window)
     params['teams'] = queries.board(window)
 
     warn_historic(request, window)
@@ -241,7 +246,7 @@ def board(request, *, window_id):
 @single_http_method('GET')
 @never_cache
 def board_overall(request):
-    params = get_default_dict(request)
+    params = {}
     params['teams'] = queries.board()
 
     return render(request, 'ctflex/board/board_overall.html', params)
@@ -289,7 +294,7 @@ class Team(DetailView):
         # TODO: use windowed decorator somehow?
         window = queries.get_window(self.kwargs['window_id'])
         context = super(Team, self).get_context_data(**kwargs)
-        context.update(get_window_dict(self.request, window))
+        context.update(windowed_context(self.request, window))
         return context
 
 
@@ -305,16 +310,16 @@ class CurrentTeam(Team):
 
 # region Auth Views
 
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def login(request):
-    return auth_login(request, template_name='ctflex/auth/login.html', extra_context=get_default_dict(request))
+@single_http_method('GET')
+def logout_done(request):
+    messages.success(request, "You have been logged out.")
+    return redirect(constants.LOGOUT_REDIRECT_URL)
 
 
-def logout(request):
-    messages.info(request, "You have been logged out")
-    return auth_logout(request, next_page=settings.LOGOUT_REDIRECT_URL)
+@single_http_method('GET')
+def password_change_done(request):
+    messages.success(request, "Your password was successfully changed.")
+    return redirect(constants.PASSWORD_CHANGE_REDIRECT_URL)
 
 
 @sensitive_post_parameters()
@@ -322,7 +327,7 @@ def logout(request):
 @never_cache
 def register(request, form=None):
     if form is None: form = forms.RegistrationForm()
-    d = get_default_dict(request)
+    d = {}
     d['form'] = form
     return render(request, 'registration/register.html', d)
 

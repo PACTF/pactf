@@ -1,5 +1,6 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
+{% load formfield from ctflex %}
 
 {% block title %}
   Login — {{ block.super }}
@@ -17,20 +18,24 @@
     <p>If you don't already have an account, <a href="{% url 'ctflex:register' %}">sign up</a>!</p>
   {% endif %}
 
-  <p>Lost your password? <a href="{% url 'password_reset' %}">Reset it.</a></p>
+  <p>Lost your password? <a href="{% url 'ctflex:password_reset' %}">Reset it.</a></p>
 
   <form method="post">
     {% csrf_token %}
+
     {% include 'ctflex/snippets/form_non_field_errors.html' %}
 
-
-    {% include 'ctflex/snippets/form_field.html' with field=form.username only %}
-    {% include 'ctflex/snippets/form_field.html' with field=form.password only %}
+    {% formfield form.username %}{% endformfield %}
+    {% formfield form.password %}{% endformfield %}
 
     <input type="hidden" name="next" value="{{ next }}"/>
 
     <input type="submit" value="Log in"/>
 
+    <script type="text/javascript">document.getElementById("id_username").focus();</script>
+
   </form>
+
+
 
 {% endblock %}
