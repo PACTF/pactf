@@ -427,9 +427,8 @@ class CtfProblem(models.Model):
     ''' Cleaning '''
 
     def validate_deps(self):
-        if self.deps is not None:
-
-            if not tuple(self.deps.keys()) in ('score', 'probs'):
+        if self.deps:
+            if list(filter(lambda x:x not in ('score', 'probs'), self.deps.keys())):
                 raise ValidationError(
                     "The field deps can only contain the keys score and probs",
                     code='deps',
