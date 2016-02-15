@@ -66,10 +66,14 @@ class Django:
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
+                    # Default
                     'django.template.context_processors.debug',
                     'django.template.context_processors.request',
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
+
+                    # CTFlex
+                    'ctflex.views.default_context'
                 ],
             },
         },
@@ -89,7 +93,7 @@ class Django:
     LOGIN_URL = 'ctflex:login'
     LOGOUT_URL = 'ctflex:logout'
     LOGIN_REDIRECT_URL = 'ctflex:index'
-    LOGOUT_REDIRECT_URL = 'ctflex:index'
+    LOGOUT_REDIRECT_URL = 'ctflex:index'  # not standard, but used by CTFlex
 
     # Internationalization
     LANGUAGE_CODE = 'en-us'
@@ -144,6 +148,25 @@ class Security:
 
     # Prevent browsers from guessing content types (reducing security risk).
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Validation for passwords
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            'OPTIONS': {
+                'min_length': 7,
+            }
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+    ]
 
 
 class Gunicorn:

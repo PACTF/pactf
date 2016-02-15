@@ -21,7 +21,10 @@
 
     {% block js %}{% endblock %}
 </head>
-
+{% if not window %}
+  {% current_window as window %}
+{% endif %}
+{% other_windows as other_windows %}
   <body>
     <div class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
@@ -58,7 +61,6 @@
             </li>
             {% if user.is_authenticated %}
               {% if team %}
-                <li><span>Score: {% score team %}</span></li>
                 <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
               {% else %}
                 <li><span>Y u no be competitor</span></li>
