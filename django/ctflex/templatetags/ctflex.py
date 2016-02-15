@@ -27,17 +27,6 @@ def format_problem(problem, team):
 def solved(problem, team):
     return queries.solved(problem, team)
 
-
-@register.simple_tag()
-def current_window():
-    return Window.objects.current()
-
-
-@register.simple_tag(takes_context=True)
-def other_windows(context):
-    return Window.objects.other(context['window'])
-
-
 # endregion
 
 
