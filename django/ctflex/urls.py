@@ -33,13 +33,10 @@ urlpatterns = [
     url('^$', views.index, name='index'),
     url(r'^board$', views.board_overall, name='scoreboard_overall'),
 
-<<<<<<< HEAD
-=======
     # Auth
     url(r'^login$', views.login, name='login'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^register$', views.register, name='register'),
->>>>>>> e1f0c200a30db6df5bc430495bc250f100a0632f
     url(r'^register_user$', views.register_user, name='register_user'),
 
     # Windowed
