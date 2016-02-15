@@ -34,7 +34,7 @@ def query_get(model, **kwargs):
 # CTFlex-specific queries
 
 def eligible(team):
-    return not team.banned and team.country == Country('US')
+    return not team.banned and all(competitor.country == Country('US') for competitor in team.competitor_set.all())
 
 
 def get_window(window_id=None):
