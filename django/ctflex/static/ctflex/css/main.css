@@ -13,6 +13,23 @@ body {
     margin: 0 auto;
 }
 
+/* Forms */
+
+.errorlist > li {
+    background-color: red;
+    list-style-type: none;
+    margin-bottom: 0.5em;
+    display: inline-block;
+}
+
+.form-field {
+    list-style-type: none;
+    margin-bottom: 1em;
+}
+
+.form-field .errorlist > li {
+    margin-left: 1em;
+}
 
 /* Messages */
 

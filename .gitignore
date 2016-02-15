@@ -1,7 +1,6 @@
 # Local config
 /django/pactf/envdir
 /static/
-/logs/
 /pactf_nginx.conf
 /pactf_supervisor.conf
 /django/*/migrations/

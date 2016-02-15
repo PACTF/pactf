@@ -1,10 +1,11 @@
 import inspect
 from functools import wraps
 
+from django.contrib.auth.views import login as auth_login, logout as auth_logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import resolve
 from django.core.exceptions import ValidationError
@@ -32,8 +33,7 @@ def is_competitor(user):
 def get_default_dict(request):
     params = {}
     params['production'] = not settings.DEBUG
-    team = request.user.competitor.team if is_competitor(request.user) else None
-    params['team'] = team
+    params['team'] = request.user.competitor.team if is_competitor(request.user) else None
     return params
 
 
@@ -206,7 +206,7 @@ def start_timer(request, *, window_id):
 # endregion
 
 
-# region GETs
+# region CTF Views
 
 @single_http_method('GET')
 def index(request):
@@ -280,14 +280,7 @@ def submit_flag(request, *, window_id, prob_id):
 
 # endregion
 
-
-# region User Views
-
-def register(request, form=None):
-    if form is None: form = forms.RegistrationForm()
-    d = get_default_dict(request)
-    d['form'] = form
-    return render(request, 'registration/register.html', d)
+# region Team Views
 
 
 @single_http_method('GET')
@@ -308,6 +301,33 @@ class Team(DetailView):
 class CurrentTeam(Team):
     def get_object(self, **kwargs):
         return self.request.user.competitor.team
+
+
+# endregion
+
+
+# region Auth Views
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login(request):
+    return auth_login(request, template_name='ctflex/auth/login.html', extra_context=get_default_dict(request))
+
+
+def logout(request):
+    messages.info(request, "You have been logged out")
+    return auth_logout(request, next_page=settings.LOGOUT_REDIRECT_URL)
+
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def register(request, form=None):
+    if form is None: form = forms.RegistrationForm()
+    d = get_default_dict(request)
+    d['form'] = form
+    return render(request, 'registration/register.html', d)
 
 
 @single_http_method('POST')

@@ -6,11 +6,11 @@
   Game — {{ block.super }}
 {% endblock %}
 
-{% block css %}
+{% block extra_css %}
   <link href="{% static "ctflex/css/game.css" %}" rel="stylesheet">
 {% endblock %}
 
-{% block js %}
+{% block extra_js %}
   <script src="{% static 'ctflex/js/game.js' %}"></script>
 {% endblock %}
 

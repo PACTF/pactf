@@ -1,5 +1,5 @@
 """Define (default) configuration for the project"""
-
+import os
 from os.path import join
 
 from configurations import Configuration, values
@@ -86,9 +86,10 @@ class Django:
     CONN_MAX_AGE = 60 * 60
 
     # Auth URLs
-    LOGIN_URL = 'login'
-    LOGOUT_URL = 'logout'
+    LOGIN_URL = 'ctflex:login'
+    LOGOUT_URL = 'ctflex:logout'
     LOGIN_REDIRECT_URL = 'ctflex:index'
+    LOGOUT_REDIRECT_URL = 'ctflex:index'
 
     # Internationalization
     LANGUAGE_CODE = 'en-us'
@@ -216,20 +217,23 @@ class Dev(Base):
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '~/.virtualenvs/pactf/debug.log',
+            # 'file': {
+            #     'level': 'DEBUG',
+            #     'class': 'logging.FileHandler',
+            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
+            # },
+            'console': {
+                'class': 'logging.StreamHandler',
             },
         },
         'loggers': {
             'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': True,
             },
-            'ctflex.queries': {
-                'handlers': ['file'],
+            ctflex.constants.QUERY_LOGGER: {
+                'handlers': ['console'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
