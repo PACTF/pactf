@@ -21,10 +21,7 @@
 
     {% block js %}{% endblock %}
 </head>
-{% if not window %}
-  {% current_window as window %}
-{% endif %}
-{% other_windows as other_windows %}
+
   <body>
     <div class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
@@ -42,12 +39,14 @@
             <li class="active">
               <li><a href="{% url 'ctflex:index' %}">{% include 'ctflex/title.txt' %}</a></li>
             </li>
+            {% if user.is_authenticated %}
             <li>
               <a href="{% url 'ctflex:game' window_id=window.id %}">Game</a>
             </li>
             <li>
               <a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Scoreboard</a>
             </li>
+            {% endif %}
             <li>
               <a href="/about">About</a>
             </li>
@@ -65,9 +64,9 @@
               {% else %}
                 <li><span>Y u no be competitor</span></li>
               {% endif %}
-              <li><a href="{% url 'logout' %}">Logout</a></li>
+              <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
             {% else %}
-              <li><a href="{% url 'login' %}">Login</a></li>
+              <li><a href="{% url 'ctflex:login' %}">Login</a></li>
               <li><a href="{% url 'ctflex:register' %}">Register</a></li>
             {% endif %}
           </ul>
