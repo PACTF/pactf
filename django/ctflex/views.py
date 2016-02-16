@@ -4,7 +4,7 @@ from functools import wraps
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import resolve
 from django.core.exceptions import ValidationError
@@ -38,6 +38,8 @@ def default_context(request):
     params = {}
     params['production'] = not settings.DEBUG
     params['team'] = request.user.competitor.team if is_competitor(request.user) else None
+    params['window'] = queries.get_window()
+    params['other_windows'] = models.Window.objects.other(params['window'])
     return params
 
 
@@ -314,15 +316,25 @@ class CurrentTeam(Team):
 # region Auth Views
 
 @single_http_method('GET')
-def logout_done(request):
-    messages.success(request, "You have been logged out.")
-    return redirect(constants.LOGOUT_REDIRECT_URL)
+def logout_done(request, *,
+                message="You have been logged out.",
+                redirect_url='ctflex:index'):
+    messages.success(request, message)
+    return redirect(redirect_url)
 
 
 @single_http_method('GET')
-def password_change_done(request):
-    messages.success(request, "Your password was successfully changed.")
-    return redirect(constants.PASSWORD_CHANGE_REDIRECT_URL)
+def password_change_done(request, *,
+                         message="Your password was successfully changed.",
+                         redirect_url=constants.TEAM_CHANGE_REDIRECT_URL):
+    messages.success(request, message)
+    return redirect(redirect_url)
+
+
+@single_http_method('GET')
+def password_reset_complete(request):
+    messages.success(request, "Your password was successfully set. You can log in now.")
+    return redirect('ctflex:login')
 
 
 @sensitive_post_parameters()
@@ -360,4 +372,4 @@ def register_user(request):
         form.add_error('handle', "Can't create user")
         return register(request, form)
 
-# endregion
+        # endregion
