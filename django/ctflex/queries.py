@@ -1,5 +1,6 @@
 import importlib.machinery
 import logging
+import zlib
 
 from functools import partial
 from os.path import join
@@ -15,42 +16,21 @@ from ctflex import constants
 logger = logging.getLogger(constants.QUERY_LOGGER)
 
 
-# General queries
-
-def query_filter(model, **kwargs):
-    return model.objects.filter(**kwargs)
+# XXX(Yatharth): Clean queries
 
 
-def create_object(model, **kwargs):
-    result = model(**kwargs)
-    result.save()
-    return result
-
-
-def query_get(model, **kwargs):
-    return model.objects.get(**kwargs)
-
-
-# CTFlex-specific queries
-
-def eligible(team):
-    return not team.banned and all(competitor.country == Country('US') for competitor in team.competitor_set.all())
+# region General
 
 
 def get_window(window_id=None):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
 
 
-def window_active(team):
-    return team.window_active()
+# endregion
 
+# region Board
 
-def viewable_problems(team, window):
-    return sorted(filter(partial(problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
-                  key=lambda problem: (problem.points, problem.name))
-
-
-def problem_unlocked(team, problem):
+def _problem_unlocked(team, problem):
     if not problem.deps:
         return True
     assert 'total' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
@@ -59,9 +39,56 @@ def problem_unlocked(team, problem):
     return filtered_score >= problem.deps['total']
 
 
+def viewable_problems(team, window):
+    return sorted(filter(partial(_problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
+                  key=lambda problem: (problem.points, problem.name))
+
+
+# endregion
+
+# region Template Tag
+
+
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
+
+# endregion
+
+# region Board
+
+def score(*, team, window):
+    score = 0
+    for competitor in team.competitor_set.all():
+        solves = competitor.solve_set.filter()
+        if window is not None:
+            solves = solves.filter(problem__window=window)
+        for solve in solves:
+            score += solve.problem.points
+    return score
+
+
+def _eligible(team):
+    return not team.banned and all(competitor.country == Country('US') for competitor in team.competitor_set.all())
+
+
+def board(window=None):
+    return enumerate(
+        sorted(
+            map(lambda team: (score(team=team, window=window), team),
+                filter(
+                    _eligible,
+                    models.Team.objects.all()
+                )),
+            key=lambda item: item[0],
+            reverse=True,
+        )
+    )
+
+
+# endregion
+
+# region Auth
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
@@ -94,18 +121,12 @@ def validate_team(name, password):
     return team, 'Success!'
 
 
-def board(window=None):
-    return enumerate(
-        sorted(
-            map(lambda team: (score(team=team, window=window), team),
-                filter(
-                    eligible,
-                    models.Team.objects.all()
-                )),
-            key=lambda item: item[0],
-            reverse=True,
-        )
-    )
+# endregion Auth
+
+# region Game
+
+def compute_key(team):
+    return zlib.adler32(bytes(str(team.id) + constants.PROBLEM_SALT + settings.SECRET_KEY, 'utf-8'))
 
 
 def grade(*, problem, flag, team):
@@ -118,8 +139,8 @@ def grade(*, problem, flag, team):
     # XXX(Yatharth): Handle FileNotFound
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
     # extract key
-    correct, message = grader.grade(hash(str(team.id) + "grading" + settings.SECRET_KEY), flag)
-    logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
+    correct, message = grader.grade(compute_key(team), flag)
+    # logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
     return correct, message
 
 
@@ -160,26 +181,16 @@ def submit_flag(prob_id, competitor, flag):
     return correct, message
 
 
-def score(*, team, window):
-    score = 0
-    for competitor in team.competitor_set.all():
-        solves = competitor.solve_set.filter()
-        if window is not None:
-            solves = solves.filter(problem__window=window)
-        for solve in solves:
-            score += solve.problem.points
-    return score
-
-
-def get_desc(problem, team):
+def _get_desc(problem, team):
     if not problem.dynamic:
         return problem.description_html
     gen_path = join(settings.PROBLEMS_DIR, problem.window.code, problem.dynamic)
     gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-    desc, hint = gen.generate(hash(str(team.id) + "grading" + settings.SECRET_KEY))
+    desc, hint = gen.generate(compute_key(team))
     return problem.process_html(desc), problem.process_html(hint)
 
 
+# TODO(Yatharth): Improve design
 def format_problem(problem, team):
     data = problem.__dict__
     if not problem.dynamic:
@@ -189,6 +200,8 @@ def format_problem(problem, team):
         pass
 
     result = Dummy()
-    data['description_html'], data['hint_html'] = get_desc(problem, team)
+    data['description_html'], data['hint_html'] = _get_desc(problem, team)
     result.__dict__ = data
     return result
+
+# endregion
