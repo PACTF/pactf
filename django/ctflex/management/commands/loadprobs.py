@@ -21,6 +21,7 @@ PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
 
 PROBLEM_BASENAME = 'problem.yaml'
 GRADER_BASENAME = 'grader.py'
+GENERATOR_BASENAME = 'generator.py'
 STATIC_BASENAME = 'static'
 UUID_BASENAME = '.uuid'
 UUID_BACKUP_BASENAME = '.uuid.rejected'
@@ -58,24 +59,24 @@ class Command(BaseCommand):
             yield basename, path
 
     def handle_error(self, err):
+        self.errored = True
         if self.debug:
             raise err
         else:
-            self.errors.append(sys.exc_info())
+            self.stdout.write(''.join(traceback.format_exception(*sys.exc_info())))
 
     def handle(self, **options):
 
         write = self.stdout.write
 
-        # Check for debug mode
+        # Get ready to give user a shell on exception if in debug mode
         self.debug = options['debug']
         if self.debug:
             sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
-        else:
-            self.errors = []
 
-        # Get ready to track problem IDs
+        # Initialize variables
         processed_problems = []
+        self.errored = False
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
@@ -109,7 +110,11 @@ class Command(BaseCommand):
                     write("Skipping '{}': No problems file found".format(prob_basename))
                     self.handle_error(err)
                     continue
+
+                # Set paths
                 data['grader'] = join(prob_path, GRADER_BASENAME)
+                if data.get('dynamic', False):
+                    data['dynamic'] = join(prob_path, GENERATOR_BASENAME)
 
                 # Clean and warn about integer IDs
                 if 'id' in data:
@@ -167,6 +172,10 @@ class Command(BaseCommand):
                 except ValidationError as err:
                     write("Validation failed for '{}'".format(prob_basename))
                     self.handle_error(err)
+
+                    # Don't delete an existing problem if clear option is given just because validation failed
+                    processed_problems.append(data['id'])
+
                     continue
 
                 # Either way, copy over any static files
@@ -191,8 +200,9 @@ class Command(BaseCommand):
                 write("Successfully imported problem for '{}'".format(prob_basename))
 
         # Delete existing problems that were not updated if clear option was given
+        # (This action is so dangerous that even passing in '--no-input' shouldn't automatically approve it.)
         unprocessed_problems = CtfProblem.objects.exclude(pk__in=processed_problems).all()
-        if options['clear'] and unprocessed_problems:
+        if unprocessed_problems:
             message = textwrap.dedent("""\
                 You have requested to delete all pre-existing problems that were not updated.
                 Please review the list of problems to be deleted.
@@ -210,9 +220,6 @@ class Command(BaseCommand):
             for problem in unprocessed_problems:
                 problem.delete()
 
-        # Print the stack traces from before if not already dealt with
-        if not self.debug and self.errors:
-            write("\nPrinting stacktraces of encountered exceptions")
-            for err in self.errors:
-                write(''.join(traceback.format_exception(*err)))
-            raise RuntimeError("Exceptions encountered")
+        # Throw one large error at end if there were any before
+        if self.errored:
+            raise RuntimeError("Exceptions were encountered")

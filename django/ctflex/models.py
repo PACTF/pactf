@@ -3,6 +3,7 @@
 import re
 import uuid
 
+from django.core import validators
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
@@ -16,10 +17,11 @@ from django_countries.fields import CountryField, Country
 import markdown2
 from localflavor.us.models import USStateField
 
-from ctflex.constants import APP_NAME
+from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD
 
 
 # region Helpers and General
+
 
 def print_time(time):
     """Format a datetime object to be human-readable"""
@@ -380,7 +382,9 @@ class CtfProblem(models.Model):
     name = models.CharField(max_length=60)
     window = models.ForeignKey(Window)
 
-    points = models.IntegerField()
+    points = models.IntegerField(
+        validators=[validators.MinValueValidator(1), ]
+    )
     description = models.TextField(default='', blank=True)
     description_html = models.TextField(editable=False, default='', blank=True)
     hint = models.TextField(default='', blank=True)
@@ -398,7 +402,7 @@ class CtfProblem(models.Model):
 
     # Dictionary for problem dependencies in format specified in README
     # (`dict` is used instead of `{}` because all objects would share dict otherwise.)
-    deps = psql.JSONField(default=dict, blank=True)
+    deps = psql.JSONField(blank=True, null=True)
 
     def __str__(self):
         return "<Problem #{} {!r}>".format(self.id, self.name)
@@ -428,27 +432,39 @@ class CtfProblem(models.Model):
     def validate_deps(self):
         if self.deps is not None:
 
-            if not tuple(self.deps.keys()) in ('score', 'probs'):
+            if not set(self.deps.keys()).issubset({DEPS_THRESHOLD_FIELD, DEPS_PROBS_FIELD}):
                 raise ValidationError(
-                    "The field deps can only contain the keys score and probs",
+                    "The dependencies field can only contain the keys {} and {}"
+                        .format(DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD),
                     code='deps',
                 )
 
-            if 'score' in self.deps:
-                score = self.deps['score']
+            if DEPS_THRESHOLD_FIELD in self.deps:
+                score = self.deps[DEPS_THRESHOLD_FIELD]
                 if type(score) != int or score <= 0:
                     raise ValidationError(
-                        "The field score must be a positive integer",
+                        "The field {} must be a positive integer".format(DEPS_THRESHOLD_FIELD),
                         code='deps',
                     )
 
-            if 'probs' in self.deps:
-                probs = self.deps['probs']
+            if DEPS_PROBS_FIELD in self.deps:
+                probs = self.deps[DEPS_PROBS_FIELD]
                 if type(probs) != list:
                     raise ValidationError(
-                        "The field probs must be an array",
+                        "The field {} must be an iterable".format(DEPS_PROBS_FIELD),
                         code='deps',
                     )
+
+    def sync_empty_deps_fields(self):
+        if self.deps is not None:
+
+            # A threshold of one means "at least one of the problems"
+            if DEPS_THRESHOLD_FIELD not in self.deps:
+                self.deps[DEPS_THRESHOLD_FIELD] = 1
+
+            # An empty tuple is interpreted as including all problems per the spec
+            if DEPS_PROBS_FIELD not in self.deps:
+                self.deps[DEPS_PROBS_FIELD] = ()
 
     def validate_desc_and_hint_exist_or_not(self):
         if self.dynamic and (self.description or self.hint):
@@ -467,8 +483,11 @@ class CtfProblem(models.Model):
             self.description_html = self.process_html(self.description)
             self.hint_html = self.process_html(self.hint)
 
-    FIELD_CLEANERs = {
-        'deps': (validate_deps,),
+    FIELD_CLEANERS = {
+        'deps': (
+            sync_empty_deps_fields,
+            validate_deps,
+        ),
     }
 
     # (The order matters here.)

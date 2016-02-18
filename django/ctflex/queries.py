@@ -7,6 +7,7 @@ from os.path import join
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Sum
 from django_countries.fields import Country
 from django.contrib.auth.password_validation import validate_password
 
@@ -30,13 +31,29 @@ def get_window(window_id=None):
 
 # region Board
 
+# FIXME(Yatharth): Test unlocking
 def _problem_unlocked(team, problem):
-    if not problem.deps:
+    """Check if a team has unlocked a problem
+
+    Refer to the README for the specification.
+    """
+
+    if problem.deps is None:
         return True
-    assert 'total' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
-    solves = models.Solve.objects.filter(competitor__team=team)
-    filtered_score = sum(solve.problem.points for solve in solves if solve.problem.id in problem.deps['probs'])
-    return filtered_score >= problem.deps['total']
+
+    threshold = problem.deps[constants.DEPS_THRESHOLD_FIELD]
+    problems = problem.deps[constants.DEPS_PROBS_FIELD]
+
+    solves = models.Solve.objects.filter(competitor__team=team, problem__id__in=problems)
+
+    if not solves.exists():
+        return False
+
+    # Just an optimization
+    if score == 1:
+        return True
+
+    return solves.aggregate(Sum('problem__points'))['problem__points__sum'] >= threshold
 
 
 def viewable_problems(team, window):
@@ -53,10 +70,6 @@ def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
-# endregion
-
-# region Board
-
 def score(*, team, window):
     score = 0
     for competitor in team.competitor_set.all():
@@ -66,6 +79,11 @@ def score(*, team, window):
         for solve in solves:
             score += solve.problem.points
     return score
+
+
+# endregion
+
+# region Board
 
 
 def _eligible(team):
@@ -125,11 +143,11 @@ def validate_team(name, password):
 
 # region Game
 
-def compute_key(team):
+def _compute_key(team):
     return zlib.adler32(bytes(str(team.id) + constants.PROBLEM_SALT + settings.SECRET_KEY, 'utf-8'))
 
 
-def grade(*, problem, flag, team):
+def _grade(*, problem, flag, team):
     # logger.debug("grading {} for {} with flag {!r}".format(problem, team, flag))
     if not flag:
         # logger.info("empty flag for {} and {}".format(problem, team))
@@ -139,8 +157,9 @@ def grade(*, problem, flag, team):
     # XXX(Yatharth): Handle FileNotFound
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
     # extract key
-    correct, message = grader.grade(compute_key(team), flag)
-    # logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
+    # XXX(Yatharth): Handle no such function or signature or anything, logging appropriate error messages
+    correct, message = grader.grade(_compute_key(team), flag)
+    # logger.info('_grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
     return correct, message
 
 
@@ -161,7 +180,7 @@ def submit_flag(prob_id, competitor, flag):
         raise ProblemAlreadySolvedException()
 
     # Grade
-    correct, message = grade(problem=problem, flag=flag, team=competitor.team)
+    correct, message = _grade(problem=problem, flag=flag, team=competitor.team)
 
     if correct:
         # This effectively updates the score too
@@ -181,16 +200,18 @@ def submit_flag(prob_id, competitor, flag):
     return correct, message
 
 
+# FIXME(Yatharth): Handle such exceptions more gracefully, like use debug param in template to show faield problem names
 def _get_desc(problem, team):
     if not problem.dynamic:
         return problem.description_html
     gen_path = join(settings.PROBLEMS_DIR, problem.window.code, problem.dynamic)
     gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-    desc, hint = gen.generate(compute_key(team))
+    desc, hint = gen.generate(_compute_key(team))
     return problem.process_html(desc), problem.process_html(hint)
 
 
 # TODO(Yatharth): Improve design
+
 def format_problem(problem, team):
     data = problem.__dict__
     if not problem.dynamic:

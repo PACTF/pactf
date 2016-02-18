@@ -1,13 +1,12 @@
 name: 'problem7'
 points: 40
 description: |
-  You should have solved two problems to see this
+  You should have solved two of problems 4, 5 and 6 to see this.
 hint: |
   Now you see me, now you don't!
 deps:
-  total: 2
+  threshold: 80
   probs:
-    - 'c1a2b8c2-6316-4266-b3c3-9e3aa6f1ab98'
-    - 'e336045a-b9cc-4e6b-ade4-d893e102f3fc'
     - '29a5abcc-54af-4073-8434-e3382dc8019c'
-    - '7013a854-1119-4a89-928e-0b72cc6fa176'
+    - 'e336045a-b9cc-4e6b-ade4-d893e102f3fc'
+    - 'c1a2b8c2-6316-4266-b3c3-9e3aa6f1ab98'
