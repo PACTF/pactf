@@ -14,7 +14,7 @@
     you by the team owner. If you're creating a new team, just enter the
     passphrase you want your team to use!</p>
 
-  <form action="{% url 'ctflex:register_user' %}", method="post">
+  <form action="{% url 'ctflex:register_user' %}" method="post">
     {% csrf_token %}
     <table>
       <tr>

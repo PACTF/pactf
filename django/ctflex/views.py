@@ -286,7 +286,6 @@ def submit_flag(request, *, window_id, prob_id):
 
 # region Team Views
 
-
 @single_http_method('GET')
 class Team(DetailView):
     model = models.Team
@@ -334,6 +333,8 @@ def password_reset_complete(request):
     return redirect('ctflex:login')
 
 
+# FIXME(yatharth): Registration
+
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -368,4 +369,4 @@ def register_user(request):
         form.add_error('handle', "Can't create user")
         return register(request, form)
 
-        # endregion
+# endregion

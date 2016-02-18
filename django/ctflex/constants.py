@@ -15,3 +15,5 @@ LOGOUT_REDIRECT_URL = 'ctflex:index'
 TEAM_CHANGE_REDIRECT_URL = 'ctflex:current_team'
 
 SUPPORT_EMAIL = 'ctflex2@gmail.com'
+
+PROBLEM_SALT = 'ctfproblem'

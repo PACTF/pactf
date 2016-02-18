@@ -8,7 +8,6 @@ from ctflex import models
 
 
 class CompetitorForm(forms.ModelForm):
-
     class Meta:
         model = models.Competitor
         exclude = ()
