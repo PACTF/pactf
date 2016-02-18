@@ -27,6 +27,10 @@ def get_window(window_id=None):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
 
 
+def _get_team(request):
+    return request.user.competitor.team
+
+
 # endregion
 
 # region Board
@@ -110,7 +114,7 @@ def board(window=None):
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
-    user = models.User.objects.create_user(handle, None, pswd)
+    user = settings.AUTH_USER_MODEL.objects.create_user(handle, None, pswd)
     try:
         validate_password(pswd, user=user)
         competitor = models.Competitor(user=user, team=team, email=email)
