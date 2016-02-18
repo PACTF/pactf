@@ -209,6 +209,9 @@ class CTFlex(Django, Configuration):
     # Directory containing problem folders
     PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
 
+    # Extras for the markdown2 Python module for formatting problem description and hints
+    MARKDOWN_EXTRAS = values.TupleValue(('fenced-code-blocks', 'smarty-pants', 'spoiler'))
+
     ''' Static Files '''
 
     # Intermediate folder for storing problem static files

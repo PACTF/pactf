@@ -408,8 +408,7 @@ class CtfProblem(models.Model):
     @staticmethod
     def markdown_to_html(markdown):
         """Convert Markdown to HTML, quoting any existing HTML """
-        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
-        return markdown2.markdown(markdown, extras=EXTRAS, safe_mode='escape')
+        return markdown2.markdown(markdown, extras=settings.MARKDOWN_EXTRAS, safe_mode='escape')
 
     @staticmethod
     def link_static(old_text, id):
