@@ -7,6 +7,7 @@ from os.path import join
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django_countries.fields import Country
+from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 
 from ctflex import models
@@ -53,7 +54,7 @@ def viewable_problems(team, window):
 def problem_unlocked(team, problem):
     if not problem.deps:
         return True
-    assert 'total' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
+    assert 'score' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
     solves = models.Solve.objects.filter(competitor__team=team)
     filtered_score = sum(solve.problem.points for solve in solves if solve.problem.id in problem.deps['probs'])
     return filtered_score >= problem.deps['total']
@@ -68,7 +69,7 @@ def solved(problem, team):
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
-    u = models.User.objects.create_user(handle, None, pswd)
+    u = User.objects.create_user(handle, None, pswd)
     try:
         validate_password(pswd, user=u)
         c = models.Competitor(user=u, team=team, email=email)

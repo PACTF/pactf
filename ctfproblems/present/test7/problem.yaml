@@ -5,6 +5,7 @@ description: |
 hint: |
   Now you see me, now you don't!
 deps:
+  score: 20
   probs:
     - 'c1a2b8c2-6316-4266-b3c3-9e3aa6f1ab98'
     - 'e336045a-b9cc-4e6b-ade4-d893e102f3fc'

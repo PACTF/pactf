@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import resolve
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -353,8 +354,7 @@ def register(request, form=None):
 def register_user(request):
     form = forms.RegistrationForm(request.POST)
     if not form.is_valid():
-        print(form.errors)
-        return register(request, form)
+        return JsonResponse({'errors' : [[k, form.errors[k]] for k in form.errors]})
     # handle, pswd, email, team, team_pass = form.cleaned_data
     team, msg = queries.validate_team(form.cleaned_data['team'], form.cleaned_data['team_pass'])
     if team is None:
@@ -370,6 +370,6 @@ def register_user(request):
         return redirect('ctflex:index')
     except ValidationError:
         form.add_error('handle', "Can't create user")
-        return register(request, form)
+        return HttpResponseNotAllowed("POST")
 
         # endregion
