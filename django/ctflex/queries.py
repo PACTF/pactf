@@ -65,32 +65,32 @@ def solved(problem, team):
 
 # TODO(Cam): Consider catching 'this' here
 def create_competitor(handle, pswd, email, team):
-    u = models.User.objects.create_user(handle, None, pswd)
+    user = models.User.objects.create_user(handle, None, pswd)
     try:
-        validate_password(pswd, user=u)
-        c = models.Competitor(user=u, team=team, email=email)
-        c.full_clean()
+        validate_password(pswd, user=user)
+        competitor = models.Competitor(user=user, team=team, email=email)
+        competitor.full_clean()
     except ValidationError:
-        u.delete()
-        logger.warning('create_competitor: Competitor creation failed: "' + handle + '".')
+        user.delete()
+        # logger.warning('create_competitor: Competitor creation failed: {}'.format(handle))
         raise
     else:
-        c.save()
-        logger.info('create_competitor: New competitor created: "' + handle + '".')
-        return c
+        competitor.save()
+        # logger.info('create_competitor: New competitor created: {}'.format(handle))
+        return competitor
 
 
 def validate_team(name, password):
     team = models.Team.objects.filter(name=name)
     if team.exists():
         if password == team[0].password:
-            logger.info('validate_team: Team credentials validated for "' + name + '".')
+            # logger.info('validate_team: Team credentials validated for "' + name + '".')
             return team[0], 'Success!'
-        logger.warning('validate_team: Team credentials incorrect for "' + name + '".')
+        # logger.warning('validate_team: Team credentials incorrect for "' + name + '".')
         return None, 'Team passphrase incorrect!'
     team = models.Team(name=name, password=password)
     team.save()
-    logger.info('validate_team: New team created: "' + name + '".')
+    # logger.info('validate_team: New team created: "' + name + '".')
     return team, 'Success!'
 
 
@@ -109,11 +109,9 @@ def board(window=None):
 
 
 def grade(*, problem, flag, team):
-    logger.debug(
-        'grade: Grading problem ' + problem.id + ' (' + problem.name + ') for team ' + team.id +
-        ' (' + team.name + ') with flag "' + flag + '".')
+    # logger.debug("grading {} for {} with flag {!r}".format(problem, team, flag))
     if not flag:
-        logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is empty.')
+        # logger.info("empty flag for {} and {}".format(problem, team))
         return False, "Empty flag"
 
     grader_path = join(settings.PROBLEMS_DIR, problem.grader)
@@ -138,7 +136,7 @@ def submit_flag(prob_id, competitor, flag):
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
-        logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
+        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
         raise ProblemAlreadySolvedException()
 
     # Grade
@@ -147,14 +145,13 @@ def submit_flag(prob_id, competitor, flag):
     if correct:
         # This effectively updates the score too
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
-        logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
+        # logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
 
     # Inform the user if they had already tried the same flag
     # (This check must come after actually grading as a team might have submitted a flag
     # that later becomes correct on a problem's being updated.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
-        logger.info('submit_flag: Team ' + competitor.team.id +
-                    ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
+        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
         raise FlagAlreadyTriedException()
 
     # For logging purposes, mainly
@@ -177,7 +174,7 @@ def score(*, team, window):
 def get_desc(problem, team):
     if not problem.dynamic:
         return problem.description_html
-    gen_path = join(settings.PROBLEMS_DIR, problem.dynamic)
+    gen_path = join(settings.PROBLEMS_DIR, problem.window.code, problem.dynamic)
     gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
     desc, hint = gen.generate(hash(str(team.id) + "grading" + settings.SECRET_KEY))
     return problem.process_html(desc), problem.process_html(hint)
@@ -192,6 +189,6 @@ def format_problem(problem, team):
         pass
 
     result = Dummy()
-    data['description_html'], data['hint_html'] = queries.get_desc(problem, team)
+    data['description_html'], data['hint_html'] = get_desc(problem, team)
     result.__dict__ = data
     return result
