@@ -27,8 +27,8 @@ def get_window(window_id=None):
     return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
 
 
-def _get_team(request):
-    return request.user.competitor.team
+def get_team(group, request):
+    return str(request.user.competitor.team.id)
 
 
 # endregion
@@ -215,7 +215,6 @@ def _get_desc(problem, team):
 
 
 # TODO(Yatharth): Improve design
-
 def format_problem(problem, team):
     data = problem.__dict__
     if not problem.dynamic:

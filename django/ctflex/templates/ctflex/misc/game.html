@@ -6,6 +6,10 @@
   Game — {{ block.super }}
 {% endblock %}
 
+{% block header %}
+  Game
+{% endblock %}
+
 {% block extra_css %}
   <link href="{% static "ctflex/css/game.css" %}" rel="stylesheet">
 {% endblock %}
@@ -14,11 +18,13 @@
   <script src="{% static 'ctflex/js/game.js' %}"></script>
 {% endblock %}
 
+
+
 {% block content %}
   <div id="problems">
     {% for raw_prob in prob_list %}
       {% format_problem raw_prob team as prob %}
-      <div class="problem" id="{{ prob.id }}">
+      <div class="problem well well-sm" id="{{ prob.id }}">
 
         <div class="problem-header">
           <h3>{{ prob.name }} <span class="problem-points">{{ prob.points }}</span></h3>
@@ -28,7 +34,7 @@
           {{ prob.description_html|safe }}
         </div>
 
-        <input type="button" class="hint-button" value="Toggle Hint"/>
+        <input type="button" class="btn btn-info hint-button" value="Toggle Hint"/>
         <div class="hint-content">
           {{ prob.hint_html|safe }}
         </div>
@@ -38,12 +44,17 @@
           <p> You have already solved this problem.</p>
         {% else %}
           <form action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
-            <label for="flag-{{ prob.id }}">Flag: </label>
-            <input id="flag-{{ prob.id }}" type="text" name="flag"/>
-
-            <input type="submit" value="Submit!"/>
-
             {% csrf_token %}
+
+            <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
+            <div class="input-group">
+              <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"/>
+               <span class="input-group-btn">
+                <input class="btn btn-info" type="submit" value="Check!"/>
+              </span>
+
+            </div>
+
           </form>
         {% endif %}
 

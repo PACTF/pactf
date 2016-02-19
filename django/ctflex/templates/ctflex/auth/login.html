@@ -6,6 +6,15 @@
   Login — {{ block.super }}
 {% endblock %}
 
+{% block header %}
+  Login
+{% endblock %}
+
+{#{% block js %}#}
+{#  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>#}
+{#  <script type="text/javascript" src="{% static 'ctflex/js/login_ajax.js' %}"></script>#}
+{#{% endblock %}#}
+
 {% block content %}
 
   {% if next %}
@@ -20,7 +29,7 @@
 
   <p>Lost your password? <a href="{% url 'ctflex:password_reset' %}">Reset it.</a></p>
 
-  <form method="post">
+  <form method="post" id="login-attempt">
     {% csrf_token %}
 
     {% include 'ctflex/snippets/form_non_field_errors.html' %}
@@ -28,14 +37,45 @@
     {% formfield form.username %}{% endformfield %}
     {% formfield form.password %}{% endformfield %}
 
+    {#    <div class="container">#}
+    {#      <form class="form-horizontal" role="form">#}
+    {#        <div class="form-group">#}
+    {#          <div class="col-sm-3">#}
+    {#            {% formfield form.username %}{% endformfield %}#}
+    {#          </div>#}
+    {#        </div>#}
+    {#        <div class="form-group">#}
+    {#          <div class="col-sm-3">#}
+    {#            {% formfield form.password %}{% endformfield %}#}
+    {#          </div>#}
+    {#        </div>#}
+    {#        <br>#}
+    {#        <div class="col-sm-offset-4 col-sm-4">#}
+    {#          <div class="btn-group btn-group-justified" role="group">#}
+    {#            <a role="button" type="submit" class="btn btn-primary" id="login">Login</a>#}
+    {#            <a role="button" type="submit" class="btn btn-default" id="reset">Reset Password</a>#}
+    {#          </div>#}
+    {#        </div>#}
+    {#      </form>#}
+    {#      <br>#}
+    {#      <br>#}
+    {#      <hr>#}
+    {#    </div>#}
+
     <input type="hidden" name="next" value="{{ next }}"/>
 
-    <input type="submit" value="Log in"/>
+    <input class="btn btn-info"  type="submit" value="Log in"/>
 
     <script type="text/javascript">document.getElementById("id_username").focus();</script>
 
   </form>
 
-
+{#  <!-- This has to go here, otherwise we can't interrupt the login form -->#}
+{#  <script type="text/javascript">#}
+{#    $('#login-attempt').on('submit', function (event) {#}
+{#      //event.preventDefault();#}
+{#      //attempt_login();#}
+{#    });#}
+{#  </script>#}
 
 {% endblock %}

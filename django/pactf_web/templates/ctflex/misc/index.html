@@ -1,29 +1,74 @@
-{% extends 'ctflex/base.html' %}
-{% load ctflex %}
+{% extends 'ctflex/base-headerless.html' %}
+{% load static from staticfiles %}
+
+{% block extra_css %}
+  <link href="{% static 'ctflex/css/index.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+
 
 {% block content %}
-  <p>
-    Welcome to {% include 'ctflex/title.txt' %}!
-  </p>
-  <p>
-    <b>New to CTFs?</b> CTFs, short for Capture the Flags, are a type of Computer Security competition where you will try to hack into our systems, break our codes, and do fun things like that for points and learning! There will be a list of 'problems' for you to solve. On solving then, you should end up with an 'answer string' called a 'flag'. You can submit this flag using the box next to the problem description and get points!
-  </p>
-  <p>
-    <b>PACTF is different</b> Typical CTFs involve a fixed start and end date with a boatload of problems to solve at your leisure between, with no regard as to your schedule and whether you can truly be competitive through SATs, essays, etc. Instead of this, PACTF has 4 week-long
-    <em>Contest Windows</em>. Each Window will have a theme and different problems.</p>
-  <p>
-    Now, during a certain Contest Window, you and your team can
-    <b>only look at the problems and submit flags in your 2 days-long
-      <em>Personal Timer</em></b>. You can choose to start it whenever during the Contest Window! This way, you only need to find 2 days or so where you will some time, and you can still be competitive! You can see the problems of a Contest Window that has ended and even submit flags and see if they were right, but those flags will not longer change your team's standing on scoreboards.
-  </p>
-  <p>
-    There is a
-    <b>scoreboard</b> for each individual Contest Window, and there is an overall all-Window scoreboard. Prizes will be given to the top-ranking teams of the individual Contest Windows and the Overall one, so whether you are a specialist or an all-rounder, there's something for you!
-  </p>
-  <p>
-    Enough talking. <b>Go to the <a href="{% url 'ctflex:game' window_id='1' %}">Game</a></b>.
-  </p>
-  <p>
-    <img src="http://holygroundallaround.com/wp-content/uploads/2013/09/arise-go-forth-and-conquer.jpg"/>
-  </p>
+
+  {# TODO(Yatharth): Separate page for explaining #}
+  {# TODO(Yatharth): Change index page to scrolling #}
+
+  <div class="jumbotron">
+    <div id="jumbotron-img" class="text-center">
+      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
+    </div>
+    <h3 class="text-center">
+      <b>PACTF</b> is an online <b>computer security</b> competition for <b>high school students</b>.
+      <div>
+        <br>
+      </div>
+    </h3>
+    <p class="text-center">
+      <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+    </p>
+  </div>
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-6">
+        <h2>
+          New to CTFs?
+        </h2>
+        <p>
+          CTFs, short for Capture the Flags, are a type of Computer Security competition where you will try to hack into our systems, break our codes, and do fun things like that for points and learning! There will be a list of 'problems' for you to solve. On solving then, you should end up with an 'answer string' called a 'flag'. You can submit this flag using the box next to the problem description and get points!
+        </p>
+        <p>
+          <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#ctf-info">What Next?</a>
+        </p>
+        <div id="ctf-info" class="collapse">
+          <p>
+            <img src="http://holygroundallaround.com/wp-content/uploads/2013/09/arise-go-forth-and-conquer.jpg"/>
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h2>
+          PACTF is different
+        </h2>
+        <p>
+          Typical CTFs involve a fixed start and end date with a boatload of problems to solve at your leisure between, with no regard as to your schedule and whether you can truly be competitive through SATs, essays, etc. Instead of this, PACTF has 4 week-long
+          <em>Contest Windows</em>. Each Window will have a theme and different problems.
+        </p>
+        <p>
+          <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#pactf-info">Tell Me More</a>
+        </p>
+        <div id="pactf-info" class="collapse">
+          <p>
+            During a certain Contest Window, you and your team can
+            <strong>only look at the problems and submit flags in your 2 days-long
+              <em>Personal Timer</em></strong>. You can choose to start it whenever during the Contest Window! This way, you only need to find 2 days or so where you will some time, and you can still be competitive! You can see the problems of a Contest Window that has ended and even submit flags and see if they were right, but those flags will not longer change your team's standing on scoreboards.
+          </p>
+          <p>
+            There is a
+            <strong>scoreboard</strong>
+            for each individual Contest Window, and there is an overall all-Window scoreboard. Prizes will be given to the top-ranking teams of the individual Contest Windows and the Overall one, so whether you are a specialist or an all-rounder, there's something for you!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

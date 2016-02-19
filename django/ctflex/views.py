@@ -15,6 +15,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.conf import settings
 
+from ratelimit.decorators import ratelimit
+from ratelimit.utils import is_ratelimited
+
 from ctflex import models
 from ctflex import queries
 from ctflex import commands
@@ -211,12 +214,22 @@ def start_timer(request, *, window_id):
 # endregion
 
 
-# region CTF Views
+# region Misc Views
+
 
 @single_http_method('GET')
 def index(request):
     return render(request, 'ctflex/misc/index.html')
 
+
+@single_http_method('GET')
+def rate_limited(request, err):
+    return render(request, 'ctflex/misc/ratelimited.html')
+
+
+# endregion
+
+# region CTF Views
 
 @single_http_method('GET')
 @competitors_only()
@@ -258,6 +271,10 @@ def board_overall(request):
 @competitors_only()
 @windowed()
 def submit_flag(request, *, window_id, prob_id):
+    # Handle rate-limiting
+    if is_ratelimited(request, fn=submit_flag, key=queries.get_team, rate='1/s', increment=True):
+        return rate_limited(request, None)
+
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
@@ -347,11 +364,12 @@ def register(request, form=None):
 
 @single_http_method('POST')
 @sensitive_post_parameters()
+@ratelimit(key='ip', rate='5/m')
 def register_user(request):
     form = forms.RegistrationForm(request.POST)
     if not form.is_valid():
-        print(form.errors)
         return register(request, form)
+        # return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
     # handle, pswd, email, team, team_pass = form.cleaned_data
     team, msg = queries.validate_team(form.cleaned_data['team'], form.cleaned_data['team_pass'])
     if team is None:
@@ -367,6 +385,7 @@ def register_user(request):
         return redirect('ctflex:index')
     except ValidationError:
         form.add_error('handle', "Can't create user")
-        return register(request, form)
+        # return register(request, form)
+        return HttpResponseNotAllowed("POST")
 
 # endregion

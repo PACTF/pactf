@@ -1,98 +1,12 @@
-{% load static from staticfiles %}
-{% load ctflex %}
+{% extends 'ctflex/base-headerless.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-  <title>
-    {% block title %}
-      {% include 'ctflex/title.txt' %}
-    {% endblock %}
-  </title>
-
-
-  <!-- CSS -->
-
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
-  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
-
-  <link href="{% static "ctflex/css/main.css" %}" rel="stylesheet">
-  <link href="{% static "ctflex/css/header.css" %}" rel="stylesheet">
-
-  {% block extra_css %}{% endblock %}
-
-
-  <!-- JavaScript -->
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
-  {% block extra_js %}{% endblock %}
-
-</head>
-<body>
-
-<header>
-  <div class="menu-wrap">
-    <nav class="menu">
-      <ul class="clearfix">
-
-        <ul class="pull-left">
-          <li><a href="{% url 'ctflex:index' %}">{% include 'ctflex/title.txt' %}</a></li>
-          <li>
-            <a href="#">{{ window.verbose_name }}<span class="arrow">&#9660;</span></a>
-            <ul class="sub-menu">
-              {% for other_window in other_windows %}
-                <li><a
-                    href="{% switch_window window=other_window resolver_match=request.resolver_match %}">{{ other_window.verbose_name }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          </li>
-          <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>
-          <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Board</a></li>
-        </ul>
-        <ul class="pull-right">
-          {% if user.is_authenticated %}
-            {% if team %}
-              <li><span>Score: {% score team %}</span></li>
-              <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
-            {% else %}
-              <li><span>Y u no be competitor</span></li>
-            {% endif %}
-            <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
-          {% else %}
-            <li><a href="{% url 'ctflex:login' %}">Login</a></li>
-            <li><a href="{% url 'ctflex:register' %}">Register</a></li>
-          {% endif %}
-        </ul>
-
-        <div style="clear: both"></div>
-      </ul>
-    </nav>
-  </div>
-</header>
-
-<div id="body">
-
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-          {{ message }}
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% block content %}{% endblock %}
-
-</div>
-
-</body>
-</html>
+{% block _header_wrapper %}
+  <header class="page-title">
+    <div class="container">
+      <h1>
+        {% block header %}
+        {% endblock %}
+      </h1>
+    </div>
+  </header>
+{% endblock %}

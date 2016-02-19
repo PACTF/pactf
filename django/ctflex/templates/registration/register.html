@@ -1,21 +1,33 @@
 {% extends 'ctflex/base.html' %}
+{% load static from staticfiles %}
 
 {% block title %}
   Register — {{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block header %}
+  Register
+{% endblock %}
 
-  {% if form.errors %}
-    <p>We were unable to register your user or your team.</p>
-  {% endif %}
+{#{% block extra_js %}#}
+{#  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>#}
+{#  <script type="text/javascript" src="{% static 'ctflex/js/reg_ajax.js' %}"></script>#}
+{#{% endblock %}#}
+
+{% block content %}
 
   <p>If the team you name already exists, the "passphrase" should be given to
     you by the team owner. If you're creating a new team, just enter the
     passphrase you want your team to use!</p>
 
-  <form action="{% url 'ctflex:register_user' %}" method="post">
+  {#  <div id="errors">#}
+  {#  </div>#}
+
+  <form action="{% url 'ctflex:register_user' %}" method="post" id="register-submit">
     {% csrf_token %}
+
+    {% include 'ctflex/snippets/form_non_field_errors.html' %}
+
     <table>
       <tr>
         <td>{{ form.handle.label_tag }}</td>
@@ -45,4 +57,12 @@
 
     <input type="submit" value="Register!"/>
   </form>
+
+  {#  <script type="text/javascript">#}
+  {#    $('#register-submit').on('submit', function (event) {#}
+  {#      event.preventDefault();#}
+  {#      attempt_register();#}
+  {#    });#}
+  {#  </script>#}
+
 {% endblock %}

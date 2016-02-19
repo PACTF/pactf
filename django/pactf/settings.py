@@ -3,6 +3,7 @@ import os
 from os.path import join
 
 from configurations import Configuration, values
+from django.contrib import messages
 
 from pactf.constants import BASE_DIR
 import ctflex.constants
@@ -28,6 +29,7 @@ class Django:
         'django_extensions',
         'debug_toolbar',
         'email_log',
+        'widget_tweaks',
 
         # Python 3rd-party
         'yaml',
@@ -39,6 +41,7 @@ class Django:
     ]
 
     MIDDLEWARE_CLASSES = (
+        # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,6 +50,9 @@ class Django:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
+
+        # Django 3rd-party
+        'ctflex.middleware.RatelimitMiddleware',
     )
 
     STATICFILES_FINDERS = (
@@ -121,6 +127,14 @@ class Django:
     EMAIL_HOST_PASSWORD = values.SecretValue()
     EMAIL_USE_TLS = values.BooleanValue(True)
     SUPPORT_EMAIL = 'ctflex2+support@gmail.com'  # not standard, but used by CTFlex
+
+    # TODO(Yatharth): Uncomment when actually able to test
+    RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
+
+    # For Boostrap Alerts
+    MESSAGE_TAGS = {
+        messages.ERROR: 'danger'
+    }
 
 
 class Security:
@@ -255,7 +269,7 @@ class Dev(Base):
             # 'file': {
             #     'level': 'DEBUG',
             #     'class': 'logging.FileHandler',
-            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
+            #     'f®ilename': join(BASE_DIR, 'logs', 'django.log'),
             # },
             'console': {
                 'class': 'logging.StreamHandler',

@@ -1,0 +1,161 @@
+{% load static from staticfiles %}
+{% load ctflex %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Meta Tags -->
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="High School CTF by Phillips Academy, Andover">
+  <meta name="author" content="PACTF">
+
+  <title>
+    {% block title %}
+      {% include 'ctflex/title.txt' %}
+    {% endblock %}
+  </title>
+
+  <!-- CSS -->
+
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css" rel="stylesheet">
+
+
+  <link href="{% static "ctflex/css/base.css" %}" rel="stylesheet">
+  <link href="{% static "ctflex/css/header.css" %}" rel="stylesheet">
+
+  {% block extra_css %}{% endblock %}
+
+  <!-- JavaScript -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+          integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+  {% block extra_js %}{% endblock %}
+
+</head>
+
+<body>
+
+<!-- Navbar -->
+
+<nav class="navbar navbar-fixed-top navbar-inverse">
+  <div class="container">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target="#navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'ctflex:index' %}">PACTF</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbar-collapse">
+
+      <ul class="nav navbar-nav">
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+             aria-expanded="false">Window: {{ window.verbose_name }}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            {% for other_window in other_windows %}
+              <li>
+                <a href="{% switch_window window=other_window resolver_match=request.resolver_match %}">
+                  {{ other_window.verbose_name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+
+        {# TODO: Active classes #}
+        <li><a href="{% url 'ctflex:game' window_id=window.id %}">Game</a></li>
+        <li><a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Scoreboard</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+
+        {% if user.is_authenticated %}
+
+          {% if team %}
+            <li><p class="navbar-text">Score: {% score team %}</p></li>
+            <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
+
+          {% else %}
+            <li>
+              <p class="navbar-text">
+                <em>Not a competitor</em>
+              </p>
+            </li>
+          {% endif %}
+
+          <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
+
+        {% else %}
+
+          <li><a href="{% url 'ctflex:login' %}">Login</a></li>
+          <li><a href="{% url 'ctflex:register' %}">Register</a></li>
+
+        {% endif %}
+      </ul>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<!-- Header-->
+
+{% block _header_wrapper %}
+{% endblock %}
+
+<div id="body">
+
+  <!-- Messages (using Bootstrap Alerts) -->
+
+  {% if messages %}
+    <ul class="messages list-unstyled">
+      {% for message in messages %}
+        <li class="alert alert-dismissible alert-{{ message.tags }}" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <span class="alert-type sr-only">{# Set by CSS automatically for accessibility #}</span>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <!-- Content -->
+
+  {% block content %}{% endblock %}
+
+</div>
+
+<!-- Footer -->
+
+<footer>
+  <div class="container">
+    <p class="text-muted">
+      © PACTF 2016 | <a href="https://pactf.statuspage.io/">Status.io</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+
+</html>
