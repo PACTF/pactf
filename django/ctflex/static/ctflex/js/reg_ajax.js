@@ -5,6 +5,7 @@ function attempt_register() {
     data : $('#register-submit').serialize(),
 
     success : function(response) {
+      console.log()
       if ('errors' in response) {
         var err_html = "<p>There were one or more errors:</p>";
         for (var i = 0 ; i < response.errors.length ; i += 1) {
@@ -13,10 +14,7 @@ function attempt_register() {
         }
         document.getElementById("errors").innerHTML = err_html;
       }
-      else {
-
-      }
-      //console.log(response);
+      else { window.location = response.redirect; }
     },
 
     error : function(xhr, msg, err) {

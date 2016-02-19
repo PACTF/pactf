@@ -57,22 +57,22 @@ def problem_unlocked(team, problem):
     assert 'score' in problem.deps and 'probs' in problem.deps and iter(problem.deps['probs'])
     solves = models.Solve.objects.filter(competitor__team=team)
     filtered_score = sum(solve.problem.points for solve in solves if solve.problem.id in problem.deps['probs'])
-    return filtered_score >= problem.deps['total']
+    return filtered_score >= problem.deps['score']
 
 # This solely exists for the purpose of rate limiting decorators
-def get_team(request):
-    return request.user.competitor.team
+def get_team(group, request):
+    return request.user.competitor.team.name
 
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
 # TODO(Cam): Consider catching 'this' here
-def create_competitor(handle, pswd, email, team):
+def create_competitor(handle, pswd, email, team, state):
     u = User.objects.create_user(handle, None, pswd)
     try:
         validate_password(pswd, user=u)
-        c = models.Competitor(user=u, team=team, email=email)
+        c = models.Competitor(user=u, team=team, email=email, state=state, first_name="dummy", last_name="dummy")
         c.full_clean()
     except ValidationError:
         u.delete()
@@ -114,10 +114,10 @@ def board(window=None):
 
 def grade(*, problem, flag, team):
     logger.debug(
-        'grade: Grading problem ' + problem.id + ' (' + problem.name + ') for team ' + team.id +
+        'grade: Grading problem ' + str(problem.id) + ' (' + problem.name + ') for team ' + str(team.id) +
         ' (' + team.name + ') with flag "' + flag + '".')
     if not flag:
-        logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is empty.')
+        logger.info('grade: Flag by team ' + str(team.id) + ' for problem ' + str(problem.id) + ' is empty.')
         return False, "Empty flag"
 
     grader_path = join(settings.PROBLEMS_DIR, problem.grader)
@@ -157,8 +157,8 @@ def submit_flag(prob_id, competitor, flag):
     # (This check must come after actually grading as a team might have submitted a flag
     # that later becomes correct on a problem's being updated.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
-        logger.info('submit_flag: Team ' + competitor.team.id +
-                    ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
+        logger.info('submit_flag: Team ' + str(competitor.team.id) +
+                    ' has already tried incorrect flag "' + flag + '" for problem ' + str(problem.id) + '.')
         raise FlagAlreadyTriedException()
 
     # For logging purposes, mainly
@@ -196,6 +196,6 @@ def format_problem(problem, team):
         pass
 
     result = Dummy()
-    data['description_html'], data['hint_html'] = queries.get_desc(problem, team)
+    data['description_html'], data['hint_html'] = get_desc(problem, team)
     result.__dict__ = data
     return result

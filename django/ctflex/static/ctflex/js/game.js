@@ -7,4 +7,18 @@ jQuery(document).ready(function () {
         });
     });
 
+    // Enable AJAX for flag submissions
+    Array.prototype.forEach.call(jQuery(".problem"), function(prob) {
+      var prob_form = jQuery(".flag-submit", prob);
+      prob_form.on('submit', function (event) {
+        event.preventDefault();
+        
+        submit_flag(prob.id, prob_form.serialize());
+      });
+    });
+
 });
+
+function submit_flag(id, data) {
+  console.log(data);
+}

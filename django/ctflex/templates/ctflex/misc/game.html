@@ -6,11 +6,11 @@
   Game — {{ block.super }}
 {% endblock %}
 
-{% block extra_css %}
+{% block css %}
   <link href="{% static "ctflex/css/game.css" %}" rel="stylesheet">
 {% endblock %}
 
-{% block extra_js %}
+{% block js %}
   <script src="{% static 'ctflex/js/game.js' %}"></script>
 {% endblock %}
 
@@ -37,7 +37,8 @@
         {% if has_solved %}
           <p> You have already solved this problem.</p>
         {% else %}
-          <form action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
+          <form class="flag-submit" action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
+            <p style="display:none" class="id_loc">{{ prob.id }}</p>
             <label for="flag-{{ prob.id }}">Flag: </label>
             <input id="flag-{{ prob.id }}" type="text" name="flag"/>
 

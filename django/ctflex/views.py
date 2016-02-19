@@ -6,10 +6,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, reverse
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
+from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -363,13 +363,14 @@ def register_user(request):
     handle = form.cleaned_data['handle']
     pswd = form.cleaned_data['pswd']
     email = form.cleaned_data['email']
+    state = form.cleaned_data['state']
     try:
-        c = queries.create_competitor(handle, pswd, email, team)
+        c = queries.create_competitor(handle, pswd, email, team, state)
         u = authenticate(username=handle, password=pswd)
         login(request, u)
-        return redirect('ctflex:index')
-    except ValidationError:
-        form.add_error('handle', "Can't create user")
-        return HttpResponseNotAllowed("POST")
+        return JsonResponse({'redirect' : reverse('ctflex:index')})
+    except ValidationError as e:
+        form.add_error('handle', str(e))
+        return JsonResponse({'errors' : [[k, form.errors[k]] for k in form.errors]})
 
         # endregion

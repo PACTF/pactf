@@ -1,6 +1,6 @@
 """Define (default) configuration for the project"""
 import os
-from os.path import join
+from os.path import join, dirname
 
 from configurations import Configuration, values
 
@@ -102,7 +102,7 @@ class Django:
     USE_TZ = True
 
     # Database
-    # (Postgres is required for CtfProblem's JSONField.)
+    # (Postgres is required for Ctf's JSONField.)
     DATABASES = values.DatabaseURLValue(environ_required=True)
 
     # Where to finally collect static files to

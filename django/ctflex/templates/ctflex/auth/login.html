@@ -25,11 +25,10 @@
 
   <p>Lost your password? <a href="{% url 'ctflex:password_reset' %}">Reset it.</a></p>
 
-  <form method="post" id="login-attempt">
+  <form method="post" class="form-horizontal" id="login-attempt">
     {% csrf_token %}
 
     <div class="container">
-      <form class="form-horizontal" role="form">
         <div class="form-group">
           <div class="col-sm-3">
             {% formfield form.username %}{% endformfield %}
@@ -47,7 +46,6 @@
             <a role="button" type="submit" class="btn btn-default" id="reset">Reset Password</a>
           </div>
         </div>
-      </form>
       <br>
       <br>
       <hr>
@@ -55,17 +53,15 @@
 
     <input type="hidden" name="next" value="{{ next }}"/>
 
-    <input type="submit" value="Log in"/>
-
     <script type="text/javascript">document.getElementById("id_username").focus();</script>
 
   </form>
 
 <!-- This has to go here, otherwise we can't interrupt the login form -->
 <script type="text/javascript">
-  $('#login-attempt').on('submit', function(event) {
-    //event.preventDefault();
-    //attempt_login();
+  $('#login').on('submit', function(event) {
+    event.preventDefault();
+    attempt_login();
   });
 </script>
 
