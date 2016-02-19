@@ -91,7 +91,10 @@ def score(*, team, window):
 
 
 def _eligible(team):
-    return not team.banned and all(competitor.country == Country('US') for competitor in team.competitor_set.all())
+    return not team.banned and all(
+        competitor.country == Country('US') and competitor.background == models.Competitor.HIGHSCHOOL
+        for competitor in team.competitor_set.all()
+    )
 
 
 def board(window=None):

@@ -1,26 +1,35 @@
-- model: "ctflex.Competitor"
+- model: ctflex.Competitor
   pk: 11
   fields:
     user: 11
     team: 1
-    email: "example11@mailinator.com"
+    email: example11@mailinator.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
     country: US
     state: MA
+    background: H
 
-- model: "ctflex.Competitor"
+- model: ctflex.Competitor
   pk: 12
   fields:
     user: 12
     team: 1
-    email: "example12@mailinator.com"
+    email: example12@mailinator.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
     country: US
     state: NY
+    background: H
 
-- model: "ctflex.Competitor"
+- model: ctflex.Competitor
   pk: 21
   fields:
     user: 21
     team: 2
-    email: "example21@example.com"
+    email: example21@example.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
     country: US
     state: TX
+    background: H
