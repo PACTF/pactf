@@ -2,6 +2,8 @@
 {% load static %}
 {% load ctflex %}
 
+{# TODO(Yatharth): Rename game to problems #}
+
 {% block title %}
   Game — {{ block.super }}
 {% endblock %}
@@ -34,7 +36,7 @@
           {{ prob.description_html|safe }}
         </div>
 
-        <input type="button" class="btn btn-info hint-button" value="Toggle Hint"/>
+        <input type="button" class="btn btn-primary hint-button" value="Toggle Hint"/>
         <div class="hint-content">
           {{ prob.hint_html|safe }}
         </div>
@@ -50,7 +52,7 @@
             <div class="input-group">
               <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"/>
                <span class="input-group-btn">
-                <input class="btn btn-info" type="submit" value="Check!"/>
+                <input class="btn btn-primary" type="submit" value="Check!"/>
               </span>
 
             </div>

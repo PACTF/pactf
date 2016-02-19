@@ -1,3 +1,5 @@
+/* TODO(Yatharth): Switch to LESS */
+
 /* Body */
 
 body {
@@ -12,23 +14,24 @@ body {
 
 }
 
-.page-title > .container, #body {
+#content {
+    margin-top: 1em;
+}
+
+.page-title > .container, #content, #messages {
     /* XXX(Yatharth) http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
     max-width: 50em;
     margin: 0 auto;
 }
 
-#body {
-    margin-top: 1em;
-}
-
-/* Title */
+/* Header */
 
 .page-title {
     background-color: #f5f5f5;
     color: #fff;
     padding: 20px 0;
     overflow: hidden;
+    margin-bottom: 1em;
 }
 
 .page-title h1 {

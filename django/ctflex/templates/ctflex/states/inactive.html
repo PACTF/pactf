@@ -14,8 +14,8 @@
   </p>
 
   <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
-    <input type="submit" value="Start!"/>
     {% csrf_token %}
+    <input class="btn btn-primary" type="submit" value="Start!"/>
   </form>
   <br/>
 
