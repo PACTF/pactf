@@ -9,7 +9,7 @@ function attempt_login() {
     },
 
     error : function(xhr, msg, err) {
-      alert(err);
+      console.log(xhr);
     }
   });
 }
