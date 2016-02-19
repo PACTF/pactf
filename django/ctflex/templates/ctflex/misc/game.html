@@ -11,10 +11,13 @@
 {% endblock %}
 
 {% block js %}
-  <script src="{% static 'ctflex/js/game.js' %}"></script>
+  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>
+  <script type="text/javascript" src="{% static 'ctflex/js/game.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+  <div id="window-id" style="display:none">{{ window.id }}</div>
+  <div id="game-messages"></div>
   <div id="problems">
     {% for raw_prob in prob_list %}
       {% format_problem raw_prob team as prob %}
@@ -33,20 +36,21 @@
           {{ prob.hint_html|safe }}
         </div>
 
-        {% solved raw_prob team as has_solved %}
-        {% if has_solved %}
-          <p> You have already solved this problem.</p>
-        {% else %}
-          <form class="flag-submit" action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
-            <p style="display:none" class="id_loc">{{ prob.id }}</p>
-            <label for="flag-{{ prob.id }}">Flag: </label>
-            <input id="flag-{{ prob.id }}" type="text" name="flag"/>
+        <div id="prob-content-{{ prob.id }}">
+          {% solved raw_prob team as has_solved %}
+          {% if has_solved %}
+            <p> You have already solved this problem.</p>
+          {% else %}
+            <form class="flag-submit" action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
+              <label for="flag-{{ prob.id }}">Flag: </label>
+              <input id="flag-{{ prob.id }}" type="text" name="flag"/>
 
-            <input type="submit" value="Submit!"/>
+              <input id="submit-{{ prob.id }}" type="submit" value="Submit!"/>
 
-            {% csrf_token %}
-          </form>
-        {% endif %}
+              {% csrf_token %}
+            </form>
+          {% endif %}
+        </div>
 
       </div>
     {% endfor %}

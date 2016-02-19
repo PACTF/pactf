@@ -273,17 +273,12 @@ def submit_flag(request, *, window_id, prob_id):
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
     except queries.ProblemAlreadySolvedException:
-        messenger = messages.error
+        correct = False
         message = "Your team has already solved this problem!"
     except queries.FlagAlreadyTriedException:
-        messenger = messages.error
+        correct = False
         message = "You or someone on your team has already tried this flag!"
-    else:
-        messenger = messages.success if correct else messages.error
-
-    # Flash message and redirect
-    messenger(request, message)
-    return redirect('ctflex:game', window_id=window.id)
+    return JsonResponse({'correct' : correct, 'msg' : message})
 
 
 # endregion

@@ -125,7 +125,7 @@ def grade(*, problem, flag, team):
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
     # extract key
     correct, message = grader.grade(hash(str(team.id) + "grading" + settings.SECRET_KEY), flag)
-    logger.info('grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
+    logger.info('grade: Flag by team ' + str(team.id) + ' for problem ' + str(problem.id) + ' is ' + str(correct) + '.')
     return correct, message
 
 
@@ -142,7 +142,7 @@ def submit_flag(prob_id, competitor, flag):
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
-        logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
+        logger.info('submit_flag: Team ' + str(competitor.team.id) + ' has already solved problem ' + str(problem.id) + '.')
         raise ProblemAlreadySolvedException()
 
     # Grade
@@ -151,7 +151,7 @@ def submit_flag(prob_id, competitor, flag):
     if correct:
         # This effectively updates the score too
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
-        logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
+        logger.info('submit_flag: Team ' + str(competitor.team.id) + ' solved problem ' + str(problem.id) + '.')
 
     # Inform the user if they had already tried the same flag
     # (This check must come after actually grading as a team might have submitted a flag

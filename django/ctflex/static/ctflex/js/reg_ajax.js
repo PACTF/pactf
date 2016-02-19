@@ -5,7 +5,6 @@ function attempt_register() {
     data : $('#register-submit').serialize(),
 
     success : function(response) {
-      console.log()
       if ('errors' in response) {
         var err_html = "<p>There were one or more errors:</p>";
         for (var i = 0 ; i < response.errors.length ; i += 1) {
@@ -18,7 +17,9 @@ function attempt_register() {
     },
 
     error : function(xhr, msg, err) {
-      alert(err);
+      document.getElementById("errors").innerHTML = (
+        "<p>There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!s</p>"
+      );
     }
   });
 }
