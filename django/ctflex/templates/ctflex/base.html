@@ -14,7 +14,7 @@
 
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
     rel="stylesheet">
-    <link href="{% static 'ctflex/css/base.css' %}">
+    <link href="{% static 'ctflex/css/base.css' %}" rel="stylesheet">
     {% block css %}{% endblock %}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -75,9 +75,12 @@
         </div>
       </div>
     </div>
-
-    {% block content %}{% endblock %}
-
+    <div class="well">
+      {% block well %}{% endblock %}
+    </div>
+    <div class="container">
+      {% block content %}{% endblock %}
+      <br><br><hr>
       <footer>
         <p>
           © PACTF 2016

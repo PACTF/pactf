@@ -28,6 +28,7 @@ class Django:
         'django_extensions',
         'debug_toolbar',
         'email_log',
+        'widget_tweaks',
 
         # Python 3rd-party
         'yaml',
