@@ -6,9 +6,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, reverse
 from django.core.exceptions import ValidationError
-from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
+from django.http import JsonResponse
+from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -118,10 +119,15 @@ def competitors_only():
 
 
 def windowed():
-    """Redirects views around based on Contest Window and Personal Timer states"""
+    """Redirects views around based on Contest Window and Personal Timer states
+
+    This decorator wraps views with competitors_only() too, so do not decorate a view with both windowed() and competitors_only() because that would be redundant.
+    """
 
     def decorator(view):
+
         @wraps(view)
+        @competitors_only()
         def decorated(request, *args, window_id, **kwargs):
 
             window = queries.get_window(window_id)
@@ -196,7 +202,6 @@ def done(request, *, window_id):
 
 
 @single_http_method('POST')
-@competitors_only()
 @windowed()
 def start_timer(request, *, window_id):
     window = queries.get_window(window_id)
@@ -232,7 +237,6 @@ def rate_limited(request, err):
 # region CTF Views
 
 @single_http_method('GET')
-@competitors_only()
 @windowed()
 def game(request, *, window_id):
     window = queries.get_window(window_id)
@@ -268,11 +272,11 @@ def board_overall(request):
 
 
 @single_http_method('POST')
-@competitors_only()
 @windowed()
 def submit_flag(request, *, window_id, prob_id):
     # Handle rate-limiting
     if is_ratelimited(request, fn=submit_flag, key=queries.get_team, rate='1/s', increment=True):
+        # FIXME(Yatharth): Return JSON
         return rate_limited(request, None)
 
     # Process data from the request
@@ -285,24 +289,22 @@ def submit_flag(request, *, window_id, prob_id):
         correct, message = queries.submit_flag(prob_id, competitor, flag)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
+    # XXX(Yatharth): Change to 'status' and have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
     except queries.ProblemAlreadySolvedException:
-        messenger = messages.error
+        correct = False
         message = "Your team has already solved this problem!"
     except queries.FlagAlreadyTriedException:
-        messenger = messages.error
+        correct = False
         message = "You or someone on your team has already tried this flag!"
-    else:
-        messenger = messages.success if correct else messages.error
-
-    # Flash message and redirect
-    messenger(request, message)
-    return redirect('ctflex:game', window_id=window.id)
+    return JsonResponse({'correct': correct, 'msg': message})
 
 
 # endregion
 
 # region Team Views
 
+# XXX(Yatharth): Needs to use a slightly different template at least
+# XXX(Yatharth): Link to from scoreboard
 @single_http_method('GET')
 class Team(DetailView):
     model = models.Team
@@ -378,14 +380,20 @@ def register_user(request):
     handle = form.cleaned_data['handle']
     pswd = form.cleaned_data['pswd']
     email = form.cleaned_data['email']
+    state = form.cleaned_data['state']
     try:
-        c = queries.create_competitor(handle, pswd, email, team)
+        c = queries.create_competitor(handle, pswd, email, team, state)
         u = authenticate(username=handle, password=pswd)
         login(request, u)
-        return redirect('ctflex:index')
-    except ValidationError:
-        form.add_error('handle', "Can't create user")
-        # return register(request, form)
-        return HttpResponseNotAllowed("POST")
+        # XXX(Yatharth): Ditch this
+        #     return redirect('ctflex:index')
+        # except ValidationError:
+        #     form.add_error('handle', "Can't create user")
+        #     # return register(request, form)
+        #     return HttpResponseNotAllowed("POST")
+        return JsonResponse({'redirect': reverse('ctflex:index')})
+    except ValidationError as e:
+        form.add_error('handle', str(e))
+        return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
 
 # endregion

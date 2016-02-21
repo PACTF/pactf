@@ -18,6 +18,7 @@ logger = logging.getLogger(constants.QUERY_LOGGER)
 
 
 # XXX(Yatharth): Clean queries
+# XXX(Yatharth): Bring back logging and set file accordingly
 
 
 # region General
@@ -69,7 +70,6 @@ def viewable_problems(team, window):
 
 # region Template Tag
 
-
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
@@ -115,13 +115,15 @@ def board(window=None):
 
 # region Auth
 
-# TODO(Cam): Consider catching 'this' here
-def create_competitor(handle, pswd, email, team):
+def create_competitor(handle, pswd, email, team, state):
     user = settings.AUTH_USER_MODEL.objects.create_user(handle, None, pswd)
     try:
         validate_password(pswd, user=user)
-        competitor = models.Competitor(user=user, team=team, email=email)
+        competitor = models.Competitor(user=user, team=team, email=email, state=state, first_name="dummy",
+                                       last_name="dummy")
         competitor.full_clean()
+
+
     except ValidationError:
         user.delete()
         # logger.warning('create_competitor: Competitor creation failed: {}'.format(handle))
@@ -156,14 +158,9 @@ def _compute_key(team):
 
 def _grade(*, problem, flag, team):
     # logger.debug("grading {} for {} with flag {!r}".format(problem, team, flag))
-    if not flag:
-        # logger.info("empty flag for {} and {}".format(problem, team))
-        return False, "Empty flag"
-
-    grader_path = join(settings.PROBLEMS_DIR, problem.grader)
-    # XXX(Yatharth): Handle FileNotFound
+    grader_path = join(settings.PROBLEMS_DIR, problem.grader)  # XXX(Yatharth): Handle FileNotFound
     grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
-    # extract key
+
     # XXX(Yatharth): Handle no such function or signature or anything, logging appropriate error messages
     correct, message = grader.grade(_compute_key(team), flag)
     # logger.info('_grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
@@ -194,9 +191,13 @@ def submit_flag(prob_id, competitor, flag):
         models.Solve(problem=problem, competitor=competitor, flag=flag).save()
         # logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
 
+    elif not flag:
+        # logger.info("empty flag for {} and {}".format(problem, team))
+        message = "The flag was empty."
+
     # Inform the user if they had already tried the same flag
     # (This check must come after actually grading as a team might have submitted a flag
-    # that later becomes correct on a problem's being updated.)
+    # that later becomes correct on a problem's being updated. It must also come after the check for emptiness of flag.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
         # logger.info('submit_flag: Team ' + competitor.team.id + ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
         raise FlagAlreadyTriedException()
@@ -227,6 +228,7 @@ def format_problem(problem, team):
         pass
 
     result = Dummy()
+
     data['description_html'], data['hint_html'] = _get_desc(problem, team)
     result.__dict__ = data
     return result

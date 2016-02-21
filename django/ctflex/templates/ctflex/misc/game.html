@@ -3,6 +3,7 @@
 {% load ctflex %}
 
 {# TODO(Yatharth): Rename game to problems #}
+{# TODO(Yatharth): Implement problem collapsing; copy Pico #}
 
 {% block title %}
   Game — {{ block.super }}
@@ -17,12 +18,23 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'ctflex/js/game.js' %}"></script>
+  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>
+  <script type="text/javascript" src="{% static 'ctflex/js/game.js' %}"></script>
 {% endblock %}
 
 
-
 {% block content %}
+
+  {# Pass some context variables to the JavaScript code #}
+  <script type="text/javascript">
+    (function () {
+      window.window_id = "{{ window.id|escapejs}}";
+    })();
+  </script>
+
+  <div id="window-id" style="display:none"></div>
+  <div id="game-messages"></div>
+
   <div id="problems">
     {% for raw_prob in prob_list %}
       {% format_problem raw_prob team as prob %}
@@ -44,17 +56,22 @@
         {% solved raw_prob team as has_solved %}
         {% if has_solved %}
           <p> You have already solved this problem.</p>
+
         {% else %}
-          <form action="{% url 'ctflex:submit_flag' prob_id=prob.id window_id=window.id %}" method="post">
+          <form class="problem-form">
             {% csrf_token %}
 
             <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
             <div class="input-group">
-              <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"/>
+              <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag" required/>
                <span class="input-group-btn">
-                <input class="btn btn-primary" type="submit" value="Check!"/>
-              </span>
 
+                 {# Setting onclick changed the behaviour for hitting enter in a text input too #}
+                 {# False is returned to prevent non-AJAX form submission #}
+                <input class="btn btn-primary" id="submit-{{ prob.id }}" type="submit" value="Check!"
+                       onclick="submit_flag('{{ prob.id|escapejs }}'); return false;"/>
+
+              </span>
             </div>
 
           </form>

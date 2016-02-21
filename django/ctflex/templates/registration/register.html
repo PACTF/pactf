@@ -9,19 +9,12 @@
   Register
 {% endblock %}
 
-{#{% block extra_js %}#}
-{#  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>#}
-{#  <script type="text/javascript" src="{% static 'ctflex/js/reg_ajax.js' %}"></script>#}
-{#{% endblock %}#}
 
 {% block content %}
 
   <p>If the team you name already exists, the "passphrase" should be given to
     you by the team owner. If you're creating a new team, just enter the
     passphrase you want your team to use!</p>
-
-  {#  <div id="errors">#}
-  {#  </div>#}
 
   <form action="{% url 'ctflex:register_user' %}" method="post" id="register-submit">
     {% csrf_token %}
@@ -57,12 +50,5 @@
 
     <input type="submit" value="Register!"/>
   </form>
-
-  {#  <script type="text/javascript">#}
-  {#    $('#register-submit').on('submit', function (event) {#}
-  {#      event.preventDefault();#}
-  {#      attempt_register();#}
-  {#    });#}
-  {#  </script>#}
 
 {% endblock %}

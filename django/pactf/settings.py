@@ -1,6 +1,6 @@
 """Define (default) configuration for the project"""
 import os
-from os.path import join
+from os.path import join, dirname
 
 from configurations import Configuration, values
 from django.contrib import messages
@@ -108,7 +108,7 @@ class Django:
     USE_TZ = True
 
     # Database
-    # (Postgres is required for CtfProblem's JSONField.)
+    # (Postgres is required for CTFlex's CtfProblem's JSONField.)
     DATABASES = values.DatabaseURLValue(environ_required=True)
 
     # Where to finally collect static files to
@@ -143,25 +143,6 @@ class Security:
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
     PASSWORD_HASHERS = ['ctflex.hashers.PBKDF2PasswordHasher4',
                         'django.contrib.auth.hashers.PBKDF2PasswordHasher']
-
-    # Minimum password strength validation
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-            'OPTIONS': {
-                'min_length': 12,
-            }
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
 
     # Number of days that a password reset link is valid for
     PASSWORD_RESET_TIMEOUT_DAYS = 1

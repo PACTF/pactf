@@ -14,16 +14,15 @@ body {
 
 }
 
-
 .page-title > .container, #content, #messages {
     /* XXX(Yatharth) http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
     max-width: 50em;
     margin: 0 auto;
 }
 
-
 #content {
     margin-top: 1em;
+    padding: 0.25em;
 }
 
 /* Header */

@@ -1,6 +1,7 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
 {% load formfield from ctflex %}
+{% load widget_tweaks %}
 
 {% block title %}
   Login — {{ block.super }}
@@ -10,10 +11,6 @@
   Login
 {% endblock %}
 
-{#{% block js %}#}
-{#  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>#}
-{#  <script type="text/javascript" src="{% static 'ctflex/js/login_ajax.js' %}"></script>#}
-{#{% endblock %}#}
 
 {% block content %}
 
@@ -29,7 +26,8 @@
 
   <p>Lost your password? <a href="{% url 'ctflex:password_reset' %}">Reset it.</a></p>
 
-  <form method="post" id="login-attempt">
+  {# TODO: Make form horizontal #}
+  <form method="post" role="form">
     {% csrf_token %}
 
     {% include 'ctflex/snippets/form_non_field_errors.html' %}
@@ -64,18 +62,10 @@
 
     <input type="hidden" name="next" value="{{ next }}"/>
 
-    <input class="btn btn-primary"  type="submit" value="Log in"/>
+    <input class="btn btn-primary" type="submit" value="Log in"/>
 
     <script type="text/javascript">document.getElementById("id_username").focus();</script>
 
   </form>
-
-{#  <!-- This has to go here, otherwise we can't interrupt the login form -->#}
-{#  <script type="text/javascript">#}
-{#    $('#login-attempt').on('submit', function (event) {#}
-{#      //event.preventDefault();#}
-{#      //attempt_login();#}
-{#    });#}
-{#  </script>#}
 
 {% endblock %}
