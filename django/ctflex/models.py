@@ -221,6 +221,20 @@ class Competitor(models.Model):
         sync_state_outside_us,
     )
 
+@cleaned
+class Announcement(models.Model):
+    a_id = models.IntegerField
+    title = models.CharField(max_length=80, blank=False)
+    body = models.TextField(blank=False)
+    posted = models.DateTimeField(auto_now_add=True)
+    problems = models.ManyToManyField(CtfProblem)
+    users_unviewed = models.ManyToManyField(Competitor)
+
+    def save(self):
+        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
+        self.body = markdown2.markdown(self.body, extras=EXTRAS, safe_mode='escape')
+        self.title = markdown2.markdown(self.title.replace('\n', ' '), safe_mode='escape')
+
 
 @unique_receiver(post_save, sender=Competitor)
 def competitor_post_save_sync_to_user(sender, instance, **kwargs):
@@ -231,7 +245,6 @@ def competitor_post_save_sync_to_user(sender, instance, **kwargs):
     instance.user.email = instance.email
 
     instance.user.save()
-
 
 # endregion
 
