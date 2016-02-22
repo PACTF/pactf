@@ -1,0 +1,86 @@
+{% extends 'ctflex/base.html' %}
+{% load static from staticfiles %}
+{% load formfield from ctflex %}
+{% load ctflex_debug %}
+
+{# TODO(Yatharth): Append asterisk after required fields #}
+{# TODO(Yatharth): Study picoctf.com/js/registration.js, especially for apiCall #}
+
+{% block title %}
+  Register — {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Register
+{% endblock %}
+
+{% block extra_css %}
+  <link href="{% static 'ctflex/css/register.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'ctflex/js/register.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    If you already have a personal account, go <a href="{% url 'ctflex:login' %}">login</a>!
+  </p>
+
+  <p>Otherwise, sign up for a personal account, and either create a new team or join an existing one.</p>
+
+  <form method="post" role="form">
+    {% csrf_token %}
+
+    {% include 'ctflex/snippets/form_non_field_errors.html' %}
+
+
+    <div id="competitor-container">
+      {% formfield form.first_name %}{% endformfield %}
+    </div>
+
+    <div id="team-buttons" class="text-center form-group">
+      <div class="btn-group " role="group">
+        <button id="new-team-btn" type="button" class="btn btn-default">Create a New Team</button>
+        <button id="existing-team-btn" type="button" class="btn btn-default">Join an Existing Team</button>
+        {# TODO: Set styles ob buttons and disable clicking #}
+      </div>
+    </div>
+
+
+    <div id="new-team-container">
+      <p>Here's how you would register your team:</p>
+      <ol>
+        <li>One member of your team creates a new team, choosing a Team Name and Passphrase.</li>
+        <li>The team creator shares the Team Name and Passphrase with other members of the team.</li>
+        <li>All other team members register and choose “Join an Existing Team,” providing the Team Name and Passphrase.</li>
+      </ol>
+      <p>
+        You can add new members to your team at any time, even after the competition starts.
+      </p>
+      <p>
+        <em>The preceding help text was adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>
+      </p>
+
+      {% formfield form.first_name %}{% endformfield %}
+
+    </div>
+
+    <div id="existing-team-container">
+
+      {% formfield form.first_name %}{% endformfield %}
+
+    </div>
+
+    <div id="common-team-container">
+
+      <input class="btn btn-primary" type="submit" value="Register"/>
+
+    </div>
+
+    <script type="text/javascript">document.getElementById("id_first_name").focus();</script>
+
+  </form>
+
+{% endblock %}

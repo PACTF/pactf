@@ -352,16 +352,13 @@ def password_reset_complete(request):
     return redirect('ctflex:login')
 
 
-# FIXME(yatharth): Registration
-
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def register(request, form=None):
-    if form is None: form = forms.RegistrationForm()
-    d = {}
-    d['form'] = form
-    return render(request, 'registration/register.html', d)
+def register(request, form_class=forms.CompetitorForm):
+    return render(request, 'ctflex/auth/register.html', {
+        'form': form_class()
+    })
 
 
 @single_http_method('POST')

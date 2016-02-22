@@ -10,7 +10,8 @@ from ctflex import models
 class CompetitorForm(forms.ModelForm):
     class Meta:
         model = models.Competitor
-        exclude = ()
+        fields = ('first_name', 'last_name')
+
 
 
 class RegistrationForm(forms.Form):
