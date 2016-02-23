@@ -1,29 +1,28 @@
 import inspect
 from functools import wraps
 
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import resolve, reverse
 from django.db import transaction
+from django.http import JsonResponse, HttpResponseRedirect
+from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
+from django.shortcuts import render, redirect, resolve_url
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import resolve, reverse
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse, HttpResponseRedirect
-from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound
-from django.shortcuts import render, redirect, resolve_url
-from django.contrib import messages
-from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
-from django.conf import settings
-
 from ratelimit.utils import is_ratelimited
 
+from ctflex import commands
+from ctflex import constants
+from ctflex import forms
 from ctflex import models
 from ctflex import queries
-from ctflex import commands
-from ctflex import forms
-from ctflex import constants
 from ctflex.constants import TEAM_STATUS_NAME, TEAM_STATUS_NEW, TEAM_STATUS_OLD
 
 
@@ -61,7 +60,19 @@ def warn_historic(request, window):
 def universal_decorator(*, methodname):
     """Makes a decorator factory able to decorate both a function and a certain method of a class
 
-    This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make a decorator factory that takes no arguments if you must.
+    Usage: Apple this decorator to a decorator of your own like so:
+
+        @universal_decorator(methodname='<some_method>')
+        def your_decorator(<arguments>):
+            def decorator(view):
+                def decorated(request, *args, **kwargs):
+                    <do things>
+                    return view(request, *args, **kwargs)
+                return decorated
+            return decorator
+
+    Drawbacks:
+    - This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make a decorator factory that takes no arguments if you must.
 
     For help, contact Yatharth.
     """
@@ -120,7 +131,7 @@ def anonyomous_users_only():
         @wraps(view)
         def decorated(request, *args, **kwargs):
             if not request.user.is_anonymous():
-                messages.warning(request, "You are already logged in; you cannot register.")
+                messages.warning(request, "You are already logged in.")
                 return HttpResponseRedirect(reverse(constants.INVALID_STATE_REDIRECT_URL))
 
             return view(request, *args, **kwargs)

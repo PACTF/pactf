@@ -33,6 +33,12 @@ Get access to our top-secret Google Doc called "Deployment Instructions" and fol
 
 Get access to our other top-secret Google Doc called "Design Doc".
 
+### Updating remote server after you push changes
+
+1. `git pull`
+1. `manage.py reloaddata`
+1. `manage.py `
+
 ### Throwing away current database during development
 
 1. Delete all files from migrations
