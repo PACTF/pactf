@@ -53,9 +53,9 @@ It is recommended to structure `PROBLEMS_DIR` as so: Have directories whose name
 
 The `problem.yaml` file must always have the `name` and `point` fields. It may have a `deps` field. Simple problems must contain the `description` and `hint` fields. Non-simple problems, called, dynamic problems, must contain the `dynamic` field.
 
-The `grader.py` file must have a `grade(key, submission)` function. The parameter `key` is a hash of the team id and a salt.
+The `grader.py` file must have a `_grade(key, submission)` function. The parameter `key` is a hash of the team id and a salt.
 
-For dynamic problems, the `dynamic` field is a string to a Python script called a 'generator'. It must contain a `gen(key)` function that returns a 2-tuple of a description and a hint. It must be deterministic upon the `key` so that `manage.py loadprobs` is an idempotent command. Currently, the output is not even cached to the database for (admittedly untested) performance reasons.
+The `dynamic` field is a boolean that defaults to False. If true, a Python script called 'generator.py' will be looked for in the problem directory. This file must contain a `gen(key)` function that returns a 2-tuple of a description and a hint. `key` will be a hash of the team ID. The function should be deterministic upon the `key` so that users don't get different problems everytime. Currently, the output is not even cached to the database for (admittedly untested) performance reasons, but problem writers do not need to worry about this. 
 
 The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `problems` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `problems` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `score` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `score` is not provided, it defaults to 1. 
 
@@ -63,6 +63,5 @@ If a `.uuid` file exists, then if a problem with the same UUID already exists, t
 
 Static files can be linked to in the description and hint using the `{% ctfstatic '<basename>' %}` tag. Any files in the `static` folder (if it exists) to the `ctfproblems/<problem-uuid>` deployment static folder, though this implementation is irrelevant to using the feature and may change.
 
-`loadprobs` creates or updates problems, but it doesn't delete them. To delete a problem, remove it from the database manually, and get rid of its now redundant static files by running `collectstatic --clear`. 
- 
- 
+`loadprobs` creates or updates problems, but it doesn't delete them. To delete a problem, remove it from the database manually, and get rid of its now redundant static files by running `collectstatic --clear`.
+

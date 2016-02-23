@@ -1,63 +1,52 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
+{% load formfield from ctflex %}
 {% load widget_tweaks %}
 
 {% block title %}
   Login — {{ block.super }}
 {% endblock %}
 
-{% block js %}
-<script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>
-<script type="text/javascript" src="{% static 'ctflex/js/login_ajax.js' %}"></script>
+{% block header %}
+  Login
 {% endblock %}
 
-{% block well %}
-<h1 class="col-sm-offset-1">
-  Login
-</h1>
-{% endblock %}
 
 {% block content %}
-  <form method="post" class="form-horizontal" id="login-attempt" role="form">
-    {% csrf_token %}
 
-    <div class="form-group">
-      <label class="control-label col-sm-offset-2 col-sm-3" for="id_username">
-        Username
-      </label>
-      <div class="col-sm-3">
-        {{ form.username|add_class:"form-control" }}
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>You are authenticated as {{ request.user.username }}, but are not authorized to access this page. Would you like to login to a different account?</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% else %}
+    <p>If you don't already have an account, <a href="{% url 'ctflex:register' %}">sign up</a>!</p>
+  {% endif %}
+
+  {% with extra_label_class='col-sm-2 col-sm-offset-2' extra_input_class='col-sm-4' extra_help_class='col-sm-4 col-sm-offset-4' %}
+    <form method="post" class="form-horizontal" role="form">
+      {% csrf_token %}
+
+      {% include 'ctflex/snippets/form_non_field_errors.html' %}
+
+      {% formfield form.username %}{% endformfield %}
+      {% formfield form.password %}{% endformfield %}
+
+      <input type="hidden" name="next" value="{{ next }}"/>
+
+      <div class="text-center form-group">
+        <div class="btn-group" role="group">
+          <input class="btn btn-primary" type="submit" value="Log in"/>
+          <a role="button" href="{% url 'ctflex:password_reset' %}" type="button" class="btn btn-default">Reset Password</a>
+          <div class="clearfix hidden-xs"></div>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-offset-2 col-sm-3" for="id_username">
-        Password
-      </label>
-      <div class="col-sm-3">
-        {{ form.password|add_class:"form-control" }}
-      </div>
-    </div>
-    <br>
-    <div class="col-sm-offset-4 col-sm-4">
-      <div class="btn-group btn-group-justified" role="group">
-        <!-- this hack ;\ -->
-        <a role="button" type="submit" class="btn btn-primary" id="login-button" onclick="$(this).closest('form').submit()">Login</a>
-        <a role="button" type="submit" class="btn btn-default" id="reset">Reset Password</a>
-      </div>
-    </div>
 
-    <input type="hidden" name="next" value="{{ next }}"/>
 
-    <script type="text/javascript">document.getElementById("id_username").focus();</script>
+      <script type="text/javascript">document.getElementById("id_username").focus();</script>
 
-  </form>
-
-<!-- This has to go here, otherwise we can't interrupt the login form -->
-<script type="text/javascript">
-  $('#login').on('submit', function(event) {
-    event.preventDefault();
-    attempt_login();
-  });
-</script>
+    </form>
+  {% endwith %}
 
 {% endblock %}

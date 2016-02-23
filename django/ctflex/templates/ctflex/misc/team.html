@@ -5,6 +5,10 @@
   Team — {{ block.super }}
 {% endblock %}
 
+{% block header %}
+  Team
+{% endblock %}
+
 {% block content %}
   <p>
     You are {{ user.username }} and part of team {{ object.name }}. You have

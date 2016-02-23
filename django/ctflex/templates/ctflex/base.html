@@ -1,94 +1,12 @@
-{% load static from staticfiles %}
+{% extends 'ctflex/base-headerless.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>
-      Home - PACTF
-    </title>
-
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
-    rel="stylesheet">
-    <link href="{% static 'ctflex/css/base.css' %}" rel="stylesheet">
-    {% block css %}{% endblock %}
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
-    {% block js %}{% endblock %}
-</head>
-
-  <body>
-    <div class="navbar navbar-fixed-top navbar-inverse">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="{% url 'ctflex:index' %}">{% include 'ctflex/title.txt' %}</a>
-        </div>
-        <!--/.navbar-collapse -->
-        <div class="navbar-collapse collapse text-left">
-          <ul class="nav navbar-nav">
-            {% if user.is_authenticated %}
-            <li>
-              <a href="{% url 'ctflex:game' window_id=window.id %}">Game</a>
-            </li>
-            <li>
-              <a href="{% url 'ctflex:scoreboard' window_id=window.id %}">Scoreboard</a>
-            </li>
-            {% endif %}
-            <li>
-              <a href="/about">About</a>
-            </li>
-            <li>
-              <a href="/faq">FAQ</a>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li>
-              <a target="_blank" href="https://pactf.statuspage.io/">Status</a>
-            </li>
-            {% if user.is_authenticated %}
-              {% if team %}
-                <li><a href="{% url 'ctflex:current_team' window_id=window.id %}">Team</a></li>
-              {% else %}
-                <li><span>Y u no be competitor</span></li>
-              {% endif %}
-              <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
-            {% else %}
-              <li><a href="{% url 'ctflex:login' %}">Login</a></li>
-              <li><a href="{% url 'ctflex:register' %}">Register</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="well">
-      {% block well %}{% endblock %}
-    </div>
+{% block _header_wrapper %}
+  <header class="page-title">
     <div class="container">
-      {% block content %}{% endblock %}
-      <br><br><hr>
-      <footer>
-        <p>
-          © PACTF 2016
-        </p>
-      </footer>
+      <h1>
+        {% block header %}
+        {% endblock %}
+      </h1>
     </div>
-    <!-- /container -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
-    </script>
-    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js">
-    </script>
-  </body>
-
-</html>
+  </header>
+{% endblock %}

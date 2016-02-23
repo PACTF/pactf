@@ -17,6 +17,7 @@ from django.views.generic import DetailView
 from django.conf import settings
 
 from ratelimit.decorators import ratelimit
+from ratelimit.utils import is_ratelimited
 
 from ctflex import models
 from ctflex import queries
@@ -118,10 +119,15 @@ def competitors_only():
 
 
 def windowed():
-    """Redirects views around based on Contest Window and Personal Timer states"""
+    """Redirects views around based on Contest Window and Personal Timer states
+
+    This decorator wraps views with competitors_only() too, so do not decorate a view with both windowed() and competitors_only() because that would be redundant.
+    """
 
     def decorator(view):
+
         @wraps(view)
+        @competitors_only()
         def decorated(request, *args, window_id, **kwargs):
 
             window = queries.get_window(window_id)
@@ -196,7 +202,6 @@ def done(request, *, window_id):
 
 
 @single_http_method('POST')
-@competitors_only()
 @windowed()
 def start_timer(request, *, window_id):
     window = queries.get_window(window_id)
@@ -214,7 +219,8 @@ def start_timer(request, *, window_id):
 # endregion
 
 
-# region CTF Views
+# region Misc Views
+
 
 @single_http_method('GET')
 def index(request):
@@ -222,7 +228,15 @@ def index(request):
 
 
 @single_http_method('GET')
-@competitors_only()
+def rate_limited(request, err):
+    return render(request, 'ctflex/misc/ratelimited.html')
+
+
+# endregion
+
+# region CTF Views
+
+@single_http_method('GET')
 @windowed()
 def game(request, *, window_id):
     window = queries.get_window(window_id)
@@ -258,10 +272,13 @@ def board_overall(request):
 
 
 @single_http_method('POST')
-@competitors_only()
 @windowed()
-@ratelimit(key=queries.get_team, rate='10/m')
 def submit_flag(request, *, window_id, prob_id):
+    # Handle rate-limiting
+    if is_ratelimited(request, fn=submit_flag, key=queries.get_team, rate='1/s', increment=True):
+        # FIXME(Yatharth): Return JSON
+        return rate_limited(request, None)
+
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
@@ -272,20 +289,22 @@ def submit_flag(request, *, window_id, prob_id):
         correct, message = queries.submit_flag(prob_id, competitor, flag)
     except models.CtfProblem.DoesNotExist:
         return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
+    # XXX(Yatharth): Change to 'status' and have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
     except queries.ProblemAlreadySolvedException:
         correct = False
         message = "Your team has already solved this problem!"
     except queries.FlagAlreadyTriedException:
         correct = False
         message = "You or someone on your team has already tried this flag!"
-    return JsonResponse({'correct' : correct, 'msg' : message})
+    return JsonResponse({'correct': correct, 'msg': message})
 
 
 # endregion
 
 # region Team Views
 
-
+# XXX(Yatharth): Needs to use a slightly different template at least
+# XXX(Yatharth): Link to from scoreboard
 @single_http_method('GET')
 class Team(DetailView):
     model = models.Team
@@ -336,11 +355,15 @@ def password_reset_complete(request):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def register(request, form=None):
-    if form is None: form = forms.RegistrationForm()
-    d = {}
-    d['form'] = form
-    return render(request, 'registration/register.html', d)
+def register(request):
+    # http://stackoverflow.com/a/575133/1292652
+    # have kwarg to have correct divs expand
+    return render(request, 'ctflex/auth/register.html', {
+        'user_form': forms.UserCreationForm(prefix='user'),
+        'competitor_form': forms.CompetitorCreationForm(prefix='competitor'),
+        'new_team_form': forms.TeamCreationForm(prefix='new_team'),
+        'existing_team_form': forms.TeamJoiningForm(prefix='existing_team')
+    })
 
 
 @single_http_method('POST')
@@ -349,7 +372,8 @@ def register(request, form=None):
 def register_user(request):
     form = forms.RegistrationForm(request.POST)
     if not form.is_valid():
-        return JsonResponse({'errors' : [[k, form.errors[k]] for k in form.errors]})
+        return register(request, form)
+        # return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
     # handle, pswd, email, team, team_pass = form.cleaned_data
     team, msg = queries.validate_team(form.cleaned_data['team'], form.cleaned_data['team_pass'])
     if team is None:
@@ -363,9 +387,15 @@ def register_user(request):
         c = queries.create_competitor(handle, pswd, email, team, state)
         u = authenticate(username=handle, password=pswd)
         login(request, u)
-        return JsonResponse({'redirect' : reverse('ctflex:index')})
+        # XXX(Yatharth): Ditch this
+        #     return redirect('ctflex:index')
+        # except ValidationError:
+        #     form.add_error('handle', "Can't create user")
+        #     # return register(request, form)
+        #     return HttpResponseNotAllowed("POST")
+        return JsonResponse({'redirect': reverse('ctflex:index')})
     except ValidationError as e:
         form.add_error('handle', str(e))
-        return JsonResponse({'errors' : [[k, form.errors[k]] for k in form.errors]})
+        return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
 
-        # endregion
+# endregion

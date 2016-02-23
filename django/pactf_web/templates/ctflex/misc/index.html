@@ -1,70 +1,78 @@
-{% extends 'ctflex/base.html' %}
-{% load ctflex %}
+{% extends 'ctflex/base-headerless.html' %}
+{% load static from staticfiles %}
 
-{% block content %}
+{% block extra_css %}
+  <link href="{% static 'ctflex/css/index.css' %}" rel="stylesheet"/>
+{% endblock %}
 
-<!-- Main jumbotron for a primary marketing message or call to action
--->
-<div class="jumbotron">
-  <div class="text-center">
-    <img src="https://tonyztan.github.io/static/ctf/sample.jpg" height="270"
-    width="1330">
+{# FIXME(Yatharth) Make include base stuff not extend, and figure out messages #}
+{# TODO(Yatharth): Make it scrolling with sections #}
+{# TODO(Yatharth): Have email sign up section #}
+{# TODO(Yatharth): Separate page for explaining #}
+{# TODO(Yatharth): More info #}
+
+{# Use content_wrapper instead of content to use full page #}
+{% block content_wrapper %}
+
+  <div class="jumbotron">
+    <div id="jumbotron-img" class="text-center">
+      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
+    </div>
+    <h3 class="text-center">
+      <b>PACTF</b> is an online <b>computer security</b> competition for <b>high school students</b>.
+      <div>
+        <br>
+      </div>
+    </h3>
+    <p class="text-center">
+      <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+    </p>
   </div>
-  <h3 class="text-center">
-    <b>PACTF</b> is an online <b>computer security</b> competition for <b>high school students</b>.
-    <div>
-      <br>
-    </div>
-  </h3>
-  <p class="text-center">
-    <a class="btn btn-lg btn-primary" href="/register">Register Now!</a>
-  </p>
-</div>
-<div class="container">
-  <!-- Example row of columns -->
-  <div class="row">
-    <div class="col-md-4">
-      <h2>
-        Heading
-      </h2>
-      <p>
-        Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus
-        ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo
-        sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed
-        odio dui.
-      </p>
-      <p>
-        <a class="btn btn-default" href="#">View details »</a>
-      </p>
-    </div>
-    <div class="col-md-4">
-      <h2>
-        Heading
-      </h2>
-      <p>
-        Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus
-        ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo
-        sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed
-        odio dui.
-      </p>
-      <p>
-        <a class="btn btn-default" href="#">View details »</a>
-      </p>
-    </div>
-    <div class="col-md-4">
-      <h2>
-        Heading
-      </h2>
-      <p>
-        Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas
-        eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus,
-        tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum
-        massa justo sit amet risus.
-      </p>
-      <p>
-        <a class="btn btn-default" href="#">View details »</a>
-      </p>
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-6">
+        <h2>
+          New to CTFs?
+        </h2>
+        <p>
+          CTFs, short for Capture the Flags, are a type of Computer Security competition where you will try to hack into our systems, break our codes, and do fun things like that for points and learning!
+        </p>
+        <p>
+          <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#ctf-info">What Next?</a>
+        </p>
+        <div id="ctf-info" class="collapse">
+          <p>
+            There will be a list of 'problems' for you to solve. On solving then, you should end up with an 'answer string' called a 'flag'. You can submit this flag using the box next to the problem description and get points!
+          </p>
+          <p>
+            <img src="http://holygroundallaround.com/wp-content/uploads/2013/09/arise-go-forth-and-conquer.jpg"/>
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h2>
+          PACTF is different
+        </h2>
+        <p>
+          Experienced CTFer? Or new to Capture The Flags? Either way, want to solve problems and win prizes without spending fourteen consecutive days on a CTF?
+        </p>
+        <p>
+          <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#pactf-info">Find out how</a>
+        </p>
+        <div id="pactf-info" class="collapse">
+          <p>
+            <strong>Instead of a two-week sprint, PACTF will have three rounds,</strong> each one week long. During each round, you can pick any two-day span to grab as many flags as you can! Choose wisely: Once your two days run out, you won’t be able to score more points in that round.
+          </p>
+          <p>
+            <strong>Don’t worry about being too slow, though!</strong> Even if your two day timer is over, you can still test your skills against problems in previous rounds.
+          </p>
+          <p>
+            <strong>There are scoreboards</strong>
+            for each individual round, and there is an overall all-time scoreboard. Prizes will be given to the top-ranking teams of the individual rounds and the overall CTF, so whether you are a specialist or an all-rounder, there's something for you!
+          </p>
+        </div>
+      </div>
     </div>
   </div>
-  <hr>
 {% endblock %}

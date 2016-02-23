@@ -1,6 +1,37 @@
-<div class="form-field">
-  {{ field.label_tag }}
-  {{ field }}
-  {{ field.errors }}
+{% load widget_tweaks %}
+
+<div class="form-group row {% if field.errors %}has-error has-feedback{% endif %} {{ extra_group_class|default:'' }}">
+
+  <label for="{{ field.auto_id }}" class="control-label {{ extra_label_class|default:'' }}">
+    {{ field.label }}
+  </label>
+
+  <div class="{{ extra_input_class|default:'' }}">
+    {{ field|add_class:"form-control" }}
+
+    {% if field.errors %}
+      <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+    {% endif %}
+  </div>
+
+
+  <div class="clearfix"></div>
+
+  <div class="{{ extra_help_class|default:'' }}">
+
+    {% if field.errors %}
+      <ul class="errorlist list-unstyled">
+        {% for error in field.errors %}
+          <li class="alert alert-danger" role="alert">
+            {{ error|escape }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="help-block">{{ field.help_text|safe }}</div>
+
+  </div>
+
   {{ extra_html|safe }}
 </div>

@@ -1,0 +1,23 @@
+/* Overrides */
+
+#body {
+    max-width: none;
+}
+
+/* Specifics */
+
+#ctf-info img {
+
+    /* Center image */
+    display: block;
+    margin: auto;
+}
+
+#jumbotron-img img {
+
+    padding-left: 1em;
+    padding-right: 1em;
+
+    width: 100%;
+    max-width: 1000px;
+}

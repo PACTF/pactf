@@ -3,6 +3,7 @@ import os
 from os.path import join, dirname
 
 from configurations import Configuration, values
+from django.contrib import messages
 
 from pactf.constants import BASE_DIR
 import ctflex.constants
@@ -40,6 +41,7 @@ class Django:
     ]
 
     MIDDLEWARE_CLASSES = (
+        # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -48,6 +50,9 @@ class Django:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
+
+        # Django 3rd-party
+        'ctflex.middleware.RatelimitMiddleware',
     )
 
     STATICFILES_FINDERS = (
@@ -103,7 +108,7 @@ class Django:
     USE_TZ = True
 
     # Database
-    # (Postgres is required for Ctf's JSONField.)
+    # (Postgres is required for CTFlex's CtfProblem's JSONField.)
     DATABASES = values.DatabaseURLValue(environ_required=True)
 
     # Where to finally collect static files to
@@ -123,6 +128,14 @@ class Django:
     EMAIL_USE_TLS = values.BooleanValue(True)
     SUPPORT_EMAIL = 'ctflex2+support@gmail.com'  # not standard, but used by CTFlex
 
+    # TODO(Yatharth): Uncomment when actually able to test
+    RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
+
+    # For Boostrap Alerts
+    MESSAGE_TAGS = {
+        messages.ERROR: 'danger'
+    }
+
 
 class Security:
     SECRET_KEY = values.SecretValue()
@@ -130,25 +143,6 @@ class Security:
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
     PASSWORD_HASHERS = ['ctflex.hashers.PBKDF2PasswordHasher4',
                         'django.contrib.auth.hashers.PBKDF2PasswordHasher']
-
-    # Minimum password strength validation
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-            'OPTIONS': {
-                'min_length': 12,
-            }
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
 
     # Number of days that a password reset link is valid for
     PASSWORD_RESET_TIMEOUT_DAYS = 1
@@ -210,6 +204,9 @@ class CTFlex(Django, Configuration):
     # Directory containing problem folders
     PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
 
+    # Extras for the markdown2 Python module for formatting problem description and hints
+    MARKDOWN_EXTRAS = values.TupleValue(('fenced-code-blocks', 'smarty-pants', 'spoiler'))
+
     ''' Static Files '''
 
     # Intermediate folder for storing problem static files
@@ -253,7 +250,7 @@ class Dev(Base):
             # 'file': {
             #     'level': 'DEBUG',
             #     'class': 'logging.FileHandler',
-            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
+            #     'f®ilename': join(BASE_DIR, 'logs', 'django.log'),
             # },
             'console': {
                 'class': 'logging.StreamHandler',
