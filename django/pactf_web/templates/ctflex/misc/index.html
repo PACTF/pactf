@@ -5,16 +5,18 @@
   <link href="{% static 'ctflex/css/index.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{# FIXME(Yatharth) Make include base stuff not extend, and figure out messages #}
 {# TODO(Yatharth): Make it scrolling with sections #}
 {# TODO(Yatharth): Have email sign up section #}
 {# TODO(Yatharth): Separate page for explaining #}
 {# TODO(Yatharth): More info #}
 
-{# Use content_wrapper instead of content to use full page #}
+{# (content_wrapper is used instead of content to be able to use the full page.) #}
 {% block content_wrapper %}
 
   <div class="jumbotron text-center">
+
+    {% include 'ctflex/snippets/messages.html' %}
+
     <div id="jumbotron-img">
       <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
     </div>

@@ -1,0 +1,12 @@
+{% if messages %}
+  <ul id="messages" class="list-unstyled">
+    {% for message in messages %}
+      <li class="alert alert-dismissible alert-{{ message.tags }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+        <span class="alert-type sr-only">{# Set by CSS automatically for accessibility #}</span>
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
