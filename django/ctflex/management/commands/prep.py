@@ -1,7 +1,6 @@
 from django.core import management
 from django.core.management.base import BaseCommand
 
-
 from ctflex.management.commands._common import add_no_input, pass_through_argument
 
 

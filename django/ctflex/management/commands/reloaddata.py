@@ -31,6 +31,8 @@ class Command(BaseCommand):
         management.call_command('flush', *pass_through_argument({
             '--no-input': not options['interactive'],
         }))
+        management.call_command('makemigrations')
+        management.call_command('migrate')
 
         if options['debug']:
             sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
