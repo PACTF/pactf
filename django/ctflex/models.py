@@ -588,7 +588,7 @@ class Submission(models.Model):
 
 @cleaned
 class Announcement(models.Model):
-    a_id = models.IntegerField
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=80, blank=False)
     body = models.TextField(blank=False)
     posted = models.DateTimeField(auto_now_add=True)
@@ -598,6 +598,7 @@ class Announcement(models.Model):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
         self.body = markdown2.markdown(self.body, extras=EXTRAS, safe_mode='escape')
         self.title = markdown2.markdown(self.title.replace('\n', ' '), safe_mode='escape')
+        super(Announcement, self).save()
 
 # endregion
 

@@ -2,11 +2,11 @@
   pk: 1
   fields:
     name: "Team 1"
-    password: password
+    passphrase: password
     affiliation: PA
 
 - model: "ctflex.Team"
   pk: 2
   fields:
     name: "Team 2"
-    password: password
+    passphrase: password
