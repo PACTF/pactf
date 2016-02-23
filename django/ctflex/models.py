@@ -54,7 +54,8 @@ def pre_save_validate(sender, instance, *args, **kwargs):
     - This receiver means that full_clean is sometimes called twice for an object.
     - Calling update() on a query does not trigger save() and thus still doesn't trigger full_clean().
     """
-    instance.full_clean()
+    if sender._meta.app_label == APP_NAME:
+        instance.full_clean()
 
 
 def cleaned(cls):
@@ -140,12 +141,8 @@ class Team(models.Model):
 
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
+    # XXX(Yatharth): Help text
     affiliation = models.CharField("Affiliation", max_length=60, blank=True)
-
-    # FIXME(Yatharth): Help text
-
-    # advisor_name = models.CharField(max_length=40, blank=True)
-    # advisor_email = models.EmailField(blank=True)
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
@@ -240,7 +237,7 @@ class Competitor(models.Model):
 
     MODEL_CLEANERS = (
         sync_state_outside_us,
-        validate_team_has_space, # FIXME Check if works if field_cleaner
+        validate_team_has_space,  # FIXME Check if works if field_cleaner
     )
 
 

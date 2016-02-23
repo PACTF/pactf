@@ -128,7 +128,6 @@ class Django:
     EMAIL_USE_TLS = values.BooleanValue(True)
     SUPPORT_EMAIL = 'ctflex2+support@gmail.com'  # not standard, but used by CTFlex
 
-    # TODO(Yatharth): Uncomment when actually able to test
     RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
 
     # For Boostrap Alerts

@@ -17,8 +17,8 @@ from ctflex import constants
 logger = logging.getLogger(constants.QUERY_LOGGER)
 
 
-# XXX(Yatharth): Clean queries
-# XXX(Yatharth): Bring back logging and set file accordingly
+# TODO(Yatharth): Clean and document queries
+# TODO(Yatharth): Bring back logging and set file accordingly
 
 
 # region General

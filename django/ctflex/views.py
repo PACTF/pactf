@@ -46,14 +46,6 @@ def default_context(request):
     return params
 
 
-def windowed_context(request, window):
-    """Return context for windowed URLs"""
-    params = {}
-    params['window'] = window
-    params['is_active_window'] = window.start
-    return params
-
-
 def warn_historic(request, window):
     """Flash info if in a historic state"""
     if window.ended():
@@ -120,6 +112,24 @@ def competitors_only():
     return user_passes_test(is_competitor)
 
 
+@universal_decorator(methodname='dispatch')
+def anonyomous_users_only():
+    """Redirect already authenticated users away"""
+
+    def decorator(view):
+        @wraps(view)
+        def decorated(request, *args, **kwargs):
+            if not request.user.is_anonymous():
+                messages.warning(request, "You are already logged in; you cannot register.")
+                return HttpResponseRedirect(reverse(constants.INVALID_STATE_REDIRECT_URL))
+
+            return view(request, *args, **kwargs)
+
+        return decorated
+
+    return decorator
+
+
 def windowed():
     """Redirects views around based on Contest Window and Personal Timer states
 
@@ -139,7 +149,6 @@ def windowed():
             STATE_VIEWS = ('ctflex:waiting', 'ctflex:inactive', 'ctflex:done')
             REDIRECT_MESSAGE = "You were redirected to this page as previous page was invalid for this window."
 
-            # TODO(Yatharth): Swap inactive and waiting?
             if not window.started():
                 if view_name == 'ctflex:waiting':
                     return original_view()
@@ -188,19 +197,19 @@ def windowed():
 @limited_http_methods('GET')
 @windowed()
 def inactive(request, *, window_id):
-    return render(request, 'ctflex/states/inactive.html', windowed_context(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/inactive.html', request)
 
 
 @limited_http_methods('GET')
 @windowed()
 def waiting(request, *, window_id):
-    return render(request, 'ctflex/states/waiting.html', windowed_context(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/waiting.html', request)
 
 
 @limited_http_methods('GET')
 @windowed()
 def done(request, *, window_id):
-    return render(request, 'ctflex/states/done.html', windowed_context(request, queries.get_window(window_id)))
+    return render(request, 'ctflex/states/done.html', request)
 
 
 @limited_http_methods('POST')
@@ -243,7 +252,7 @@ def rate_limited(request, err):
 def game(request, *, window_id):
     window = queries.get_window(window_id)
 
-    params = windowed_context(request, window)
+    params = {}
     params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
 
     warn_historic(request, window)
@@ -259,7 +268,7 @@ def board(request, *, window_id):
     if not window.started():
         return redirect('ctflex:waiting', window_id=window.id)
 
-    params = windowed_context(request, window)
+    params = {}
     params['teams'] = queries.board(window)
 
     warn_historic(request, window)
@@ -316,10 +325,8 @@ class Team(DetailView):
     template_name = 'ctflex/misc/team.html'
 
     def get_context_data(self, **kwargs):
-        # TODO: use windowed decorator somehow?
-        window = queries.get_window(self.kwargs['window_id'])
+        window = queries.get_window()
         context = super(Team, self).get_context_data(**kwargs)
-        context.update(windowed_context(self.request, window))
         return context
 
 
@@ -362,6 +369,7 @@ class DummyAtomicException(Exception):
 
 
 @limited_http_methods('GET', 'POST')
+@anonyomous_users_only()
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -369,58 +377,61 @@ def register(request,
              template_name='ctflex/auth/register.html',
              post_change_redirect=None,
              extra_context=None):
-    # have kwarg to have correct divs expand
-
-    if request.user.is_authenticated():
-        messages.warning("You are already logged in; you cannot register.")
-        return HttpResponseRedirect(constants.INVALID_STATE_REDIRECT_URL)
-
+    # Initialize redirect URL
     if post_change_redirect is None:
         post_change_redirect = resolve_url('ctflex:game', window_id=queries.get_window().id)
     else:
         post_change_redirect = resolve_url(post_change_redirect)
 
-    # TODO: Move to query
+    # If POST, process submitted data
     if request.method == 'POST':
+
+        # Process POST data
 
         user_form = forms.UserCreationForm(data=request.POST)
         competitor_form = forms.CompetitorCreationForm(data=request.POST)
 
         team_status = request.POST.get(TEAM_STATUS_NAME, '')
         if team_status == TEAM_STATUS_OLD:
-            existing_team_form = active_team_form = forms.TeamJoiningForm(data=request.POST)
+            existing_team_form = forms.TeamJoiningForm(data=request.POST)
             new_team_form = forms.TeamCreationForm()
+            active_team_form = existing_team_form
         else:
             team_status = TEAM_STATUS_NEW
-            new_team_form = active_team_form = forms.TeamCreationForm(data=request.POST)
+            new_team_form = forms.TeamCreationForm(data=request.POST)
             existing_team_form = forms.TeamJoiningForm()
+            active_team_form = new_team_form
 
+        # If valid, begin a transaction
         if user_form.is_valid() and active_team_form.is_valid() and competitor_form.is_valid():
             try:
                 with transaction.atomic():
 
+                    # Save form without without committing the competitor since it needs to reference the others
                     user = user_form.save()
                     team = active_team_form.save()
                     competitor = competitor_form.save(commit=False)
 
+                    # Try saving the user now
                     competitor.user = user
                     competitor.team = team
-
                     try:
                         competitor.save()
 
+                    # If there were errors, flash them
                     except ValidationError as err:
                         for msg in err.messages:
                             messages.error(request, msg)
 
-                        # Let the atomic transaction manager know that shit happened
+                        # Let the atomic transaction manager know that shit happened so it rolls back
                         raise DummyAtomicException()
 
+            # Don't do anything more with the dummy exception than
+            # what the atomic transaction manager would have already done for us
             except DummyAtomicException:
-                # Don't do anything more with the dummy exception than
-                # what the atomic transaction manager would have already done for us
                 pass
 
+            # Log in the user and redirect!
             else:
                 auth_user = authenticate(
                     username=user_form.cleaned_data['username'],
@@ -430,7 +441,7 @@ def register(request,
                 messages.success(request, "You were successfully registered!")
                 return HttpResponseRedirect(post_change_redirect)
 
-
+    # Otherwise, create blank forms
     else:
         team_status = ''
         user_form = forms.UserCreationForm()
@@ -438,6 +449,7 @@ def register(request,
         new_team_form = forms.TeamCreationForm()
         existing_team_form = forms.TeamJoiningForm()
 
+    # Configure context and render
     context = {
         'team_status': team_status,
         'user_form': user_form,
@@ -445,42 +457,8 @@ def register(request,
         'new_team_form': new_team_form,
         'existing_team_form': existing_team_form,
     }
-
     if extra_context is not None:
         context.update(extra_context)
-
     return render(request, template_name, context)
-
-# @limited_http_methods('POST')
-# @sensitive_post_parameters()
-# @ratelimit(key='ip', rate='5/m')
-# def register_user(request):
-#     form = forms.RegistrationForm(request.POST)
-#     if not form.is_valid():
-#         return register(request, form)
-#         # return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
-#     # handle, pswd, email, team, team_pass = form.cleaned_data
-#     team, msg = queries.validate_team(form.cleaned_data['team'], form.cleaned_data['team_pass'])
-#     if team is None:
-#         form.add_error('team', msg)
-#         return register(request, form)
-#     handle = form.cleaned_data['handle']
-#     pswd = form.cleaned_data['pswd']
-#     email = form.cleaned_data['email']
-#     state = form.cleaned_data['state']
-#     try:
-#         c = queries.create_competitor(handle, pswd, email, team, state)
-#         u = authenticate(username=handle, password=pswd)
-#         login(request, u)
-#         # XXX(Yatharth): Ditch this
-#         #     return redirect('ctflex:index')
-#         # except ValidationError:
-#         #     form.add_error('handle', "Can't create user")
-#         #     # return register(request, form)
-#         #     return HttpResponseNotAllowed("POST")
-#         return JsonResponse({'redirect': reverse('ctflex:index')})
-#     except ValidationError as e:
-#         form.add_error('handle', str(e))
-#         return JsonResponse({'errors': [[k, form.errors[k]] for k in form.errors]})
 
 # endregion

@@ -88,7 +88,6 @@ p.navbar-text {
     line-height: 21px;
 }
 
-/* TODO(Yatharth): get max-width programmatically? */
 @media (max-width: 767px) {
     p.navbar-text {
         margin: 0;

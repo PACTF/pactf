@@ -4,19 +4,14 @@ from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 
+from ctflex.views import anonyomous_users_only
 from pactf.constants import VERBOSE_NAME
 from ctflex.constants import APP_NAME, UUID_REGEX
 from ctflex import views
 
 app_name = APP_NAME
 
-# TODO(Yatharth): Look into changing links everywhere to pass window if it is there
-
 windowed_urls = [
-    # Team
-    url(r'^team/$', views.CurrentTeam.as_view(), name='current_team'),
-    url(r'^team/(?P<pk>\d+)$', views.Team.as_view(), name='team'),
-
     # State
     url(r'^waiting/$', views.waiting, name='waiting'),
     url(r'^inactive/$', views.inactive, name='inactive'),
@@ -32,7 +27,7 @@ windowed_urls = [
 ]
 
 auth_urls = [
-    url(r'^login/$', auth_views.login, name='login', kwargs={
+    url(r'^login/$', anonyomous_users_only()(auth_views.login), name='login', kwargs={
         'template_name': 'ctflex/auth/login.html'
     }),
 
@@ -81,9 +76,13 @@ urlpatterns = [
     url('^$', views.index, name='index'),
     url(r'^board/$', views.board_overall, name='scoreboard_overall'),
 
+    # Team
+    url(r'^team/$', views.CurrentTeam.as_view(), name='current_team'),
+    url(r'^team/(?P<pk>\d+)$', views.Team.as_view(), name='team'),
+
     # Includes
     url(r'^', include(auth_urls)),
     url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
-    # XXX Include url without prefix that gets current window
+    # TODO(Yatharth): Include url without prefix that gets current window
 
 ]

@@ -1,11 +1,6 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
-{% load formfield from ctflex %}
-{% load non_form_field_errors from ctflex %}
-{% load ctflex_debug %}
-
-{# TODO(Yatharth): Append asterisk after required fields #}
-{# TODO(Yatharth): Study picoctf.com/js/registration.js, especially for apiCall #}
+{% load ctflex_forms %}
 
 {% block title %}
   Register — {{ block.super }}
@@ -46,7 +41,6 @@
         {% formfield user_form.username %}{% endformfield %}
         {% formfield user_form.password2 %}{% endformfield %}
         <div class="clearfix hidden-xs"></div>
-        {# TODO copy over password1 to password2? #}
 
         {% formfield competitor_form.email %}{% endformfield %}
         {% formfield competitor_form.background %}{% endformfield %}
