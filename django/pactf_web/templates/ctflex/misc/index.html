@@ -29,7 +29,11 @@
       <br>
     </h3>
     <p class="text-center">
-      <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+      {% if team %}
+        <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' window_id=window.id %}">Go the to Game!</a>
+      {% else %}
+        <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+      {% endif %}
     </p>
   </div>
   <div class="container">

@@ -13,6 +13,7 @@ UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 # LOGIN_REDIRECT_URL is in settings.py because Django code uses it
 LOGOUT_REDIRECT_URL = 'ctflex:index'
 TEAM_CHANGE_REDIRECT_URL = 'ctflex:current_team'
+INVALID_STATE_REDIRECT_URL = 'ctflex:index'
 
 SUPPORT_EMAIL = 'ctflex2@gmail.com'
 
@@ -20,3 +21,7 @@ PROBLEM_SALT = 'ctfproblem'
 
 DEPS_PROBS_FIELD = 'probs'
 DEPS_THRESHOLD_FIELD = 'threshold'
+
+TEAM_STATUS_NAME = 'team-status'
+TEAM_STATUS_NEW = 'new'
+TEAM_STATUS_OLD = 'old'

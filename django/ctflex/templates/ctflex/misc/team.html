@@ -23,6 +23,6 @@
     {% endfor %}
   </ul>
   <p>
-    For new members to join, give them the passphrase {{ team.key }}. You can also <a href="{% url 'ctflex:password_change' %}">change your password</a>.
+    For new members to join, give them the passphrase <em>{{ team.passphrase }}</em>. You can also <a href="{% url 'ctflex:password_change' %}">change your personal password</a>.
   </p>
 {% endblock %}

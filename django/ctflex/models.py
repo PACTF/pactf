@@ -141,6 +141,7 @@ class Team(models.Model):
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
     affiliation = models.CharField("Affiliation", max_length=60, blank=True)
+
     # FIXME(Yatharth): Help text
 
     # advisor_name = models.CharField(max_length=40, blank=True)
@@ -150,6 +151,12 @@ class Team(models.Model):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
     ''' Properties '''
+
+    def size(self):
+        return self.competitor_set.count()
+
+    def has_space(self):
+        return self.size() <= settings.MAX_TEAM_SIZE
 
     def timer(self, window):
         return self.timer_set.get(window=window)
@@ -218,12 +225,22 @@ class Competitor(models.Model):
         if self.country != Country('US'):
             self.state = None
 
+    def validate_team_has_space(self):
+        try:
+            team = self.team
+        except Team.DoesNotExist:
+            pass
+        else:
+            if not team.has_space():
+                raise ValidationError("The team is already full.")
+
     FIELD_CLEANERS = {
         'state': [validate_state_is_given_for_us],
     }
 
     MODEL_CLEANERS = (
         sync_state_outside_us,
+        validate_team_has_space, # FIXME Check if works if field_cleaner
     )
 
 

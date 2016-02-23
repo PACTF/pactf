@@ -1,17 +1,13 @@
-{% if form.errors %}
+<p class="errornote">
+  Please correct the
+  {% if error_count == 1 %}error{% else %}errors{% endif %}
+  below.
+</p>
 
-  <p class="errornote">
-    Please correct the
-    {% if form.errors.items|length == 1 %}error{% else %}errors{% endif %}
-    below.
-  </p>
-
-  <ul class="errorlist errorlist-nonfield list-unstyled">
-    {% for error in form.non_field_errors %}
-      <li class="alert alert-danger" role="alert">
-        {{ error|escape }}
-      </li>
-    {% endfor %}
-  </ul>
-
-{% endif %}
+<ul class="errorlist errorlist-nonfield list-unstyled">
+  {% for error in non_field_errors %}
+    <li class="alert alert-danger" role="alert">
+      {{ error|escape }}
+    </li>
+  {% endfor %}
+</ul>

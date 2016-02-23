@@ -207,6 +207,9 @@ class CTFlex(Django, Configuration):
     # Extras for the markdown2 Python module for formatting problem description and hints
     MARKDOWN_EXTRAS = values.TupleValue(('fenced-code-blocks', 'smarty-pants', 'spoiler'))
 
+    # How many competitor can be in one team
+    MAX_TEAM_SIZE = values.IntegerValue(5)
+
     ''' Static Files '''
 
     # Intermediate folder for storing problem static files

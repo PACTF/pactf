@@ -1,6 +1,7 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
 {% load formfield from ctflex %}
+{% load non_form_field_errors from ctflex %}
 {% load widget_tweaks %}
 
 {% block title %}
@@ -28,7 +29,7 @@
     <form method="post" class="form-horizontal" role="form">
       {% csrf_token %}
 
-      {% include 'ctflex/snippets/form_non_field_errors.html' %}
+      {% non_form_field_errors form %}
 
       {% formfield form.username %}{% endformfield %}
       {% formfield form.password %}{% endformfield %}

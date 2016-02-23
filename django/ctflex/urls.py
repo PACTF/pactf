@@ -73,9 +73,6 @@ auth_urls = [
     url(r'^reset/done/$', views.password_reset_complete, name='password_reset_complete'),
 
     url(r'^register/$', views.register, name='register'),
-
-    # XXX(Yatharth): Make one URL
-    url(r'^register_user/$', views.register_user, name='register_user'),
 ]
 
 urlpatterns = [
@@ -87,5 +84,6 @@ urlpatterns = [
     # Includes
     url(r'^', include(auth_urls)),
     url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
+    # XXX Include url without prefix that gets current window
 
 ]

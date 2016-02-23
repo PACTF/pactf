@@ -119,6 +119,17 @@ p.navbar-text {
     font-weight: bold;
 }
 
+/* Messages */
+
+.jumbotron #messages {
+    margin-top: -30px;
+    padding-top: 0;
+}
+
+#messages {
+    padding-top: 0.5em;
+}
+
 /* Message Accessibility */
 
 .alert-success .alert-type:before {

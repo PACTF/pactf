@@ -64,16 +64,31 @@ def _model_generated(model):
 # region Registration
 
 class CompetitorCreationForm(forms.ModelForm):
+    prefix = 'competitor'
+
     class Meta:
         model = models.Competitor
         fields = ('email', 'first_name', 'last_name', 'country', 'state', 'background')
 
 
 class UserCreationForm(auth_forms.UserCreationForm):
-    pass
+    prefix = 'user'
+
+    def __init__(self, *args, data=None, **kwargs):
+        if data is not None:
+            data = data.copy()
+            data['{}-password1'.format(self.prefix)] = data.get('{}-password2'.format(self.prefix), '')
+
+        super().__init__(*args, data=data, **kwargs)
+
+        self.fields['password2'].label = self.fields['password1'].label
+        self.fields['password2'].help_text = ''
+        self.fields['username'].help_text = ''
 
 
 class TeamCreationForm(forms.ModelForm):
+    prefix = 'new_team'
+
     class Meta:
         model = models.Team
         fields = ('name', 'passphrase', 'affiliation')
@@ -81,12 +96,16 @@ class TeamCreationForm(forms.ModelForm):
 
 @_model_generated(models.Team)
 class TeamJoiningForm(forms.Form):
+    prefix = 'existing_team'
+
     MODEL_GENERATED_FIELDS = ('name', 'passphrase')
 
     def clean_name(self):
         data = self.cleaned_data['name']
+
         if not models.Team.objects.filter(name=data).exists():
             raise forms.ValidationError("No team with this name exists.")
+
         return data
 
     def clean(self):
@@ -99,5 +118,8 @@ class TeamJoiningForm(forms.Form):
             self.add_error('passphrase', "The passphrase is incorrect. Check again with your team creator.")
 
         return cleaned_data
+
+    def save(self):
+        return models.Team.objects.get(name=self.cleaned_data['name'], passphrase=self.cleaned_data['passphrase'])
 
 # endregion

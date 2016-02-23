@@ -1,6 +1,7 @@
 {% extends 'ctflex/base.html' %}
 {% load static from staticfiles %}
 {% load formfield from ctflex %}
+{% load non_form_field_errors from ctflex %}
 {% load ctflex_debug %}
 
 {# TODO(Yatharth): Append asterisk after required fields #}
@@ -34,7 +35,7 @@
     <form method="post" class="form-horizontal" role="form">
       {% csrf_token %}
 
-      {% include 'ctflex/snippets/form_non_field_errors.html' %}
+      {% non_form_field_errors competitor_form user_form existing_team_form new_team_form %}
 
       <div id="competitor-container">
 
@@ -43,7 +44,7 @@
         <div class="clearfix hidden-xs"></div>
 
         {% formfield user_form.username %}{% endformfield %}
-        {% formfield user_form.password1 %}{% endformfield %}
+        {% formfield user_form.password2 %}{% endformfield %}
         <div class="clearfix hidden-xs"></div>
         {# TODO copy over password1 to password2? #}
 
@@ -85,7 +86,7 @@
         <div class="clearfix hidden-xs"></div>
 
 
-        {% with extra_group_class='col-sm-12' extra_label_class='col-sm-2' extra_input_class='col-sm-10' %}
+        {% with extra_group_class='col-sm-12' extra_label_class='col-sm-2' extra_input_class='col-sm-10' extra_help_class='col-sm-10 col-sm-offset-2' %}
           {% formfield new_team_form.affiliation %}{% endformfield %}
         {% endwith %}
         <div class="clearfix hidden-xs"></div>
@@ -106,6 +107,9 @@
         </div>
 
       </div>
+
+      {# To keep track of which sub-form is/should be open #}
+      <input id="team-status" name="team-status" type="text" value="{{ team_status }}" hidden/>
 
       <script type="text/javascript">document.getElementById("id_competitor-first_name").focus();</script>
 
