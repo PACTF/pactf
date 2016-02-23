@@ -27,6 +27,7 @@ def format_problem(problem, team):
 def solved(problem, team):
     return queries.solved(problem, team)
 
+
 # endregion
 
 
@@ -62,15 +63,19 @@ class FormFieldNode(template.Node):
 
         extra_html = self.nodelist.render(template_context)
         template_instance = get_template(template_name='ctflex/snippets/form_field.html')
-        template_context = Context({'field': field, 'extra_html': extra_html})
-        return template_instance.render(template_context)
+        custom_context = Context({'field': field, 'extra_html': extra_html})
+        custom_context.update(template_context)
+        return template_instance.render(custom_context)
 
 
 @register.tag
 def formfield(parser, token):
     """Render a label, a widget and errors for a form field, optionally with extra HTML
 
-    Usage: Inside a form element in a template, write `{% formfield form.field %}<p>Whee</p>{% endformfield %}`. This will use the form_field.html template to render the form field, adding `<p>Whee</p>` after the field widget. The `<p>Whee</p>` part is optional.
+    Usage: Inside a form element in a template, write `{% formfield form.field %}<p>Whee</p>{% endformfield %}`.
+    This will use the form_field.html template to render the form field, adding `<p>Whee</p>` after the field widget.
+    The `<p>Whee</p>` part is optional.
+    The template will use the extra_group_class, extra_label_class, extra_input_class and extra_help_class variables from the context if they exist.
     """
 
     try:

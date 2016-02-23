@@ -355,9 +355,14 @@ def password_reset_complete(request):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def register(request, form_class=forms.CompetitorForm):
+def register(request):
+    # http://stackoverflow.com/a/575133/1292652
+    # have kwarg to have correct divs expand
     return render(request, 'ctflex/auth/register.html', {
-        'form': form_class()
+        'user_form': forms.UserCreationForm(prefix='user'),
+        'competitor_form': forms.CompetitorCreationForm(prefix='competitor'),
+        'new_team_form': forms.TeamCreationForm(prefix='new_team'),
+        'existing_team_form': forms.TeamJoiningForm(prefix='existing_team')
     })
 
 

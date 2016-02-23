@@ -30,57 +30,86 @@
 
   <p>Otherwise, sign up for a personal account, and either create a new team or join an existing one.</p>
 
-  <form method="post" role="form">
-    {% csrf_token %}
+  {% with extra_group_class='col-sm-6' extra_label_class='col-sm-4' extra_input_class='col-sm-8' extra_help_class='hidden' %}
+    <form method="post" class="form-horizontal" role="form">
+      {% csrf_token %}
 
-    {% include 'ctflex/snippets/form_non_field_errors.html' %}
+      {% include 'ctflex/snippets/form_non_field_errors.html' %}
 
+      <div id="competitor-container">
 
-    <div id="competitor-container">
-      {% formfield form.first_name %}{% endformfield %}
-    </div>
+        {% formfield competitor_form.first_name %}{% endformfield %}
+        {% formfield competitor_form.last_name %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
 
-    <div id="team-buttons" class="text-center form-group">
-      <div class="btn-group " role="group">
-        <button id="new-team-btn" type="button" class="btn btn-default">Create a New Team</button>
-        <button id="existing-team-btn" type="button" class="btn btn-default">Join an Existing Team</button>
-        {# TODO: Set styles ob buttons and disable clicking #}
+        {% formfield user_form.username %}{% endformfield %}
+        {% formfield user_form.password1 %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
+        {# TODO copy over password1 to password2? #}
+
+        {% formfield competitor_form.email %}{% endformfield %}
+        {% formfield competitor_form.background %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
+
+        {% formfield competitor_form.country %}{% endformfield %}
+        {% formfield competitor_form.state %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
+
       </div>
-    </div>
+
+      <div id="team-buttons" class="text-center form-group">
+        <div class="btn-group " role="group">
+          <button id="new-team-btn" type="button" class="btn btn-default">Create a New Team</button>
+          <button id="existing-team-btn" type="button" class="btn btn-default">Join an Existing Team</button>
+          <div class="clearfix hidden-xs"></div>
+        </div>
+      </div>
 
 
-    <div id="new-team-container">
-      <p>Here's how you would register your team:</p>
-      <ol>
-        <li>One member of your team creates a new team, choosing a Team Name and Passphrase.</li>
-        <li>The team creator shares the Team Name and Passphrase with other members of the team.</li>
-        <li>All other team members register and choose “Join an Existing Team,” providing the Team Name and Passphrase.</li>
-      </ol>
-      <p>
-        You can add new members to your team at any time, even after the competition starts.
-      </p>
-      <p>
-        <em>The preceding help text was adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>
-      </p>
+      <div id="new-team-container">
+        <p>Here's how you would register your team:</p>
+        <ol>
+          <li>One member of your team creates a new team, choosing a Team Name and Passphrase.</li>
+          <li>The team creator shares the Team Name and Passphrase with other members of the team.</li>
+          <li>All other team members register and choose “Join an Existing Team,” providing the Team Name and Passphrase.</li>
+        </ol>
+        <p>
+          You can add new members to your team at any time, even after the competition starts.
+        </p>
+        <p>
+          <em>The preceding help text was adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>
+        </p>
 
-      {% formfield form.first_name %}{% endformfield %}
+        {% formfield new_team_form.name %}{% endformfield %}
+        {% formfield new_team_form.passphrase %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
 
-    </div>
 
-    <div id="existing-team-container">
+        {% with extra_group_class='col-sm-12' extra_label_class='col-sm-2' extra_input_class='col-sm-10' %}
+          {% formfield new_team_form.affiliation %}{% endformfield %}
+        {% endwith %}
+        <div class="clearfix hidden-xs"></div>
 
-      {% formfield form.first_name %}{% endformfield %}
+      </div>
 
-    </div>
+      <div id="existing-team-container">
 
-    <div id="common-team-container">
+        {% formfield existing_team_form.name %}{% endformfield %}
+        {% formfield existing_team_form.passphrase %}{% endformfield %}
 
-      <input class="btn btn-primary" type="submit" value="Register"/>
+      </div>
 
-    </div>
+      <div id="common-team-container">
 
-    <script type="text/javascript">document.getElementById("id_first_name").focus();</script>
+        <div class="text-center">
+          <input class="btn btn-primary" type="submit" value="Register"/>
+        </div>
 
-  </form>
+      </div>
+
+      <script type="text/javascript">document.getElementById("id_competitor-first_name").focus();</script>
+
+    </form>
+  {% endwith %}
 
 {% endblock %}

@@ -1,12 +1,14 @@
 {% load widget_tweaks %}
 
-<div class="form-group {% if field.errors %}has-error has-feedback{% endif %}">
+<div class="form-group row {% if field.errors %}has-error has-feedback{% endif %} {{ extra_group_class|default:'' }}">
 
-  <label for="{{ field.auto_id }}" class="control-label">
+  <label for="{{ field.auto_id }}" class="control-label {{ extra_label_class|default:'' }}">
     {{ field.label }}
   </label>
 
-  {{ field|add_class:"form-control" }}
+  <div class="{{ extra_input_class|default:'' }}">
+    {{ field|add_class:"form-control" }}
+  </div>
 
   {% if field.errors %}
     <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
@@ -19,6 +21,8 @@
       {% endfor %}
     </ul>
   {% endif %}
+
+  <div class="help-block {{ extra_help_class|default:'' }}">{{ field.help_text|safe }}</div>
 
   {{ extra_html|safe }}
 </div>

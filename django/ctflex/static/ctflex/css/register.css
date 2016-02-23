@@ -1,3 +1,18 @@
 #existing-team-container, #new-team-container, #common-team-container {
     display: none;
 }
+
+.form-control {
+    height: 34px;
+}
+
+.control-label {
+    font-weight: bold;
+}
+
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+}

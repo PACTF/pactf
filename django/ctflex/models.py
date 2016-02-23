@@ -132,13 +132,16 @@ class Team(models.Model):
     ''' Structural Fields '''
 
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30, unique=True)
-    password = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True,
+                            verbose_name="Team Name")
     banned = models.BooleanField(default=False)
 
     ''' Extra Data '''
 
-    affiliation = models.CharField(max_length=60, blank=True)
+    passphrase = models.CharField(max_length=30,
+                                  verbose_name="Passphrase")
+    affiliation = models.CharField("Affiliation", max_length=60, blank=True)
+    # FIXME(Yatharth): Help text
 
     # advisor_name = models.CharField(max_length=40, blank=True)
     # advisor_email = models.EmailField(blank=True)

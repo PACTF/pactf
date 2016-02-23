@@ -16,7 +16,7 @@ body {
 
 .page-title > .container, #content, #messages {
     /* XXX(Yatharth) http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
-    max-width: 50em;
+    max-width: 55em;
     margin: 0 auto;
 }
 
@@ -71,6 +71,10 @@ footer > .container {
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+}
+
+footer > .container > p {
+    margin-bottom: 0;
 }
 
 /* Navbar */
