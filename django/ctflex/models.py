@@ -173,7 +173,7 @@ class Competitor(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
-    unread_announcements = models.ManyToManyField(Announcement)
+    unread_announcements = models.ManyToManyField('Announcement')
 
     ''' Extra Data '''
 
@@ -226,19 +226,6 @@ class Competitor(models.Model):
     MODEL_CLEANERS = (
         sync_state_outside_us,
     )
-
-@cleaned
-class Announcement(models.Model):
-    a_id = models.IntegerField
-    title = models.CharField(max_length=80, blank=False)
-    body = models.TextField(blank=False)
-    posted = models.DateTimeField(auto_now_add=True)
-    problems = models.ManyToManyField(CtfProblem)
-
-    def save(self):
-        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
-        self.body = markdown2.markdown(self.body, extras=EXTRAS, safe_mode='escape')
-        self.title = markdown2.markdown(self.title.replace('\n', ' '), safe_mode='escape')
 
 
 @unique_receiver(post_save, sender=Competitor)
@@ -597,6 +584,22 @@ class Submission(models.Model):
 
 # endregion
 
+# region misc
+
+@cleaned
+class Announcement(models.Model):
+    a_id = models.IntegerField
+    title = models.CharField(max_length=80, blank=False)
+    body = models.TextField(blank=False)
+    posted = models.DateTimeField(auto_now_add=True)
+    problems = models.ManyToManyField(CtfProblem)
+
+    def save(self):
+        EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
+        self.body = markdown2.markdown(self.body, extras=EXTRAS, safe_mode='escape')
+        self.title = markdown2.markdown(self.title.replace('\n', ' '), safe_mode='escape')
+
+# endregion
 
 # region Permissions and Groups (old)
 #

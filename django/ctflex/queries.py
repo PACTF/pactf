@@ -32,6 +32,10 @@ def get_team(group, request):
     return str(request.user.competitor.team.id)
 
 
+def get_unread_announcements(competitor):
+    return list(competitor.unread_announcements)
+
+
 # endregion
 
 # region Board
@@ -173,11 +177,6 @@ class ProblemAlreadySolvedException(Exception):
 
 class FlagAlreadyTriedException(Exception):
     pass
-
-
-def get_unread_announcements(competitor):
-    announces = models.Competitor.objects.get(pk=competitor)
-
 
 def submit_flag(prob_id, competitor, flag):
     problem = models.CtfProblem.objects.get(pk=prob_id)

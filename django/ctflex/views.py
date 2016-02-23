@@ -42,6 +42,7 @@ def default_context(request):
     params['team'] = request.user.competitor.team if is_competitor(request.user) else None
     params['window'] = queries.get_window()
     params['other_windows'] = models.Window.objects.other(params['window'])
+    params['announcements'] = queries.get_unread_announcements(request.user.competitor) if is_competitor(request.user) else None
     return params
 
 
