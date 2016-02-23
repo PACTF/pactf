@@ -14,15 +14,17 @@
 {# Use content_wrapper instead of content to use full page #}
 {% block content_wrapper %}
 
-  <div class="jumbotron">
-    <div id="jumbotron-img" class="text-center">
+  <div class="jumbotron text-center">
+    <div id="jumbotron-img">
       <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
     </div>
-    <h3 class="text-center">
-      <b>PACTF</b> is an online <b>computer security</b> competition for <b>high school students</b>.
-      <div>
-        <br>
-      </div>
+    <h3>
+      <strong>PACTF</strong> is an online <b>computer security</b> competition for
+      <strong>high school students.</strong>
+      <br>
+      <strong>April 10</strong>–<strong>April 30</strong>
+      <br>
+      <br>
     </h3>
     <p class="text-center">
       <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
