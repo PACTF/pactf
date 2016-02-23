@@ -137,6 +137,10 @@ class FlagAlreadyTriedException(Exception):
     pass
 
 
+def get_unread_announcements(competitor):
+    announces = models.Competitor.objects.get(pk=competitor)
+
+
 def submit_flag(prob_id, competitor, flag):
     problem = models.CtfProblem.objects.get(pk=prob_id)
 

@@ -168,6 +168,7 @@ class Competitor(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
+    unread_announcements = models.ManyToManyField(Announcement)
 
     ''' Extra Data '''
 
@@ -228,7 +229,6 @@ class Announcement(models.Model):
     body = models.TextField(blank=False)
     posted = models.DateTimeField(auto_now_add=True)
     problems = models.ManyToManyField(CtfProblem)
-    users_unviewed = models.ManyToManyField(Competitor)
 
     def save(self):
         EXTRAS = ('fenced-code-blocks', 'smarty-pants', 'spoiler')
