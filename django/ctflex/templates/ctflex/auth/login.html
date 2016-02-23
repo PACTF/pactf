@@ -24,48 +24,29 @@
     <p>If you don't already have an account, <a href="{% url 'ctflex:register' %}">sign up</a>!</p>
   {% endif %}
 
-  <p>Lost your password? <a href="{% url 'ctflex:password_reset' %}">Reset it.</a></p>
+  {% with extra_label_class='col-sm-2 col-sm-offset-2' extra_input_class='col-sm-4' extra_help_class='col-sm-4 col-sm-offset-4' %}
+    <form method="post" class="form-horizontal" role="form">
+      {% csrf_token %}
 
-  {# TODO: Make form horizontal #}
-  <form method="post" role="form">
-    {% csrf_token %}
+      {% include 'ctflex/snippets/form_non_field_errors.html' %}
 
-    {% include 'ctflex/snippets/form_non_field_errors.html' %}
+      {% formfield form.username %}{% endformfield %}
+      {% formfield form.password %}{% endformfield %}
 
-    {% formfield form.username %}{% endformfield %}
-    {% formfield form.password %}{% endformfield %}
+      <input type="hidden" name="next" value="{{ next }}"/>
 
-    {#    <div class="container">#}
-    {#      <form class="form-horizontal" role="form">#}
-    {#        <div class="form-group">#}
-    {#          <div class="col-sm-3">#}
-    {#            {% formfield form.username %}{% endformfield %}#}
-    {#          </div>#}
-    {#        </div>#}
-    {#        <div class="form-group">#}
-    {#          <div class="col-sm-3">#}
-    {#            {% formfield form.password %}{% endformfield %}#}
-    {#          </div>#}
-    {#        </div>#}
-    {#        <br>#}
-    {#        <div class="col-sm-offset-4 col-sm-4">#}
-    {#          <div class="btn-group btn-group-justified" role="group">#}
-    {#            <a role="button" type="submit" class="btn btn-primary" id="login">Login</a>#}
-    {#            <a role="button" type="submit" class="btn btn-default" id="reset">Reset Password</a>#}
-    {#          </div>#}
-    {#        </div>#}
-    {#      </form>#}
-    {#      <br>#}
-    {#      <br>#}
-    {#      <hr>#}
-    {#    </div>#}
+      <div class="text-center form-group">
+        <div class="btn-group" role="group">
+          <input class="btn btn-primary" type="submit" value="Log in"/>
+          <a role="button" href="{% url 'ctflex:password_reset' %}" type="button" class="btn btn-default">Reset Password</a>
+          <div class="clearfix hidden-xs"></div>
+        </div>
+      </div>
 
-    <input type="hidden" name="next" value="{{ next }}"/>
 
-    <input class="btn btn-primary" type="submit" value="Log in"/>
+      <script type="text/javascript">document.getElementById("id_username").focus();</script>
 
-    <script type="text/javascript">document.getElementById("id_username").focus();</script>
-
-  </form>
+    </form>
+  {% endwith %}
 
 {% endblock %}

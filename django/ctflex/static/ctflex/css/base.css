@@ -108,10 +108,15 @@ p.navbar-text {
 }
 
 .form-group > .errorlist > li {
-    margin-left: 1em;
+    margin-left: 15px;
+    margin-right: 15px;
     margin-bottom: 0.25em;
     padding: 0.5em;
     padding-right: 2.25em;
+}
+
+.control-label {
+    font-weight: bold;
 }
 
 /* Message Accessibility */
