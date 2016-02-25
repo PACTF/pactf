@@ -15,8 +15,9 @@
     <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#show-button">I'm ready</a>
   </p>
   <div id="show-button" class="collapse">
+    <h2><strong>Are you sure?</strong></h2>
     <p>
-      <strong>Make sure your team is ready!</strong> Once you hit "start", you won't be able to make another try this round!
+      Once you hit "start", you won't be able to make another try this round!
     </p>
     <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
       {% csrf_token %}
