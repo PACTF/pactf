@@ -8,15 +8,21 @@
 {% block content %}
   <p>
     {# TODO(Yatharth): Write JS to take min and show countdown #}
-    The window is active!! You can start your personal timer until {{ window.end }}. You will have up
-    to {{ window.personal_timer_duration }} hours to work on it, or until the end of the Contest Window, whichever comes
-    earlier. Bon courage.
+    Welcome to PACTF! The current round is currently active and waiting for you to start your team's timer! Make sure that everyone is ready, then click start!
   </p>
 
-  <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
-    {% csrf_token %}
-    <input class="btn btn-primary" type="submit" value="Start!"/>
-  </form>
+  <p>
+    <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#show-button">I'm ready</a>
+  </p>
+  <div id="show-button" class="collapse">
+    <p>
+      <strong>Make sure your team is ready!</strong> Once you hit "start", you won't be able to make another try this round!
+    </p>
+    <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
+      {% csrf_token %}
+      <input class="btn btn-primary" type="submit" value="Start!"/>
+    </form>
+  </div>
   <br/>
 
   <p>
