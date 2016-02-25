@@ -1,4 +1,5 @@
 {% extends 'ctflex/base-headerless.html' %}
+{% load static from staticfiles %}
 {% load ctflex %}
 
 {% block title %}
@@ -13,7 +14,7 @@
   <p>
     You may browse other windows, wait for the next one to start, or look at funny memes.
   </p>
-  <p>
-    <img src="http://www.quickmeme.com/img/4d/4d0c6ca5e84ed24d6ce0888d0867b48fa3a5506abf3318371cbbb4e6b84d47eb.jpg"/>
+  <p class="text-center">
+    <img src="{% static 'ctflex/img/i_must_go.jpg' %}"/>
   </p>
 {% endblock %}

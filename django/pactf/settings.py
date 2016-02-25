@@ -152,7 +152,7 @@ class Security:
     # Prevent browsers from guessing content types (reducing security risk).
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
-    # Validation for passwords
+    # Minimum password strength validation
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
