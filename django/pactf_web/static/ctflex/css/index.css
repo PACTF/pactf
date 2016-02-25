@@ -6,6 +6,16 @@
 
 /* Specifics */
 
+.jumbotron h3 {
+    margin-bottom: 0.5em;
+}
+
+#date-heading {
+    margin-top: 0;
+    margin-bottom: 1.5em;
+}
+
+
 #ctf-info img {
 
     /* Center image */
