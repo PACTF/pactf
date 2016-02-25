@@ -239,11 +239,26 @@ class Base(Security, CTFlex, Gunicorn, Django, Configuration):
 
 
 class Dev(Base):
-    # Security
+    """Insecure and noisy settings for development"""
+
+    ''' Security '''
+
     DEBUG = True
     ALLOWED_HOSTS = values.ListValue(['*'])
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            'OPTIONS': {
+                'min_length': 5,
+            }
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+    ]
 
-    # Logging
+    ''' Logging '''
+
     EMAIL_BACKEND = 'email_log.backends.EmailBackend'
     LOGGING = {
         'version': 1,
@@ -274,6 +289,8 @@ class Dev(Base):
 
 
 class Prod(Base):
+    """Secure and quite settings for production"""
+
     # Security
     DEBUG = False
     ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
