@@ -160,7 +160,7 @@ class Security:
         {
             'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
             'OPTIONS': {
-                'min_length': 7,
+                'min_length': 10,
             }
         },
         {
