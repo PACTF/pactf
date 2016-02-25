@@ -33,7 +33,7 @@ def get_team(group, request):
 
 
 def get_unread_announcements(competitor):
-    return list(competitor.unread_announcements)
+    return list(competitor.unread_announcements.all())
 
 
 # endregion

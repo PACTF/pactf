@@ -239,6 +239,7 @@ def rate_limited(request, err):
 
 @single_http_method('GET')
 @windowed()
+@never_cache
 def game(request, *, window_id):
     window = queries.get_window(window_id)
 
