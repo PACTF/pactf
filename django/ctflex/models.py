@@ -65,7 +65,8 @@ def cleaned(cls):
 
     Purpose: This decorator calls methods in FIELD_CLEANERS or MODEL_CLEANERS along with the super class's clean_fields() or clean() method. It collects any and all of the ValidationErrors and raises them as one big ValidationError. It excludes fields in clean_fields() based on the keys in FIELD_CLEANERS.
 
-    Drawbacks: This decorator will replace any defined clean_fields() and clean() methods instead of decorate them.
+    Drawbacks:
+    - This decorator will replace any defined clean_fields() and clean() methods instead of decorate them.
     """
 
     def clean(self):
