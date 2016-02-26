@@ -57,6 +57,6 @@ def switch_window(context, window):
         view_name = constants.WINDOW_CHANGE_URL
 
     kwargs['window_id'] = window.id
-    return reverse(resolver_match.view_name, args=args, kwargs=kwargs)
+    return reverse(view_name, args=args, kwargs=kwargs)
 
 # endregion
