@@ -198,6 +198,7 @@ class Command(BaseCommand):
         # (This action is so dangerous that even passing in '--no-input' shouldn't automatically approve it.)
         unprocessed_problems = CtfProblem.objects.exclude(pk__in=processed_problems).all()
         if unprocessed_problems:
+            affirmative_answer = "yes_this_is_dangerous"
             message = textwrap.dedent("""\
                 You have requested to delete all pre-existing problems that were not updated.
                 Please review the list of problems to be deleted.
@@ -207,13 +208,19 @@ class Command(BaseCommand):
                 This will DELETE ALL THE LISTED PROBLEMS!
                 Are you sure you want to do this?
 
-                Type 'yes' to continue, or 'no' to cancel:\
-                """.format(unprocessed_problems))
-            if options['interactive'] and input(message) != "yes":
-                raise CommandError("Loading problems cancelled.")
-            write("\nDeleting all unprocessed problems\n\n")
-            for problem in unprocessed_problems:
-                problem.delete()
+                Type {!r} to continue, or 'no' to cancel:\
+                """.format(', '.join(map(str, unprocessed_problems)), affirmative_answer))
+            if not options['interactive']:
+                self.stderr.write("WARNING: You can only delete pre-existing problems in interactive mode\n"
+                                  "(i.e., without the --no-input option)")
+            elif input(message) != affirmative_answer:
+                self.stderr.write("Did not receive response {!r}; therefore:\n"
+                                  "NOT deleting the above-listed problems"
+                                  .format(affirmative_answer))
+            else:
+                write("\nDeleting all unprocessed problems\n\n")
+                for problem in unprocessed_problems:
+                    problem.delete()
 
         # Throw one large error at end if there were any before
         if self.errored:
