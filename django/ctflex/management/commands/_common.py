@@ -34,7 +34,7 @@ def add_debug_argument(parser):
                         help="Launch a pdb session on encountering an exception.")
 
 
-def add_clear(parser):
+def add_clear_argument(parser):
     parser.add_argument('--clear', '-c',
                         action='store_true', dest='clear', default=False,
                         help="Clear existing content if it wasn't just updated.")

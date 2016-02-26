@@ -10,10 +10,12 @@ import yaml
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
+from django.core import management
 
-from ctflex.constants import (UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME, \
+from ctflex.constants import (UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME,
                               STATIC_BASENAME, UUID_BASENAME, UUID_BACKUP_BASENAME)
-from ctflex.management.commands._common import (add_debug_argument, add_no_input_argument, add_clear, debug_with_pdb)
+from ctflex.management.commands._common import (add_debug_argument, add_no_input_argument,
+                                                add_clear_argument, debug_with_pdb, filter_dict)
 from ctflex.models import CtfProblem, Window
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
@@ -23,12 +25,12 @@ PK_FIELD = 'id'
 
 
 class Command(BaseCommand):
-    help = "Add/Update/Delete problems"
+    help = "Add/Update/Delete problems (and static files)"
 
     def add_arguments(self, parser):
         add_no_input_argument(parser)
         add_debug_argument(parser)
-        add_clear(parser)
+        add_clear_argument(parser)
 
     def walk(self, directory):
         """Yield sub-directories that don't begin with an underscore"""
@@ -178,7 +180,6 @@ class Command(BaseCommand):
                     static_from = join(prob_path, STATIC_BASENAME)
                     static_to = join(PROBLEMS_STATIC_DIR, str(uuid))
 
-                    # TODO(Yatharth): Hash filenames
                     if isdir(static_from):
                         write("Trying to copy static files from '{}'".format(prob_basename))
                         shutil.copytree(static_from, static_to)
@@ -221,6 +222,14 @@ class Command(BaseCommand):
                 write("\nDeleting all unprocessed problems\n\n")
                 for problem in unprocessed_problems:
                     problem.delete()
+
+        # Collect all static files to final location
+        write("")
+        write("Collecting static files")
+        management.call_command('collectstatic', *filter_dict({
+            '--no-input': not options['interactive'],
+            '--clear': options['clear'],
+        }))
 
         # Throw one large error at end if there were any before
         if self.errored:

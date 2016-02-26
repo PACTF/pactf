@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from ctflex.management.commands._common import add_no_input_argument, add_debug_argument, debug_with_pdb, filter_dict, \
-    add_clear
+    add_clear_argument
 
 BASE_DIR = join(dirname(dirname(dirname(abspath(__file__)))), 'fixtures')
 PRE_PROBLEMS_FIXTURES = ('users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml',)
@@ -18,7 +18,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         add_debug_argument(parser)
         add_no_input_argument(parser)
-        add_clear(parser)
+        add_clear_argument(parser)
 
     @staticmethod
     def load_fixture(fixture):
@@ -50,7 +50,3 @@ class Command(BaseCommand):
 
             for fixture in POST_PROBLEMS_FIXTURES:
                 self.load_fixture(fixture)
-
-            management.call_command('collectstatic', '-c', *filter_dict({
-                '--no-input': not options['interactive'],
-            }))
