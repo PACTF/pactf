@@ -8,15 +8,14 @@ from os.path import join, isfile, isdir
 
 import yaml
 from django.conf import settings
+from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from django.core import management
 
 from ctflex.constants import (UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME,
                               STATIC_BASENAME, UUID_BASENAME, UUID_BACKUP_BASENAME)
-from ctflex.management.commands._common import (add_debug_argument, add_no_input_argument,
-                                                add_clear_argument, debug_with_pdb, filter_dict)
+from ctflex.management.commands import helpers
 from ctflex.models import CtfProblem, Window
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
@@ -29,9 +28,9 @@ class Command(BaseCommand):
     help = "Add/Update/Delete problems atomically (with static files)"
 
     def add_arguments(self, parser):
-        add_no_input_argument(parser)
-        add_debug_argument(parser)
-        add_clear_argument(parser)
+        helpers.add_no_input_argument(parser)
+        helpers.add_debug_argument(parser)
+        helpers.add_clear_argument(parser)
 
     def walk(self, directory):
         """Yield sub-directories that don't begin with an underscore"""
@@ -74,7 +73,7 @@ class Command(BaseCommand):
 
         # Get ready to give user a shell on exception if in debug mode
         if self.debug:
-            debug_with_pdb()
+            helpers.debug_with_pdb()
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
@@ -234,7 +233,7 @@ class Command(BaseCommand):
             # Collect all static files to final location
             write("")
             write("Collecting static files to final location")
-            management.call_command('collectstatic', *filter_dict({
+            management.call_command('collectstatic', *helpers.filter_dict({
                 '--no-input': not options['interactive'],
                 '--clear': options['clear'],
             }))

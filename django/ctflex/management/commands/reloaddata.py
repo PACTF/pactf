@@ -4,8 +4,7 @@ from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from ctflex.management.commands._common import add_no_input_argument, add_debug_argument, debug_with_pdb, filter_dict, \
-    add_clear_argument
+from ctflex.management.commands import helpers
 
 BASE_DIR = join(dirname(dirname(dirname(abspath(__file__)))), 'fixtures')
 PRE_PROBLEMS_FIXTURES = ('users.yaml', 'teams.yaml', 'competitors.yaml', 'windows.yaml',)
@@ -16,9 +15,9 @@ class Command(BaseCommand):
     help = "Flush and migrate the database, and reload fixtures and problems (with static files)"
 
     def add_arguments(self, parser):
-        add_debug_argument(parser)
-        add_no_input_argument(parser)
-        add_clear_argument(parser)
+        helpers.add_debug_argument(parser)
+        helpers.add_no_input_argument(parser)
+        helpers.add_clear_argument(parser)
 
     @staticmethod
     def load_fixture(fixture):
@@ -28,11 +27,11 @@ class Command(BaseCommand):
     def handle(self, **options):
 
         if options['debug']:
-            debug_with_pdb()
+            helpers.debug_with_pdb()
 
         with transaction.atomic():
 
-            management.call_command('flush', *filter_dict({
+            management.call_command('flush', *helpers.filter_dict({
                 '--no-input': not options['interactive'],
             }))
             management.call_command('makemigrations')
@@ -41,7 +40,7 @@ class Command(BaseCommand):
             for fixture in PRE_PROBLEMS_FIXTURES:
                 self.load_fixture(fixture)
 
-            management.call_command('loadprobs', *filter_dict({
+            management.call_command('loadprobs', *helpers.filter_dict({
                 '--no-input': not options['interactive'],
                 '--debug': options['debug'],
                 '--clear': options['clear']
