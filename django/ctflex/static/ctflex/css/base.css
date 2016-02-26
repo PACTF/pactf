@@ -7,15 +7,10 @@ body {
     padding: 0;
 
     background-color: lightblue;
-
-    /* Move down content because we have a fixed navbar that is 50px tall */
-    padding-top: 45px;
-    padding-bottom: 20px;
-
 }
 
 .page-title > .container, #content, #messages {
-    /* XXX(Yatharth) http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
+    /* XXX(Yatharth): Look into http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
     max-width: 55em;
     margin: 0 auto;
 }
@@ -25,7 +20,7 @@ body {
     padding: 0.25em;
 }
 
-/* Header */
+/* Title */
 
 .page-title {
     background-color: #f5f5f5;
@@ -79,6 +74,12 @@ footer > .container > p {
 
 /* Navbar */
 
+body {
+    /* Move down content because because of navbar */
+    padding-top: 45px;
+    padding-bottom: 20px;
+}
+
 p.navbar-text {
     margin: 0;
     padding: 12px 15px;
@@ -129,7 +130,7 @@ p.navbar-text {
     padding-top: 0.5em;
 }
 
-/* Message Accessibility */
+/* Messages Accessibility */
 
 .alert-success .alert-type:before {
     content: "Success!"

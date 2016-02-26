@@ -40,6 +40,7 @@ class Command(BaseCommand):
             for fixture in PRE_PROBLEMS_FIXTURES:
                 self.load_fixture(fixture)
 
+            # (loadprobs will call collectstatic.)
             management.call_command('loadprobs', *helpers.filter_dict({
                 '--no-input': not options['interactive'],
                 '--debug': options['debug'],
