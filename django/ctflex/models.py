@@ -115,7 +115,8 @@ def cleaned(cls):
     return cls
 
 
-# class Config(models.Model):
+# FIXME(Yatharth): Implement lockdown
+# class State(models.Model):
 #     default_category = models.ForeignKey(Category)
 #
 #     def save(self, *args, **kwargs):
@@ -434,7 +435,7 @@ class CtfProblem(models.Model):
 
     @staticmethod
     def link_static(old_text, id):
-        """Replace {% ctflexstatic %} directives with the appropriate static file link"""
+        """Replace {% ctflexstatic ... %} directives with the appropriate static file link"""
 
         PATTERN = re.compile(r'''{% \s* ctflexstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
         REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, id)

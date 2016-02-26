@@ -60,7 +60,7 @@ def warn_historic(request, window):
 def universal_decorator(*, methodname):
     """Makes a decorator factory able to decorate both a function and a certain method of a class
 
-    Usage: Apple this decorator to a decorator of your own like so:
+    Usage: Apply this decorator to a decorator of your own like so:
 
         @universal_decorator(methodname='<some_method>')
         def your_decorator(<arguments>):

@@ -7,34 +7,27 @@ import traceback
 from os.path import join, isfile, isdir
 
 import yaml
-from IPython.core import ultratb
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 
-from ctflex.constants import UUID_REGEX
-from ctflex.management.commands._common import add_debug, add_no_input, add_clear
+from ctflex.constants import UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME, STATIC_BASENAME, \
+    UUID_BASENAME, UUID_BACKUP_BASENAME
+from ctflex.management.commands._common import add_debug_argument, add_no_input_argument, add_clear, debug_with_pdb
 from ctflex.models import CtfProblem, Window
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
 PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
 
-PROBLEM_BASENAME = 'problem.yaml'
-GRADER_BASENAME = 'grader.py'
-GENERATOR_BASENAME = 'generator.py'
-STATIC_BASENAME = 'static'
-UUID_BASENAME = '.uuid'
-UUID_BACKUP_BASENAME = '.uuid.rejected'
-
 PK_FIELD = 'id'
 
 
 class Command(BaseCommand):
-    help = "Add/Update problems"
+    help = "Add/Update/Delete problems"
 
     def add_arguments(self, parser):
-        add_no_input(parser)
-        add_debug(parser)
+        add_no_input_argument(parser)
+        add_debug_argument(parser)
         add_clear(parser)
 
     def walk(self, directory):
@@ -69,20 +62,22 @@ class Command(BaseCommand):
 
         write = self.stdout.write
 
-        # Get ready to give user a shell on exception if in debug mode
-        self.debug = options['debug']
-        if self.debug:
-            sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
-
-        # Initialize variables
+        # Initialize list for problems we came across from the files
         processed_problems = []
+
+        # Initialize error handling-related variables
         self.errored = False
+        self.debug = options['debug']
+
+        # Get ready to give user a shell on exception if in debug mode
+        if self.debug:
+            debug_with_pdb()
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
             message = textwrap.dedent("""\
                 You have requested to load problems into the database and collect static files
-                to the intermediate     location as specified in your settings:
+                to the intermediate location as specified in your settings:
 
                     {}
 
@@ -173,7 +168,7 @@ class Command(BaseCommand):
                     write("Validation failed for '{}'".format(prob_basename))
                     self.handle_error(err)
 
-                    # Don't delete an existing problem if clear option is given just because validation failed
+                    # Don't delete an existing problem later just because validation failed
                     processed_problems.append(data['id'])
 
                     continue
