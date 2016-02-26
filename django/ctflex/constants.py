@@ -32,7 +32,7 @@ PROBLEM_SALT = 'ctfproblem'
 DEPS_PROBS_FIELD = 'probs'
 DEPS_THRESHOLD_FIELD = 'threshold'
 
-''' loadprobs management command '''
+''' Problem folder structure '''
 
 PROBLEM_BASENAME = 'problem.yaml'
 GRADER_BASENAME = 'grader.py'

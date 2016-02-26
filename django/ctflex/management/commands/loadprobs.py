@@ -11,9 +11,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 
-from ctflex.constants import UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME, STATIC_BASENAME, \
-    UUID_BASENAME, UUID_BACKUP_BASENAME
-from ctflex.management.commands._common import add_debug_argument, add_no_input_argument, add_clear, debug_with_pdb
+from ctflex.constants import (UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME, \
+                              STATIC_BASENAME, UUID_BASENAME, UUID_BACKUP_BASENAME)
+from ctflex.management.commands._common import (add_debug_argument, add_no_input_argument, add_clear, debug_with_pdb)
 from ctflex.models import CtfProblem, Window
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
@@ -197,7 +197,7 @@ class Command(BaseCommand):
         # Delete existing problems that were not updated if clear option was given
         # (This action is so dangerous that even passing in '--no-input' shouldn't automatically approve it.)
         unprocessed_problems = CtfProblem.objects.exclude(pk__in=processed_problems).all()
-        if unprocessed_problems:
+        if options['clear'] and unprocessed_problems:
             affirmative_answer = "yes_this_is_dangerous"
             message = textwrap.dedent("""\
                 You have requested to delete all pre-existing problems that were not updated.
