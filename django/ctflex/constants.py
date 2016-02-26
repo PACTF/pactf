@@ -21,6 +21,7 @@ QUERY_LOGGER = APP_NAME + '.queries'
 UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 # (LOGIN_REDIRECT_URL is in settings.py because Django code uses it.)
+WINDOW_CHANGE_URL = 'ctflex:game'
 LOGOUT_REDIRECT_URL = 'ctflex:index'
 TEAM_CHANGE_REDIRECT_URL = 'ctflex:current_team'
 INVALID_STATE_REDIRECT_URL = 'ctflex:index'
