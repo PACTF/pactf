@@ -1,8 +1,6 @@
 import inspect
-from copy import copy
 from functools import wraps
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import user_passes_test
@@ -24,7 +22,7 @@ from ctflex import constants
 from ctflex import forms
 from ctflex import models
 from ctflex import queries
-from ctflex.constants import TEAM_STATUS_NAME, TEAM_STATUS_NEW, TEAM_STATUS_OLD
+from ctflex.constants import TEAM_STATUS_NAME, TEAM_STATUS_NEW, TEAM_STATUS_OLD, WINDOW_SESSION_KEY
 
 
 # region Helper Methods
@@ -33,18 +31,23 @@ def is_competitor(user):
     return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
 
 
+def get_window(request):
+    window_id = request.session.get(WINDOW_SESSION_KEY, '')
+    window = queries.get_window(window_id)
+    return window
+
+
 def default_context(request):
     """Return default CTFlex context
 
     This context processor is included as the global context processor in settings.py; therefore, it should not be manually included.
     """
-    params = {}
-    params['production'] = not settings.DEBUG
-    params['team'] = request.user.competitor.team if is_competitor(request.user) else None
+    context = {}
+    context['team'] = request.user.competitor.team if is_competitor(request.user) else None
+    context['window'] = get_window(request)
+    context['other_windows'] = models.Window.objects.other(context['window'])
 
-    params['window'] = queries.get_window(request.resolver_match.kwargs.get('window_id', ''))
-    params['other_windows'] = models.Window.objects.other(params['window'])
-    return params
+    return context
 
 
 def warn_historic(request, window):
@@ -142,25 +145,6 @@ def anonyomous_users_only():
 
     return decorator
 
-@universal_decorator(methodname='dispatch')
-def redirected_from_no_window(*, takes_window_param=False):
-    """If no window argument is present, redirect to current window"""
-
-    def decorator(view):
-        @wraps(view)
-        def decorated(request, *args, **kwargs):
-            if 'window_id' not in kwargs:
-                kwargs['window_id'] = queries.get_window().id
-                return redirect(reverse(request.resolver_match.view_name, args=args, kwargs=kwargs))
-            else:
-                if not takes_window_param:
-                    del kwargs['window_id']
-                return view(request, *args, **kwargs)
-
-        return decorated
-
-    return decorator
-
 
 def windowed():
     """Redirects views around based on Contest Window and Personal Timer states
@@ -172,12 +156,18 @@ def windowed():
 
         @wraps(view)
         @competitors_only()
-        @redirected_from_no_window(takes_window_param=True)
-        def decorated(request, *args, window_id, **kwargs):
+        def decorated(request, *args, window_id=None, **kwargs):
 
-            window = queries.get_window(window_id)
-            view_name = resolve(request.path_info).view_name
-            original_view = lambda: view(request, *args, window_id=window_id, **kwargs)
+            view_name = request.resolver_match.view_name
+
+            if window_id is None:
+                kwargs['window_id'] = get_window(request).id
+                return HttpResponseRedirect(reverse(view_name, args=args, kwargs=kwargs))
+
+            request.session[WINDOW_SESSION_KEY] = window_id
+            window = get_window(request)
+
+            original_view = lambda: view(request, *args, **kwargs)
 
             STATE_VIEWS = ('ctflex:waiting', 'ctflex:inactive', 'ctflex:done')
             REDIRECT_MESSAGE = "You were redirected to this page as previous page was invalid for this window."
@@ -186,13 +176,13 @@ def windowed():
                 if view_name == 'ctflex:waiting':
                     return original_view()
                 else:
-                    return redirect('ctflex:waiting', window_id=window.id)
+                    return redirect('ctflex:waiting')
             # Window has started
 
             if window.ended():
                 if view_name in STATE_VIEWS:
                     messages.warning(request, REDIRECT_MESSAGE)
-                    return redirect('ctflex:game', window_id=window.id)
+                    return redirect('ctflex:game')
                 else:
                     return original_view()
             # Window has not ended
@@ -202,19 +192,19 @@ def windowed():
                 if view_name in ['ctflex:inactive', 'ctflex:start_timer']:
                     return original_view()
                 else:
-                    return redirect('ctflex:inactive', window_id=window.id)
+                    return redirect('ctflex:inactive')
             # There is an active or expired timer
 
             if not team.timer(window).active():
                 if view_name == 'ctflex:done':
                     return original_view()
                 else:
-                    return redirect('ctflex:done', window_id=window.id)
+                    return redirect('ctflex:done')
             # There is an active timer
 
             if view_name in STATE_VIEWS:
                 messages.warning(request, REDIRECT_MESSAGE)
-                return redirect('ctflex:game', window_id=window.id)
+                return redirect('ctflex:game')
 
             return original_view()
 
@@ -229,26 +219,26 @@ def windowed():
 
 @limited_http_methods('GET')
 @windowed()
-def inactive(request, *, window_id):
-    return render(request, 'ctflex/states/inactive.html', request)
+def inactive(request):
+    return render(request, 'ctflex/states/inactive.html')
 
 
 @limited_http_methods('GET')
 @windowed()
-def waiting(request, *, window_id):
-    return render(request, 'ctflex/states/waiting.html', request)
+def waiting(request):
+    return render(request, 'ctflex/states/waiting.html')
 
 
 @limited_http_methods('GET')
 @windowed()
-def done(request, *, window_id):
-    return render(request, 'ctflex/states/done.html', request)
+def done(request):
+    return render(request, 'ctflex/states/done.html')
 
 
 @limited_http_methods('POST')
 @windowed()
-def start_timer(request, *, window_id):
-    window = queries.get_window(window_id)
+def start_timer(request):
+    window = get_window(request)
     team = request.user.competitor.team
 
     success, msgs = commands.start_timer(team=team, window=window)
@@ -257,7 +247,7 @@ def start_timer(request, *, window_id):
         for msg in msgs:
             messages.error(request, msg)
 
-    return redirect('ctflex:game', window_id=window.id)
+    return redirect('ctflex:game')
 
 
 # endregion
@@ -267,7 +257,7 @@ def start_timer(request, *, window_id):
 
 
 @limited_http_methods('GET')
-def index(request, *, window_id=None):
+def index(request):
     """Index
 
     It takes window_id since all other views take it and didn't want to make exception for index page
@@ -280,7 +270,6 @@ def index(request, *, window_id=None):
 
 
 @limited_http_methods('GET')
-@redirected_from_no_window()
 def rate_limited(request, err):
     return render(request, 'ctflex/misc/ratelimited.html')
 
@@ -291,46 +280,47 @@ def rate_limited(request, err):
 
 @limited_http_methods('GET')
 @windowed()
-def game(request, *, window_id):
-    window = queries.get_window(window_id)
+def game(request):
+    window = get_window(request)
 
-    params = {}
-    params['prob_list'] = queries.viewable_problems(request.user.competitor.team, window)
+    context = {
+        'prob_list': queries.viewable_problems(request.user.competitor.team, window)
+    }
 
     warn_historic(request, window)
 
-    return render(request, 'ctflex/misc/game.html', params)
+    return render(request, 'ctflex/misc/game.html', context)
 
 
 @limited_http_methods('GET')
 @never_cache
-def board(request, *, window_id):
-    window = queries.get_window(window_id)
+def board(request):
+    window = get_window(request)
 
     if not window.started():
-        return redirect('ctflex:waiting', window_id=window.id)
+        return redirect('ctflex:waiting')
 
-    params = {}
-    params['teams'] = queries.board(window)
+    context = {
+        'teams': queries.board(window)
+    }
 
     warn_historic(request, window)
 
-    return render(request, 'ctflex/board/board_specific.html', params)
+    return render(request, 'ctflex/board/board_specific.html', context)
 
 
 @limited_http_methods('GET')
-@redirected_from_no_window()
 @never_cache
 def board_overall(request):
-    params = {}
-    params['teams'] = queries.board()
+    context = {}
+    context['teams'] = queries.board()
 
-    return render(request, 'ctflex/board/board_overall.html', params)
+    return render(request, 'ctflex/board/board_overall.html', context)
 
 
 @limited_http_methods('POST')
 @windowed()
-def submit_flag(request, *, window_id, prob_id):
+def submit_flag(request, prob_id):
     # Handle rate-limiting
     if is_ratelimited(request, fn=submit_flag, key=queries.get_team, rate='1/s', increment=True):
         # FIXME(Yatharth): Return JSON
@@ -339,7 +329,6 @@ def submit_flag(request, *, window_id, prob_id):
     # Process data from the request
     flag = request.POST.get('flag', '')
     competitor = request.user.competitor
-    window = queries.get_window(window_id)
 
     # Grade
     try:
@@ -363,7 +352,6 @@ def submit_flag(request, *, window_id, prob_id):
 # XXX(Yatharth): Needs to use a slightly different template at least
 # XXX(Yatharth): Link to from scoreboard
 @limited_http_methods('GET')
-@redirected_from_no_window()
 class Team(DetailView):
     model = models.Team
     template_name = 'ctflex/misc/team.html'
@@ -375,7 +363,6 @@ class Team(DetailView):
 
 @limited_http_methods('GET')
 @competitors_only()
-@redirected_from_no_window()
 class CurrentTeam(Team):
     def get_object(self, **kwargs):
         return self.request.user.competitor.team

@@ -63,7 +63,7 @@ def _problem_unlocked(team, problem):
 
 def viewable_problems(team, window):
     return sorted(filter(partial(_problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
-                  key=lambda problem: (problem.points, problem.name))
+                  key=lambda problem: (problem.points, problem.name.lower()))
 
 
 # endregion

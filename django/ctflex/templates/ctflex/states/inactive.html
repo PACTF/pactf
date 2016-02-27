@@ -13,7 +13,7 @@
     earlier. Bon courage.
   </p>
 
-  <form action="{% url 'ctflex:start_timer' window_id=window.id %}" method="post">
+  <form action="{% url 'ctflex:start_timer'context %}" method="post">
     {% csrf_token %}
     <input class="btn btn-primary" type="submit" value="Start!"/>
   </form>
