@@ -1,0 +1,69 @@
+{% load ctflex %}
+
+<nav class="navbar navbar-fixed-top navbar-inverse">
+  <div class="container">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target="#navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'ctflex:index' %}">PACTF</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbar-collapse">
+
+      <ul class="nav navbar-nav">
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+             aria-expanded="false">Window: {{ window.verbose_name }}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            {% for other_window in other_windows %}
+              <li>
+                <a href="{% switch_window other_window %}">
+                  {{ other_window.verbose_name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+
+        {# TODO: Active classes #}
+        <li><a href="{% url 'ctflex:game'%} ">Game</a></li>
+        <li><a href="{% url 'ctflex:scoreboard' %}">Scoreboard</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+
+        {% if user.is_authenticated %}
+
+          {% if team %}
+            <li><p class="navbar-text">Score: {% score team %}</p></li>
+            <li><a href="{% url 'ctflex:current_team' %}">Team</a></li>
+
+          {% else %}
+            <li>
+              <p class="navbar-text">
+                <em>Not a competitor</em>
+              </p>
+            </li>
+          {% endif %}
+
+          <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
+
+        {% else %}
+
+          <li><a href="{% url 'ctflex:login' %}">Login</a></li>
+          <li><a href="{% url 'ctflex:register' %}">Register</a></li>
+
+        {% endif %}
+      </ul>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

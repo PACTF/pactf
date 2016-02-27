@@ -1,4 +1,4 @@
-{% extends 'ctflex/base-headerless.html' %}
+{% extends 'ctflex/base/base.template.html' %}
 {% load static from staticfiles %}
 
 {% block extra_css %}
@@ -13,7 +13,7 @@
 
   <div class="jumbotron text-center">
 
-    {% include 'ctflex/snippets/messages.html' %}
+    {% include 'ctflex/base/messages.snippet.html' %}
 
     <div id="jumbotron-img">
       <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
