@@ -100,6 +100,8 @@
   <script type="text/javascript">
     (function () {
       window.js_context = {{ js_context|safe }};
+
+      document.dispatchEvent(new Event('js_context'));
     })();
   </script>
 {% endif %}

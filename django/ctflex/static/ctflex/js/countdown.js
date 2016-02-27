@@ -46,6 +46,8 @@ function initializeCountdown() {
     var timeinterval = setInterval(updateClock, 1000);
 }
 
-jQuery(document).ready(function () {
-    initializeCountdown();
-});
+if (document.addEventListener) {
+    document.addEventListener('js_context', initializeCountdown, false);
+} else {
+    document.attachEvent('js_context', initializeCountdown);
+}
