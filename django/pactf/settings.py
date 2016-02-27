@@ -27,7 +27,7 @@ class Django:
         # Django 3rd-party
         'django_countries',
         'django_extensions',
-        # 'debug_toolbar',
+        'debug_toolbar',
         'email_log',
         'widget_tweaks',
 

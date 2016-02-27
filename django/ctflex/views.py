@@ -49,7 +49,7 @@ def default_context(request):
 def windowed_context(window):
     return {
         'window': window,
-        'windows': models.Window.objects.order_by('start').all,
+        'windows': queries.all_windows(),
     }
 
 
@@ -163,7 +163,10 @@ def defaulted_window():
 
 @limited_http_methods('GET')
 def index(request):
-    return render(request, 'ctflex/misc/index.html')
+    context = {
+        'windows': queries.all_windows(),
+    }
+    return render(request, 'ctflex/misc/index.html', context)
 
 
 # @limited_http_methods('GET')

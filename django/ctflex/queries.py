@@ -28,6 +28,10 @@ def get_window(window_codename=None):
     return models.Window.objects.get(codename=window_codename) if window_codename else models.Window.objects.current()
 
 
+def all_windows():
+    return models.Window.objects.order_by('start').all
+
+
 def competitor_key(group, request):
     """Key function for ratelimiting based on competitor"""
     return str(request.user.competitor.team.id)

@@ -20,9 +20,17 @@
       <strong>PACTF</strong> is an online <b>computer security</b> competition for
       <strong>high school students.</strong>
     </h3>
-    <h3 id="date-heading">
-      <strong>April 10</strong>&nbsp;–&nbsp;<strong>April 30</strong>
-    </h3>
+
+    <div id="date-headings" class="row">
+      {% for window in windows %}
+        <h3>
+          <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}:</strong></span>
+          <br class="visible-xs-block"/>
+          <span class="col-sm-6 text-left">{{ window.start|date:'F j' }}&nbsp;–&nbsp;{{ window.end|date:'F j' }}</span>
+        </h3>
+      {% endfor %}
+    </div>
+
     <p class="text-center">
       {% if team %}
         <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go the to Game!</a>
@@ -50,7 +58,7 @@
             There will be a list of ‘problems’ for you to solve. On solving a problem, you should end up with a string as an answer called a ‘flag’ (hence the term ‘Capture the Flag’). You can submit this flag using the text box next to the problem description for points and fun!
           </p>
           <p>
-            <img src="{% static 'ctflex/img/go_forth.jpg' %}" />
+            <img src="{% static 'ctflex/img/go_forth.jpg' %}"/>
           </p>
           <p class="text-muted">
             <em>Some text adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>

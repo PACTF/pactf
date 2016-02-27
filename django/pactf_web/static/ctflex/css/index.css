@@ -10,9 +10,14 @@
     margin-bottom: 0.5em;
 }
 
-#date-heading {
+#date-headings {
     margin-top: 0;
     margin-bottom: 1.5em;
+}
+
+#date-headings h3 {
+    margin: 0;
+    margin-bottom: 0.25em;
 }
 
 
