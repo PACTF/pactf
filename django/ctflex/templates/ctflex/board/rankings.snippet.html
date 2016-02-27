@@ -1,0 +1,20 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th>Rank</th>
+    <th>Team Name</th>
+    <th>Affiliation</th>
+    <th>Score</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for rank, team, score in board %}
+    <tr>
+      <td>{{ rank }}.</td>
+      <td>{{ team.name }}</td>
+      <td>{{ team.affiliation }}</td>
+      <td>{{ score }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

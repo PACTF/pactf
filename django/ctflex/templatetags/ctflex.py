@@ -14,7 +14,8 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def score(context, team):
-    return queries.score(team=team, window=context['window'])
+    window = context.get('window', queries.get_window())
+    return queries.score(team=team, window=window)
 
 
 @register.simple_tag()

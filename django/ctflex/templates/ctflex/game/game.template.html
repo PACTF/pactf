@@ -1,0 +1,20 @@
+{% extends 'ctflex/base/windowed.template.html' %}
+{% load static %}
+
+{% block title %}
+  Game — {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Game: {{ window.verbose_name }}
+{% endblock %}
+
+{% block extra_css %}
+  <link href="{% static "ctflex/css/game/game.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+  <script type="text/javascript" src="{% static 'ctflex/js/ajax_utils.js' %}"></script>
+  <script type="text/javascript" src="{% static 'ctflex/js/game.js' %}"></script>
+{% endblock %}
+

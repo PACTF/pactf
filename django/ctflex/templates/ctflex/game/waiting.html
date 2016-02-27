@@ -1,0 +1,32 @@
+{% extends 'ctflex/game/game.template.html' %}
+{% load static from staticfiles %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static 'ctflex/css/game/active.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'ctflex/js/countdown.js' %}" async></script>
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>Welcome to {{ window.verbose_name }}! This round has not yet started.</strong> It will run from
+    {{ window.start|date:'F j, Y' }} to {{ window.end|date:'F j, Y' }} and start in:
+  </p>
+
+  {% include 'ctflex/game/countdown.snippet.html' %}
+
+  <p>
+    When it starts, your team will be able to pick any {% include 'ctflex/timer_length.adjective.txt' %} span within the round to solve problems. Until then, you can:
+  </p>
+  <ul>
+    <li>Look at past rounds’ problems using the dropdown above.</li>
+    <li>Find out all of the roundss’ schedules on the <a href="{% url 'ctflex:index' %}">homepage</a>.</li>
+    <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/title.txt' %}!
+    </li>
+  </ul>
+{% endblock %}

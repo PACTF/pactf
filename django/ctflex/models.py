@@ -18,6 +18,7 @@ import markdown2
 from localflavor.us.models import USStateField
 
 from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD
+from ctflex import constants
 
 
 # region Helpers and General
@@ -115,7 +116,9 @@ def cleaned(cls):
     return cls
 
 
-# FIXME(Yatharth): Implement lockdown
+word_characters = validators.RegexValidator(r'^\w*$', "Only alphanumeric characters and underscores are allowed.")
+
+
 # class State(models.Model):
 #     default_category = models.ForeignKey(Category)
 #
@@ -286,8 +289,8 @@ class Window(models.Model):
     objects = WindowManager()
 
     id = models.AutoField(primary_key=True)
-    code = models.CharField(max_length=30, unique=True,
-                            help_text="Non-user-facing human-readable identifier for window")
+    codename = models.CharField(max_length=30, unique=True, validators=[word_characters],
+                                help_text="Non-user-facing human-readable identifier for window")
     verbose_name = models.CharField(max_length=30, unique=True, blank=False,
                                     help_text="User-facing title of window")
 
@@ -297,7 +300,7 @@ class Window(models.Model):
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
-        return "<Window #{} {!r} {} – {}>".format(self.id, self.code, print_time(self.start), print_time(self.end))
+        return "<Window #{} {!r} {} – {}>".format(self.id, self.codename, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
 
@@ -306,6 +309,9 @@ class Window(models.Model):
 
     def ended(self):
         return self.end < timezone.now()
+
+    def ongoing(self):
+        return self.started() and not self.ended()
 
     ''' Cleaning '''
 
@@ -322,6 +328,10 @@ class Window(models.Model):
         if self.start >= self.end:
             raise ValidationError("The end is not after the start", code='timedelta_is_positive')
 
+    def validate_window_is_not_named_overall(self):
+        if self.codename == constants.OVERALL_WINDOW_NAME:
+            raise ValidationError("The window codename cannot be {!r}".format(constants.OVERALL_WINDOW_NAME))
+
     def sync_timers(self):
         """Make timers update their end times per changes in the personal window duration
 
@@ -335,6 +345,7 @@ class Window(models.Model):
     MODEL_CLEANERS = (
         validate_windows_dont_overlap,
         validate_timedelta_is_positive,
+        validate_window_is_not_named_overall,
         sync_timers,
     )
 
@@ -374,7 +385,7 @@ class Timer(models.Model):
             self.start = timezone.now()
 
     def sync_end(self):
-        self.end = timezone.now() + self.window.personal_timer_duration
+        self.end = min(self.start + self.window.personal_timer_duration, self.window.end)
 
     def validate_timer_is_within_window(self):
         if self.start < self.window.start or self.end > self.window.end:

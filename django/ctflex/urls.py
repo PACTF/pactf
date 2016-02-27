@@ -2,28 +2,26 @@
 
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
-from django.conf import settings
 
+from ctflex import settings
 from ctflex.views import anonyomous_users_only
-from pactf.constants import VERBOSE_NAME
 from ctflex.constants import APP_NAME, UUID_REGEX
 from ctflex import views
 
 app_name = APP_NAME
 
-windowed_urls = [
-    # State
-    url(r'^waiting/$', views.waiting, name='waiting'),
-    url(r'^inactive/$', views.inactive, name='inactive'),
-    url(r'^done/$', views.done, name='done'),
+WINDOW_CODE_TOKEN = r'(?:(?P<window_codename>\w+)/)'
 
-    # Windowed CTF GETs
-    url(r'^game/$', views.game, name='game'),
-    url(r'^board/$', views.board, name='scoreboard'),
+ctf_urls = [
+    url('^$', views.index, name='index'),
 
-    # Windowed CTF POSTs
+    url(r'^game/{}?$'.format(WINDOW_CODE_TOKEN), views.game, name='game'),
+    url(r'^scoreboard/{}?$'.format(WINDOW_CODE_TOKEN), views.board, name='scoreboard'),
+
     url(r'^submit_flag/(?P<prob_id>{})/$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
     url(r'^start_timer/$', views.start_timer, name='start_timer'),
+
+    url(r'^team/$', views.Team.as_view(), name='current_team'),
 ]
 
 auth_urls = [
@@ -51,7 +49,7 @@ auth_urls = [
         'post_reset_redirect': 'ctflex:password_reset_done',
         'extra_email_context': {
             'support_email': settings.SUPPORT_EMAIL,
-            'sitename': VERBOSE_NAME,
+            'sitename': settings.SITENAME,
         },
     }),
 
@@ -70,21 +68,7 @@ auth_urls = [
     url(r'^register/$', views.register, name='register'),
 ]
 
-non_windowed_urls = [
-    url(r'^board/overall$', views.board_overall, name='scoreboard_overall'),
-
-    url(r'^team/$', views.CurrentTeam.as_view(), name='current_team'),
-    url(r'^team/(?P<pk>\d+)$', views.Team.as_view(), name='team'),
-]
-
 urlpatterns = [
-    url('^$', views.index, name='index'),
-
-    url(r'^', include(
-        auth_urls + non_windowed_urls + windowed_urls
-    )),
-
-    url(r'^window(?P<window_id>\d+)/', include(
-        non_windowed_urls + windowed_urls
-    )),
+    url(r'', include(auth_urls)),
+    url(r'', include(ctf_urls)),
 ]

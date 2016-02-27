@@ -18,22 +18,22 @@
 
       <ul class="nav navbar-nav">
 
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false">Window: {{ window.verbose_name }}<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            {% for other_window in other_windows %}
-              <li>
-                <a href="{% switch_window other_window %}">
-                  {{ other_window.verbose_name }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </li>
+{#        <li class="dropdown">#}
+{#          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"#}
+{#             aria-expanded="false">Window: {{ window.verbose_name }}<span class="caret"></span></a>#}
+{#          <ul class="dropdown-menu">#}
+{#            {% for other_window in other_windows %}#}
+{#              <li>#}
+{#                <a href="{% switch_window other_window %}">#}
+{#                  {{ other_window.verbose_name }}#}
+{#                </a>#}
+{#              </li>#}
+{#            {% endfor %}#}
+{#          </ul>#}
+{#        </li>#}
 
         {# TODO: Active classes #}
-        <li><a href="{% url 'ctflex:game'%} ">Game</a></li>
+        <li><a href="{% url 'ctflex:game' %} ">Game</a></li>
         <li><a href="{% url 'ctflex:scoreboard' %}">Scoreboard</a></li>
 
       </ul>

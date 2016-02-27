@@ -31,7 +31,6 @@
 
 
   <link href="{% static "ctflex/css/base.css" %}" rel="stylesheet">
-  <link href="{% static "ctflex/css/header.css" %}" rel="stylesheet">
 
   {% block extra_css %}{% endblock %}
 
@@ -46,9 +45,10 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
           integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
           crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"
-          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"
-          crossorigin="anonymous"></script>
+  {# TODO(Yatharth): This script loads too slowly! Download this locally (and the other ones too) #}
+  {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
+  {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
+  {#          crossorigin="anonymous"></script>#}
 
   {% block extra_js %}{% endblock %}
 
@@ -89,11 +89,20 @@
     <p class="text-muted">
       © PACTF 2016
       | <a href="https://pactf.statuspage.io/">StatusPage.io</a>
-      | <a href="mailto:contact@pactf.com">Contact Us</a>
+      | <a href="mailto:{{ contact_email }}">Contact Us</a>
       | Hosted from <a href="https://www.andover.edu/">Phillips Academy</a>
     </p>
   </div>
 </footer>
+
+<!-- JS Context -->
+{% if js_context %}
+  <script type="text/javascript">
+    (function () {
+      window.js_context = {{ js_context|safe }};
+    })();
+  </script>
+{% endif %}
 
 </body>
 

@@ -141,7 +141,7 @@ class Command(BaseCommand):
                         uuid = None
 
                     # Add window and add defaults
-                    data['window'] = Window.objects.get(code=window_basename)
+                    data['window'] = Window.objects.get(codename=window_basename)
                     data.setdefault('dynamic', None)
                     data.setdefault('description', '')
                     data.setdefault('hint', '')

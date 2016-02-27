@@ -1,0 +1,48 @@
+{% extends 'ctflex/base/headered.template.html' %}
+
+{% block _header_wrapper %}
+  <header class="page-title">
+    <div class="container">
+      <h1>
+        {% block header %}:
+        {% endblock header %}
+      </h1>
+
+      <div id="window-dropdown-container">
+        <div id="window-dropdown" class="dropdown ">
+          <button class="btn btn-default dropdown-toggle" type="button" id="window-dropdown-menu" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+            Switch Round
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="window-dropdown-menu">
+
+            {% with selected_window=window %}
+
+              {% if overall_window_codename %}
+                <li class="{% if selected_window == None %}disabled{% endif %}">
+                  <a href="{% url request.resolver_match.view_name window_codename=overall_window_codename %}">
+                    Overall
+                  </a></li>
+                <li role="separator" class="divider"></li>
+              {% endif %}
+
+              {% for window in windows %}
+                <li class="{% if window == selected_window %}disabled{% endif %}">
+                  <a href="{% url request.resolver_match.view_name window_codename=window.codename %}">
+                    {{ window.verbose_name }}
+                    {% if window.ongoing %}
+                      (Ongoing)
+                    {% endif %}
+                  </a></li>
+              {% endfor %}
+            {% endwith %}
+
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+{% endblock %}

@@ -1,5 +1,5 @@
-{% extends 'ctflex/base/titled.template.html' %}
-{% load static %}
+{% extends 'ctflex/base/windowed.template.html' %}
+{% load static from staticfiles %}
 {% load ctflex %}
 
 {% block title %}
@@ -7,35 +7,9 @@
 {% endblock %}
 
 {% block header %}
-  Scoreboard
+  Scoreboard:
+  {% block header_window_name %}
+    {{ window.verbose_name }}
+  {% endblock %}
 {% endblock %}
 
-{% block content %}
-  <p>
-    {% block board_message %}
-    {% endblock %}
-  </p>
-  <p>
-    I GUESS WE CAN PUT A GRAPH HERE
-  </p>
-  <table class="table">
-    <thead>
-    <tr>
-      <th></th>
-      <th>Team Name</th>
-      <th>School</th>
-      <th>Score</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for i, score_team in teams %}
-      <tr>
-        <td>{{ i|add:'1' }}.</td>
-        <td>{{ score_team.1.name }}</td>
-        <td>{{ score_team.1.affiliation }}</td>
-        <td>{{ score_team.0 }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-{% endblock %}

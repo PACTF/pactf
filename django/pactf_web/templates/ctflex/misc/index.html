@@ -5,8 +5,6 @@
   <link href="{% static 'ctflex/css/index.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{# TODO(Yatharth): Make it scrolling with sections #}
-{# TODO(Yatharth): Separate page for explaining #}
 
 {# (content_wrapper is used instead of content to be able to use the full page.) #}
 {% block content_wrapper %}
@@ -40,18 +38,22 @@
         <h2>
           New to CTFs?
         </h2>
+        {# TODO(Yatharth): Copy HSCTF index page and font #}
         <p>
-          CTFs, short for Capture the Flags, are a type of Computer Security competition where you will try to hack into our systems, break our codes, and do fun things like that for points and learning!
+          CTFs, short for Capture the Flags, are a type of Computer Security competition where hack, decrypt, reverse, and do whatever it takes to solve increasingly challenging security puzzles!
         </p>
         <p>
           <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#ctf-info">What Next?</a>
         </p>
         <div id="ctf-info" class="collapse">
           <p>
-            There will be a list of 'problems' for you to solve. On solving then, you should end up with an 'answer string' called a 'flag'. You can submit this flag using the box next to the problem description and get points!
+            There will be a list of ‘problems’ for you to solve. On solving a problem, you should end up with a string as an answer called a ‘flag’ (hence the term ‘Capture the Flag’). You can submit this flag using the text box next to the problem description for points and fun!
           </p>
           <p>
-            <img src="{% static 'ctflex/img/go_forth.jpg' %}"/>
+            <img src="{% static 'ctflex/img/go_forth.jpg' %}" />
+          </p>
+          <p class="text-muted">
+            <em>Some text adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>
           </p>
         </div>
       </div>
@@ -67,10 +69,10 @@
         </p>
         <div id="pactf-info" class="collapse">
           <p>
-            <strong>Instead of a two-week sprint, PACTF will have three rounds,</strong> each one week long. During each round, you can pick any two-day span to grab as many flags as you can! Choose wisely: Once your two days run out, you won’t be able to score more points in that round.
+            <strong>Instead of a two-week sprint, PACTF will have three rounds,</strong> each one week long. During each round, you can pick any {% include 'ctflex/timer_length.adjective.txt' %} span to grab as many flags as you can! Choose wisely: Once your {% include 'ctflex/timer_length.noun.txt' %} run out, you won’t be able to score more points in that round.
           </p>
           <p>
-            <strong>Don’t worry about being too slow, though!</strong> Even if your two day timer is over, you can still test your skills against problems in previous rounds.
+            <strong>Don’t worry about being too slow, though!</strong> Even if your {% include 'ctflex/timer_length.adjective.txt' %} timer is over, you can still test your skills against problems in previous rounds.
           </p>
           <p>
             <strong>There are scoreboards</strong>

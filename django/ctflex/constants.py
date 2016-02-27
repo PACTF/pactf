@@ -5,6 +5,10 @@ These constants can't just be stored in `models.py` because `apps.py` can't impo
 Note: It might make sense to move some of the below constants to the settings.py file.
 """
 
+import zlib
+
+from django.conf import settings
+
 ''' Meta info '''
 
 APP_NAME = 'ctflex'
@@ -20,6 +24,10 @@ QUERY_LOGGER = APP_NAME + '.queries'
 
 UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
+''' Window Names '''
+
+OVERALL_WINDOW_NAME = 'overall'
+
 ''' Session '''
 
 WINDOW_SESSION_KEY = 'window_id'
@@ -34,7 +42,7 @@ INVALID_STATE_REDIRECT_URL = 'ctflex:index'
 
 ''' Security '''
 
-PROBLEM_SALT = 'ctfproblem'
+PROBLEM_SALT = 'ctfproblems'
 
 ''' Problem Dependencies '''
 

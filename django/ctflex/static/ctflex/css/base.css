@@ -17,7 +17,7 @@ body {
 
 #content {
     margin-top: 1em;
-    padding: 0.25em;
+    padding: 1em;
 }
 
 /* Title */
@@ -146,4 +146,25 @@ p.navbar-text {
 
 .alert-info .alert-type:before {
     content: "Info: "
+}
+
+/* Modals */
+
+body.modal-open div.modal-backdrop {
+    /* Fix modals being tinted out too */
+    z-index: 0;
+}
+
+/* Window Dropdown */
+
+.page-title {
+    overflow: visible;
+}
+
+.page-title h1 {
+    padding-bottom: 0.2em;
+}
+
+#window-dropdown-container {
+    float: right;
 }

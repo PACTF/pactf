@@ -1,0 +1,65 @@
+{% extends 'ctflex/game/game.template.html' %}
+{% load static from staticfiles %}
+
+{% block header %}
+  {{ block.super }} (Ongoing)
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static 'ctflex/css/game/active.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'ctflex/js/countdown.js' %}" async></script>
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>Welcome to {{ window.verbose_name }}!</strong> This round started at on
+    {{ window.start|date:'F j, Y' }} and will run until
+    {{ window.end|date:'F j, Y' }}.
+  </p>
+  <p>
+    You can start solving problems once you start your team’s {% include 'ctflex/timer_length.adjective.txt' %} timer. Your team will then have {% include 'ctflex/timer_length.noun.txt' %} to solve as many problems as you all can!
+  </p>
+  <p>
+    You can start this timer anytime while the round is running — feel free to come back later if that fits your schedule better!
+  </p>
+
+  <p>Your team’s timer will last for:</p>
+
+  {% include 'ctflex/game/countdown.snippet.html' %}
+
+  <p class="text-center">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#startTimerModal">
+      Start my Team's Timer
+    </button>
+  </p>
+
+  <div class="modal fade" id="startTimerModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form class="form" action="{% url 'ctflex:start_timer' %}" method="post">
+          {% csrf_token %}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Start Timer</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              <strong>Have you talked to your team about starting the timer?</strong> Once you start the timer and the timer ends, none of you will be able to solve problems for points.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Later</button>
+            <button type="submit" class="btn btn-primary">Start Timer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

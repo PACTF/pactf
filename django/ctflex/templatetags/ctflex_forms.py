@@ -20,7 +20,7 @@ class FormFieldNode(template.Node):
             return ''
 
         extra_html = self.nodelist.render(template_context)
-        template_instance = get_template(template_name='ctflex/snippets/form_field.html')
+        template_instance = get_template(template_name='ctflex/forms/field.snippet.html')
         custom_context = Context({'field': field, 'extra_html': extra_html})
         # TODO: fix warning
         custom_context.update(template_context)
@@ -71,7 +71,7 @@ class NonFormFieldErrors(template.Node):
         if not error_count:
             return ''
 
-        template_instance = get_template(template_name='ctflex/snippets/form_non_field_errors.html')
+        template_instance = get_template(template_name='ctflex/forms/non_field_errors.snippet.html')
         custom_context = {
             'non_field_errors': non_field_errors,
             'error_count': error_count,

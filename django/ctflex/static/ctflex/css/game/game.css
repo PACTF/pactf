@@ -1,6 +1,9 @@
+.problem-header-right {
+    float: right;
+}
+
 .problem-points {
     font-weight: bold;
-    float: right;
 }
 
 .problem-header {
@@ -12,6 +15,8 @@
 
     padding-left: 10px;
     padding-right: 10px;
+
+    margin-bottom: 1em;
 }
 
 .problem-header h3 {
@@ -21,10 +26,6 @@
 
 .problem {
     margin-bottom: 10px;
-}
-
-.problem-description {
-    margin-top: 1em;
 }
 
 .hint-content {

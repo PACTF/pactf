@@ -1,0 +1,28 @@
+{% extends 'ctflex/game/game.template.html' %}
+{% load static from staticfiles %}
+
+{% block header %}
+  {{ block.super }} (Ongoing)
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static 'ctflex/css/game/active.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'ctflex/js/countdown.js' %}" async></script>
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>Your team’s {% include 'ctflex/timer_length.adjective.txt' %} timer is active!</strong> You can solve problems below until your timer runs out.
+  </p>
+
+  {% include 'ctflex/game/countdown.snippet.html' %}
+
+  {% include 'ctflex/game/problems.snippet.html' %}
+
+{% endblock %}

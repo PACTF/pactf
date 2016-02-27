@@ -1,0 +1,33 @@
+/* Timer */
+
+#timer {
+    font-family: sans-serif;
+    color: #fff;
+    font-weight: 100;
+    text-align: center;
+    font-size: 2em;
+
+    display: block;
+    margin: 0.4em auto;
+}
+
+#timer .timespan {
+    padding: 10px;
+    border-radius: 3px;
+    background-color: hsl(195, 100%, 37%); /*#00BF96*/
+    display: inline-block;
+    margin: 0.1em 0;
+}
+
+#timer .value {
+    width: 2em;
+    padding: 15px;
+    border-radius: 3px;
+    background-color: hsla(195, 100%, 25%, 1); /*#00816A*/
+    display: inline-block;
+}
+
+#timer .description {
+    padding-top: 5px;
+    font-size: 16px;
+}

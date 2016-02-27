@@ -1,0 +1,14 @@
+{% extends 'ctflex/board/board.template.html' %}
+
+
+{% block content %}
+  <p>
+    <strong>{{ window.verbose_name }} has ended, so the rankings for this round were frozen.</strong>
+    You can still look at the problems for this round in <a
+      href="{% url 'ctflex:game' window_codename=window.codename %}">The Game</a>.
+  </p>
+  <p>To look at other rounds’ scoreboards or the overall scoreboard, use the dropdown above.</p>
+
+  {% include 'ctflex/board/rankings.snippet.html' %}
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'ctflex/game/game.template.html' %}
+
+{% block header %}
+  {{ block.super }} (ended)
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>You are viewing {{ window.verbose_name }}. This round has ended.</strong> You can still look at problems and submit flags for fun, but <a href="{% url 'ctflex:scoreboard' window_codename=window.codename %}">the scoreboard</a> has been frozen.
+  </p>
+  {% if can_compete_in_current_window %}
+    <p>
+      <strong>However, you can still improve your ranking for the currently ongoing round, {{ current_window.verbose_name }}!</strong> To switch to that round, use the dropdown above.
+    </p>
+  {% else %}
+    <p>
+      To look at other rounds, use the dropdown above.
+    </p>
+  {% endif %}
+
+  {% include 'ctflex/game/problems.snippet.html' %}
+
+{% endblock %}

@@ -1,6 +1,6 @@
 # (Passwords are 'password')
 
-# Super-users
+# Non-competitors
 
 - model: "auth.user"
   pk: 101
@@ -16,24 +16,6 @@
     groups: []
     user_permissions: []
 
-
-# Staff
-
-- model: "auth.user"
-  pk: 201
-  fields:
-    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
-    last_login: null
-    is_superuser: false
-    username: "staff1"
-    email: "yatharth999@gmail.com"
-    is_staff: true
-    is_active: true
-    date_joined: "2015-12-30T07:32:56.341Z"
-    groups: []
-    user_permissions: []
-
-
 # Competitors
 
 - model: "auth.user"
@@ -41,9 +23,9 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: false
+    is_superuser: true
     username: "user11"
-    is_staff: false
+    is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
@@ -56,9 +38,9 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: false
+    is_superuser: true
     username: "user12"
-    is_staff: false
+    is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []
@@ -71,9 +53,9 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: false
+    is_superuser: true
     username: "user21"
-    is_staff: false
+    is_staff: true
     is_active: true
     date_joined: "2015-12-30T07:32:56.341Z"
     groups: []

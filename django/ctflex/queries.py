@@ -1,18 +1,18 @@
 import importlib.machinery
 import logging
-import zlib
-
 from functools import partial
 from os.path import join
 
 from django.conf import settings
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
+from django.utils import timezone
 from django_countries.fields import Country
-from django.contrib.auth.password_validation import validate_password
 
-from ctflex import models
 from ctflex import constants
+from ctflex import hashers
+from ctflex import models
 
 logger = logging.getLogger(constants.QUERY_LOGGER)
 
@@ -24,17 +24,18 @@ logger = logging.getLogger(constants.QUERY_LOGGER)
 # region General
 
 
-def get_window(window_id=None):
-    return models.Window.objects.get(pk=window_id) if window_id else models.Window.objects.current()
+def get_window(window_codename=None):
+    return models.Window.objects.get(codename=window_codename) if window_codename else models.Window.objects.current()
 
 
-def get_team(group, request):
+def competitor_key(group, request):
+    """Key function for ratelimiting based on competitor"""
     return str(request.user.competitor.team.id)
 
 
 # endregion
 
-# region Board
+# region Game
 
 # FIXME(Yatharth): Test unlocking
 def _problem_unlocked(team, problem):
@@ -98,17 +99,11 @@ def _eligible(team):
 
 
 def board(window=None):
-    return enumerate(
-        sorted(
-            map(lambda team: (score(team=team, window=window), team),
-                filter(
-                    _eligible,
-                    models.Team.objects.all()
-                )),
-            key=lambda item: item[0],
-            reverse=True,
-        )
-    )
+    teams = (team for team in models.Team.objects.iterator() if _eligible(team))
+    decorated = ((score(team=team, window=window), team.name, team) for team in teams)
+    sorted_ = sorted(decorated, reverse=True)
+    enumerated = ((i + 1, team, score_) for i, (score_, name, team) in enumerate(sorted_))
+    return enumerated
 
 
 # endregion
@@ -152,69 +147,14 @@ def validate_team(name, password):
 
 # region Game
 
-def _compute_key(team):
-    return zlib.adler32(bytes(str(team.id) + constants.PROBLEM_SALT + settings.SECRET_KEY, 'utf-8'))
-
-
-def _grade(*, problem, flag, team):
-    # logger.debug("grading {} for {} with flag {!r}".format(problem, team, flag))
-    grader_path = join(settings.PROBLEMS_DIR, problem.grader)  # XXX(Yatharth): Handle FileNotFound
-    grader = importlib.machinery.SourceFileLoader('grader', grader_path).load_module()
-
-    # XXX(Yatharth): Handle no such function or signature or anything, logging appropriate error messages
-    correct, message = grader.grade(_compute_key(team), flag)
-    # logger.info('_grade: Flag by team ' + team.id + ' for problem ' + problem.id + ' is ' + correct + '.')
-    return correct, message
-
-
-class ProblemAlreadySolvedException(Exception):
-    pass
-
-
-class FlagAlreadyTriedException(Exception):
-    pass
-
-
-def submit_flag(prob_id, competitor, flag):
-    problem = models.CtfProblem.objects.get(pk=prob_id)
-
-    # Check if the problem has already been solved
-    if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
-        raise ProblemAlreadySolvedException()
-
-    # Grade
-    correct, message = _grade(problem=problem, flag=flag, team=competitor.team)
-
-    if correct:
-        # This effectively updates the score too
-        models.Solve(problem=problem, competitor=competitor, flag=flag).save()
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
-
-    elif not flag:
-        # logger.info("empty flag for {} and {}".format(problem, team))
-        message = "The flag was empty."
-
-    # Inform the user if they had already tried the same flag
-    # (This check must come after actually grading as a team might have submitted a flag
-    # that later becomes correct on a problem's being updated. It must also come after the check for emptiness of flag.)
-    elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
-        raise FlagAlreadyTriedException()
-
-    # For logging purposes, mainly
-    models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
-
-    return correct, message
-
 
 # FIXME(Yatharth): Handle such exceptions more gracefully, like use debug param in template to show faield problem names
 def _get_desc(problem, team):
     if not problem.dynamic:
         return problem.description_html
-    gen_path = join(settings.PROBLEMS_DIR, problem.window.code, problem.dynamic)
+    gen_path = join(settings.PROBLEMS_DIR, problem.window.codename, problem.dynamic)
     gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-    desc, hint = gen.generate(_compute_key(team))
+    desc, hint = gen.generate(hashers.dyanamic_problem_key(team))
     return problem.process_html(desc), problem.process_html(hint)
 
 
@@ -233,4 +173,4 @@ def format_problem(problem, team):
     result.__dict__ = data
     return result
 
-# endregion
+    # endregion

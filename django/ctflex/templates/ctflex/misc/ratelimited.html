@@ -4,8 +4,13 @@
   Rate-limited - {{ block.super }}
 {% endblock %}
 
+{% block header %}
+  Slow down!
+{% endblock %}
+
+
 {% block content %}
   <p>
-    You have been rate-limited. Please slow down and try again later.
+    Please slow down and try again later.
   </p>
 {% endblock %}

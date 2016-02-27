@@ -27,7 +27,7 @@ class Django:
         # Django 3rd-party
         'django_countries',
         'django_extensions',
-        'debug_toolbar',
+        # 'debug_toolbar',
         'email_log',
         'widget_tweaks',
 
@@ -126,7 +126,6 @@ class Django:
     EMAIL_HOST_USER = values.Value('ctflex2@gmail.com')
     EMAIL_HOST_PASSWORD = values.SecretValue()
     EMAIL_USE_TLS = values.BooleanValue(True)
-    SUPPORT_EMAIL = 'ctflex2+support@gmail.com'  # not standard, but used by CTFlex
 
     RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
 
@@ -208,6 +207,11 @@ class CTFlex(Django, Configuration):
 
     # How many competitor can be in one team
     MAX_TEAM_SIZE = values.IntegerValue(5)
+
+    CTFLEX_SUPPORT_EMAIL = 'support@pactf.com'
+    CTFLEX_CONTACT_EMAIL = 'contact@pactf.com'
+
+    CTFLEX_SITENAME = 'PACTF'
 
     ''' Static Files '''
 

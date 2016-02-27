@@ -29,24 +29,29 @@ class Command(BaseCommand):
         if options['debug']:
             helpers.debug_with_pdb()
 
-        with transaction.atomic():
+        try:
+            with transaction.atomic():
 
-            management.call_command('flush', *helpers.filter_dict({
-                '--no-input': not options['interactive'],
-            }))
-            management.call_command('makemigrations')
-            management.call_command('migrate')
+                management.call_command('flush', *helpers.filter_dict({
+                    '--no-input': not options['interactive'],
+                }))
+                management.call_command('makemigrations')
+                management.call_command('migrate')
 
-            for fixture in PRE_PROBLEMS_FIXTURES:
-                self.load_fixture(fixture)
+                for fixture in PRE_PROBLEMS_FIXTURES:
+                    self.load_fixture(fixture)
 
-            # (loadprobs will call collectstatic.)
-            management.call_command('loadprobs', *helpers.filter_dict({
-                '--no-input': not options['interactive'],
-                '--debug': options['debug'],
-                '--clear': options['clear']
-            }))
-            self.stdout.write('')
+                # (loadprobs will call collectstatic.)
+                management.call_command('loadprobs', *helpers.filter_dict({
+                    '--no-input': not options['interactive'],
+                    '--debug': options['debug'],
+                    '--clear': options['clear']
+                }))
+                self.stdout.write('')
 
-            for fixture in POST_PROBLEMS_FIXTURES:
-                self.load_fixture(fixture)
+                for fixture in POST_PROBLEMS_FIXTURES:
+                    self.load_fixture(fixture)
+
+        except Exception as err:
+            self.stderr.write("Exception encountered; rolling back")
+            raise err
