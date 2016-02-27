@@ -70,19 +70,21 @@ auth_urls = [
     url(r'^register/$', views.register, name='register'),
 ]
 
-urlpatterns = [
+non_windowed_urls = [
+    url(r'^board/overall$', views.board_overall, name='scoreboard_overall'),
 
-    # Non-windowed CTF
-    url('^$', views.index, name='index'),
-    url(r'^board/$', views.board_overall, name='scoreboard_overall'),
-
-    # Team
     url(r'^team/$', views.CurrentTeam.as_view(), name='current_team'),
     url(r'^team/(?P<pk>\d+)$', views.Team.as_view(), name='team'),
+]
 
-    # Includes
-    url(r'^', include(auth_urls)),
-    url(r'^window(?P<window_id>\d+)/', include(windowed_urls)),
-    # TODO(Yatharth): Include url without prefix that gets current window
+urlpatterns = [
+    url('^$', views.index, name='index'),
 
+    url(r'^', include(
+        auth_urls + non_windowed_urls + windowed_urls
+    )),
+
+    url(r'^window(?P<window_id>\d+)/', include(
+        non_windowed_urls + windowed_urls
+    )),
 ]

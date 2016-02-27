@@ -1,4 +1,5 @@
 import inspect
+from copy import copy
 from functools import wraps
 
 from django.conf import settings
@@ -40,7 +41,8 @@ def default_context(request):
     params = {}
     params['production'] = not settings.DEBUG
     params['team'] = request.user.competitor.team if is_competitor(request.user) else None
-    params['window'] = queries.get_window()
+
+    params['window'] = queries.get_window(request.resolver_match.kwargs.get('window_id', ''))
     params['other_windows'] = models.Window.objects.other(params['window'])
     return params
 
@@ -140,17 +142,37 @@ def anonyomous_users_only():
 
     return decorator
 
+@universal_decorator(methodname='dispatch')
+def redirected_from_no_window(*, takes_window_param=False):
+    """If no window argument is present, redirect to current window"""
+
+    def decorator(view):
+        @wraps(view)
+        def decorated(request, *args, **kwargs):
+            if 'window_id' not in kwargs:
+                kwargs['window_id'] = queries.get_window().id
+                return redirect(reverse(request.resolver_match.view_name, args=args, kwargs=kwargs))
+            else:
+                if not takes_window_param:
+                    del kwargs['window_id']
+                return view(request, *args, **kwargs)
+
+        return decorated
+
+    return decorator
+
 
 def windowed():
     """Redirects views around based on Contest Window and Personal Timer states
 
-    This decorator wraps views with competitors_only() too, so do not decorate a view with both windowed() and competitors_only() because that would be redundant.
+    This decorator wraps views with competitors_only() and redirected_from_no_window() too, so do not decorate a view with either of them if you are already using windowed() since doing so would be redundant.
     """
 
     def decorator(view):
 
         @wraps(view)
         @competitors_only()
+        @redirected_from_no_window(takes_window_param=True)
         def decorated(request, *args, window_id, **kwargs):
 
             window = queries.get_window(window_id)
@@ -245,11 +267,20 @@ def start_timer(request, *, window_id):
 
 
 @limited_http_methods('GET')
-def index(request):
+def index(request, *, window_id=None):
+    """Index
+
+    It takes window_id since all other views take it and didn't want to make exception for index page
+    but it resets you to current window because:
+    - the index page should return a user back to the 'home'
+    - this isn't as good of a reason, but it's just hard to think of how to get passed the window info without
+    getting it via a URL but then having a URL like  /window1/ looks like it is just for windo1 and not a general index page
+    """
     return render(request, 'ctflex/misc/index.html')
 
 
 @limited_http_methods('GET')
+@redirected_from_no_window()
 def rate_limited(request, err):
     return render(request, 'ctflex/misc/ratelimited.html')
 
@@ -288,6 +319,7 @@ def board(request, *, window_id):
 
 
 @limited_http_methods('GET')
+@redirected_from_no_window()
 @never_cache
 def board_overall(request):
     params = {}
@@ -331,18 +363,19 @@ def submit_flag(request, *, window_id, prob_id):
 # XXX(Yatharth): Needs to use a slightly different template at least
 # XXX(Yatharth): Link to from scoreboard
 @limited_http_methods('GET')
+@redirected_from_no_window()
 class Team(DetailView):
     model = models.Team
     template_name = 'ctflex/misc/team.html'
 
     def get_context_data(self, **kwargs):
-        window = queries.get_window()
         context = super(Team, self).get_context_data(**kwargs)
         return context
 
 
 @limited_http_methods('GET')
 @competitors_only()
+@redirected_from_no_window()
 class CurrentTeam(Team):
     def get_object(self, **kwargs):
         return self.request.user.competitor.team
