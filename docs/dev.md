@@ -1,6 +1,6 @@
 # Developer Documentation
 
-If you want to hack on CTFlex or understand how it works, you’ve come to to the right place! If you are just looking to host your own CTF, you can check out the [host documentation](./hosts.md). Make sure you’ve read the host documentation before this document.
+If you want to hack on CTFlex or understand how it works, you’ve come to to the right place! If you are just looking to host your own CTF, you can check out the [host documentation](./host.md). Make sure you’ve read the host documentation before this document.
 
 ## Overview of Design
 

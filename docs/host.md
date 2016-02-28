@@ -3,7 +3,7 @@
 
 If you are looking to host your own CTF, you’ve come to to the right place! You can determine whether CTFlex is right for you by reading about its [Features](#features) and [Problem Specification](#writing-problems).
 
-If you want to hack on CTFlex or just know how it works, read this document and then check out the [developer documentation](./devs.md).
+If you want to hack on CTFlex or just know how it works, read this document and then check out the [developer documentation](./dev.md).
 
 
 ## Features

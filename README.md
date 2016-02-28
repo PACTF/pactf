@@ -59,7 +59,7 @@ Now go check out the [host documentation](docs/host.md)!
 
 ### Want to hack on CTFlex or just know how it works?
  
-That’s awesome! Check out the [developer documentation](docs/devs.md).
+That’s awesome! Check out the [developer documentation](docs/dev.md).
 
 
 ## Who are we?
