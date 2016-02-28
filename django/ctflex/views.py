@@ -440,6 +440,11 @@ def register(request,
 
     class DummyException(Exception):
         pass
+    # Initialize redirect URL
+    if post_change_redirect is None:
+        post_change_redirect = resolve_url('ctflex:game', window_codename=queries.get_window().codename)
+    else:
+        post_change_redirect = resolve_url(post_change_redirect)
 
     # If POST, process submitted data
     if request.method == 'POST':

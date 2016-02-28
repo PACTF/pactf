@@ -76,7 +76,7 @@ class CompetitorCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Competitor
-        fields = ('email', 'first_name', 'last_name', 'country', 'state', 'background')
+        fields = ('email', 'country', 'state', 'background')
 
 
 class UserCreationForm(auth_forms.UserCreationForm):

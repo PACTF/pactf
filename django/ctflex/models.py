@@ -228,10 +228,15 @@ class Competitor(models.Model):
     ''' Extra Data '''
 
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(default="Mysterious", max_length=30)
+    last_name = models.CharField(default="Competitor", max_length=30)
 
-    country = CountryField(default='US')
+    COUNTRY_CHOICES = (
+        ('US', "United States"),
+        ('OT', "Other (ineligible to win prizes)"),
+    )
+
+    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default='US')
     state = USStateField(blank=True, null=True)
 
     MIDDLESCHOOL = 'M'
@@ -246,13 +251,7 @@ class Competitor(models.Model):
     BACKGROUND_CHOICES = (
         (MIDDLESCHOOL, "Middle School Student"),
         (HIGHSCHOOL, "High School Student"),
-        (HOMESCHOOLED, "Homeschooled"),
-        (UNDERGRAD, "Undergraduate"),
-        (GRADUATE, "Graduate Student"),
-        (TEACHER, "Teacher"),
-        (PROFESSIONAL, "Security Professional"),
-        (HOBBYIST, "CTF Hobbyist"),
-        (OTHER, "Other"),
+        (OTHER, "Other (ineligible to win prizes)"),
     )
     background = models.CharField(max_length=1,
                                   choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
