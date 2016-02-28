@@ -1,73 +1,82 @@
-# PACTF (Beta)
+# PACTF
 
-## Documentation for Everyone
 
-Do make sure to read the (parts of the) Glossary (relevant to you). It's in a Google Doc somewhere. 
+## What is this?
+
+This repository (currently) houses two projects:
  
+- **CTFlex**, short for ‘CTF-lexible’: a reusable CTF framework written as a [Django][django] app.
+- **PACTF Web**: a website for PACTF that uses CTFlex.
 
-## Host Documentation
+**PACTF** itself, short for ‘Phillips Academy CTF’, is a PvE CTF targeted at high schoolers.
 
-### Installation
-
-Get access to our top-secret Google Doc called "Deployment Instructions" and follow those steps.
-
-
-### Updating remote servers
-
-1. Pull from your origin repo using `git pull`
-1. Install new Python packages using `pip install -r requirements.txt`
-1. Prep for deployment using `manage.py prep`, which runs the following commands for you:
-
-        makemigrations
-        migrate
-        loadprobs
-        collectstatic
-    
-1. Restart Gunicorn via Supervisor or yourself (using `supervisorctl restart pactf`)
-1. (If needed:) Validate and update nginx configuration using: `sudo nginx -t; and sudo service nginx restart`
+Don’t know what a PvE CTF is? Read on!
 
 
-## Developer Documentation
+### What is a CTF?
 
-### Figuring out what is what
+**CTFs**, short for ‘Capture the Flags,’ are a type of Computer Security competition where “you hack, decrypt, reverse, and do whatever it takes to” capture secret answer strings called ‘flags’ (to quote [PicoCTF’s website][picoctf]).
 
-Get access to our other top-secret Google Doc called "Design Doc".
+In a **PvP CTF**, teams get assigned systems and try to hack into other teams’ systems, whereas in a **PvE CTF**, teams solve puzzles all written and set-up by the contest organizers. Most high-school CTFs (including PACTF) are PvE, and this documentation only talks about PvE CTFs.
 
-### Updating remote server after you push changes
+To get **flags**, you solve problems, and once you solve one, you should end up with, among other things, a string of text. This string is usually human-readable, and it almost always adheres to a predictable format, like `flag{<this_part_changes>}`. Once you think you’ve captured the flag, you can submit it online next to the problem’s description. Your submission will be graded, and, if it is correct, you will earn points and possibly unlock more problems!
 
-1. `git pull`
-1. `manage.py reloaddata`
-1. `manage.py `
-
-### Throwing away current database during development
-
-1. Delete all files from migrations
-1. Run `manage.py reset_db`
-1. Run `manage.py makemigrations`
-1. Run `manage.py migrate`
-1. Run `manage.py reloaddata`
-1. Run `manage.py prep`
-
-In dire circumstances, use `initializedb.sql`.
+You sign up for CTFs as part of a **team** of 1–5 players. Mosts CTFs award prizes to top scorers if your team is **eligible** based on its members’ locations, educational background etc. For example, for PACTF, your team has to consist of American middle- or high-schoolers to be ranked on the scoreboard and win prizes. The **scoreboard** is just that: a ranking of eligible teams.
 
 
-## Problem Writer Documentation
+### PACTF/CTFlex is different
 
-Configure relevant settings in pactf/envdir.
+From [PACTF’s website][pactf]:
 
-It is recommended to structure `PROBLEMS_DIR` as so: Have directories whose names are Contest Window 'codes'. Then, in each such directory, have 'problem folders'.  Problem folders whose name begins with an underscore are ignored. In a problem folder, you must have the file `problem.yaml`, the Python script `grader.py`, (optionally) the folder `static`folder, and (recommendedly) a `.uuid` file.
+> Experienced CTFer? Or new to Capture The Flags? Either way, want to solve problems and win prizes without spending fourteen consecutive days on a CTF? Check out PACTF.
 
-The `problem.yaml` file must always have the `name` and `point` fields. It may have a `deps` field. Simple problems must contain the `description` and `hint` fields. Non-simple problems, called, dynamic problems, must contain the `dynamic` field.
+> **Instead of a two-week sprint,** PACTF will have three rounds, each one week long. During each round, your team will be able to pick any two-day span to grab as many flags as you can! Choose wisely: Once your two days run out, you won’t be able to score more points in that round.
 
-The `grader.py` file must have a `_grade(key, submission)` function. The parameter `key` is a hash of the team id and a salt.
+> **Don’t worry about being too slow, though!** Even if your two-day timer is over, you can still test your skills against problems in previous rounds.
 
-The `dynamic` field is a boolean that defaults to False. If true, a Python script called `generator.py` will be looked for in the problem directory. This file must contain a `gen(key)` function that returns a 2-tuple of a description and a hint. `key` will be a hash of the team ID. The function should be deterministic upon the `key` so that users don't get different problems everytime. Currently, the output is not even cached to the database for (admittedly untested) performance reasons, but problem writers do not need to worry about this. 
+> **There are scoreboards** for each individual round, and there is an overall all-time scoreboard. Prizes will be given to the top-ranking teams of the individual rounds and the overall CTF, so whether you are a specialist or an all-rounder, there's something for you!
 
-The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `problems` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `problems` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `score` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `score` is not provided, it defaults to 1. 
+PACTF enjoys this feature of rounds and timers grâce à CTFlex.
 
-If a `.uuid` file exists, then if a problem with the same UUID already exists, that problem will be updated; else, a new problem will be created with the gien UUID. If a `.uuid` file does not exist, one will be created on running `manage.py loadprobs`.
 
-Static files can be linked to in the description and hint using the `{% ctfstatic '<basename>' %}` tag. Any files in the `static` folder (if it exists) to the `ctfproblems/<problem-uuid>` deployment static folder, though this implementation is irrelevant to using the feature and may change.
+## Who are you?
 
-`loadprobs` creates or updates problems, but it doesn't delete them. To delete a problem, remove it from the database manually, and get rid of its now redundant static files by running `collectstatic --clear`.
+### Want to solve computer security puzzles for fun and prizes?
 
+Head on over to [PACTF’s website][pactf]!
+
+
+### Want to host your own CTF?
+
+Then you’ve have come to the right place!
+
+By using CTFlex, you will be able to **focus on what’s important to _your_ CTF like writing problems,** not getting bogged down with the minutiae of of figuring out email password resets etc.
+
+**You need not be familiar with Django** or proficient with Python to use CTFlex successfully.
+
+Now go check out the [host documentation](docs/host.md)!
+
+
+### Want to hack on CTFlex or just know how it works?
+ 
+That’s awesome! Check out the [developer documentation](docs/developer.md).
+
+
+## Who are we?
+
+We are bunch of high-schoolers who participated in their first CTF in the Spring of 2015 and have since been driven to bring that same rewarding experience to everyone. We are:
+
+- [Yatharth Agarwal](mailto:yagarwal@andover.edu)
+- [Cameron Wong](mailto:cwong@andover.edu)
+- [Tony Tan](mailto:ztan@andover.edu)
+
+If you are using CTFlex and PACTF, we would love for you to get in touch for providing feedback or asking for support.
+
+We were able to bring CTFlex and PACTF to you thanks to support from our school, [Phillips Academy, Andover][andover].
+
+
+  [django]: https://djangoproject.org
+  [picoctf]: https://picoctf.com
+  [pactf]: https://pactf.com
+  [andover]: https://www.andover.edu
+ 
