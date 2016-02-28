@@ -2,6 +2,10 @@ jQuery(document).ready(function () {
 
     // Hint visibility toggling
     Array.prototype.forEach.call(jQuery(".problem"), function (prob) {
+        // there is definitely a better way to do this
+        if (jQuery(".problem-solved-status", prob).html().includes("Solved")) {
+            jQuery(".problem-body", prob).collapse("hide");
+        }
         jQuery(".hint-button", prob).on('click', function (event) {
             jQuery('.hint-content', prob).toggle('show');
         });

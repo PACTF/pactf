@@ -6,7 +6,8 @@
     {% solved raw_prob team as has_solved %}
 
     <div class="problem well well-sm" id="{{ prob.id }}">
-
+      <div id="{{ prob.id }}-alert" style="display:none">
+      </div>
       <div class="problem-header" data-toggle="collapse" data-target="#{{ prob.id }}-body">
         <h3>
           <span class="problem-title">{{ prob.name }}</span>
