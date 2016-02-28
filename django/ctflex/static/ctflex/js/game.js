@@ -45,7 +45,7 @@ function submit_flag(problem_id) {
 
             // TODO: handle rate limiting
             error: function (xhr, msg, err) {
-                jQuery.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "warn");
+                jQuery.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "error");
             }
         });
 
