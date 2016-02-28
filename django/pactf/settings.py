@@ -172,6 +172,8 @@ class Security:
 
 
 class Gunicorn:
+    """Settings for running PACTF with Gunicorn"""
+
     # As whom Gunicorn should run the server
     USER = values.Value()
     GROUP = values.Value()
@@ -199,34 +201,23 @@ ctflex_prefix = ctflex.constants.APP_NAME.capitalize()
 class CTFlex(Django, Configuration):
     """Configure CTFlex"""
 
-    # Directory containing problem folders
-    PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
-
-    # Extras for the markdown2 Python module for formatting problem description and hints
-    MARKDOWN_EXTRAS = values.TupleValue(('fenced-code-blocks', 'smarty-pants', 'spoiler'))
-
-    # How many competitor can be in one team
-    MAX_TEAM_SIZE = values.IntegerValue(5)
+    ''' General '''
 
     CTFLEX_SUPPORT_EMAIL = 'support@pactf.com'
     CTFLEX_CONTACT_EMAIL = 'contact@pactf.com'
 
     CTFLEX_SITENAME = 'PACTF'
 
-    ''' Static Files '''
+    ''' Problems and Staticfiles '''
 
-    # Intermediate folder for storing problem static files
-    # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
-    # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
-    PROBLEMS_STATIC_DIR = join(PROBLEMS_DIR.value, '_static')
-
-    # Subdirectory (of the directory to which static files are collected) for problems' static files
-    PROBLEMS_STATIC_URL = 'ctfproblems'
+    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
+    CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
+    CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
 
     @classmethod
     def add_staticfiles_dir(cls):
         cls.STATICFILES_DIRS.append(
-            (cls.PROBLEMS_STATIC_URL, cls.PROBLEMS_STATIC_DIR)
+            (cls.CTFLEX_PROBLEMS_STATIC_URL, cls.CTFLEX_PROBLEMS_STATIC_DIR)
         )
 
     ''' General '''
@@ -283,7 +274,7 @@ class Dev(Base):
                 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': True,
             },
-            ctflex.constants.QUERY_LOGGER: {
+            ctflex.constants.QUERIES_LOGGER: {
                 'handlers': ['console'],
                 'level': 'DEBUG',
                 'propagate': False,

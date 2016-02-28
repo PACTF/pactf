@@ -1,9 +1,16 @@
+"""Register app with Django"""
+
 from django.apps import AppConfig
 
 from ctflex.constants import APP_NAME, VERBOSE_NAME
 
 
+class CtflexConfig(AppConfig):
+    name = APP_NAME
+    verbose_name = VERBOSE_NAME
 
+# region Add permission to group (obsolete)
+#
 # COMPETE_PERMISSION_CODENAME = 'compete'
 # COMPETITOR_GROUP_NAME = 'ctflex.competitors'
 #
@@ -28,11 +35,7 @@ from ctflex.constants import APP_NAME, VERBOSE_NAME
 #     # Add Permissions to Groups
 #     competitorGroup.permissions.add(competePermission)
 #     competitorGroup.save()
-
-
-class CtflexConfig(AppConfig):
-    name = APP_NAME
-    verbose_name = VERBOSE_NAME
-
-    # def ready(self):
-    #     post_migrate.connect(add_group_permissions, sender=self)
+#
+# CtflexConfig.ready = lambda self:
+#
+# endregion

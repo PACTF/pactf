@@ -1,3 +1,5 @@
+"""Register models with the admin interface"""
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -14,10 +16,15 @@ class CompetitorInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (CompetitorInline,)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        personal_info = self.fieldsets[1][1]  # mutable, so we can modify it in the next line
+    def remove_email_field(self):
+        # (`personal_info` is mutable, so we can modify it after getting a reference.)
+        personal_info = self.fieldsets[1][1]
         personal_info['fields'] = tuple(field for field in personal_info['fields'] if field != 'email')
+
+
+def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.remove_email_field()
 
 
 class TimerAdmin(admin.ModelAdmin):

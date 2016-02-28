@@ -5,7 +5,6 @@ import uuid
 
 from django.core import validators
 from django.db import models
-from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver as _receiver
 from django.utils import timezone
@@ -17,8 +16,8 @@ from django_countries.fields import CountryField, Country
 import markdown2
 from localflavor.us.models import USStateField
 
+from ctflex import settings
 from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD
-from ctflex import constants
 
 
 # region Helpers and General
@@ -329,8 +328,8 @@ class Window(models.Model):
             raise ValidationError("The end is not after the start", code='timedelta_is_positive')
 
     def validate_window_is_not_named_overall(self):
-        if self.codename == constants.OVERALL_WINDOW_NAME:
-            raise ValidationError("The window codename cannot be {!r}".format(constants.OVERALL_WINDOW_NAME))
+        if self.codename == settings.OVERALL_WINDOW_CODENAME:
+            raise ValidationError("The window codename cannot be {!r}".format(settings.OVERALL_WINDOW_CODENAME))
 
     def sync_timers(self):
         """Make timers update their end times per changes in the personal window duration

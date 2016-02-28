@@ -7,19 +7,25 @@ import traceback
 from os.path import join, isfile, isdir
 
 import yaml
-from django.conf import settings
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from ctflex.constants import (UUID_REGEX, PROBLEM_BASENAME, GRADER_BASENAME, GENERATOR_BASENAME,
-                              STATIC_BASENAME, UUID_BASENAME, UUID_BACKUP_BASENAME)
+from ctflex import constants
+from ctflex import settings
 from ctflex.management.commands import helpers
 from ctflex.models import CtfProblem, Window
 
 PROBLEMS_DIR = settings.PROBLEMS_DIR
 PROBLEMS_STATIC_DIR = settings.PROBLEMS_STATIC_DIR
+
+PROBLEMFILE_BASENAME = 'problem.yaml'
+GRADER_BASENAME = 'grader.py'
+GENERATOR_BASENAME = 'generator.py'
+STATICFOLDER_BASENAME = 'static'
+UUID_BASENAME = '.uuid'
+UUID_BACKUP_BASENAME = '.uuid.rejected'
 
 PK_FIELD = 'id'
 
@@ -101,7 +107,7 @@ class Command(BaseCommand):
                 for prob_basename, prob_path in self.walk(window_path):
 
                     # Load problem file
-                    problem_filename = join(prob_path, PROBLEM_BASENAME)
+                    problem_filename = join(prob_path, PROBLEMFILE_BASENAME)
                     try:
                         with open(problem_filename) as problem_file:
                             data = yaml.load(problem_file)
@@ -130,8 +136,8 @@ class Command(BaseCommand):
                             uuid = uuid_file.read().strip()
                             data[PK_FIELD] = uuid
 
-                        if not re.match('{}$'.format(UUID_REGEX), uuid):
-                            write("Error: UUID File did not match the expected format '{}'".format(UUID_REGEX))
+                        if not re.match('{}$'.format(constants.UUID_REGEX), uuid):
+                            write("Error: UUID File did not match the expected format '{}'".format(constants.UUID_REGEX))
                             uuid = None
 
                             write("Backing up and deleting existing UUID file")
@@ -179,7 +185,7 @@ class Command(BaseCommand):
 
                     # Either way, copy over any static files
                     try:
-                        static_from = join(prob_path, STATIC_BASENAME)
+                        static_from = join(prob_path, STATICFOLDER_BASENAME)
                         static_to = join(PROBLEMS_STATIC_DIR, str(uuid))
 
                         if isdir(static_from):

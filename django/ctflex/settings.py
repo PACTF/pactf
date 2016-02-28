@@ -1,19 +1,74 @@
 """Proxy all the settings CTFlex needs, providing defaults
 
-The advantages of having this file are being able to:
-- Refer to settings without the 'CTFLEX_' prefix
-- Provide defaults while being DRY (which stands for "Don't Repeat Yourself")
-- Look at all of the settings CTFlex uses at a glance
+This file enables:
+- Referring to settings without the 'CTFLEX_' prefix
+- Providing defaults while being DRY (which stands for "Don't Repeat Yourself")
+- Looking at all of the settings CTFlex uses at a glance
 """
 
 from django.conf import settings
 
+_PREFIX = 'CTFLEX_'
+_SETTINGS = (
 
-def get(key, default):
-    return getattr(settings, key, default)
+    ### General
 
+    ('AUTH_USER_MODEL', None, 'AUTH_USER_MODEL'),
 
-# TODO(Yatharth): Move more settings into here
-SUPPORT_EMAIL = get('CTFLEX_SUPPORT_EMAIL', 'example@example.com')
-CONTACT_EMAIL = get('CTFLEX_CONTACT_EMAIL', 'example@example.com')
-SITENAME = get('CTFLEX_SITENAME', 'CTFlex')
+    ('SECRET_KEY', None, 'SECRET_KEY'),
+
+    # How many competitors can be in one team
+    ('MAX_TEAM_SIZE ', 5, None),
+
+    ### Metadata
+
+    # Name used for site in emails sent out
+    ('SITENAME', 'CTFlex', None),
+
+    ('SUPPORT_EMAIL', 'example@example.com', None),
+    ('CONTACT_EMAIL', 'example@example.com', None),
+
+    ### URLs and Views
+
+    ('OVERALL_WINDOW_CODENAME', 'overall', None),
+
+    ('LOGIN_REDIRECT_URL', 'ctflex:index', 'LOGIN_REDIRECT_URL'),
+    ('WINDOW_CHANGE_URL', 'ctflex:game', None),
+    ('LOGOUT_REDIRECT_URL', 'ctflex:index', None),
+    ('TEAM_CHANGE_REDIRECT_URL', 'ctflex:current_team', None),
+    ('INVALID_STATE_REDIRECT_URL', 'ctflex:index', None),
+
+    ### Problems
+
+    # A salt prepended to SECRET_KEY while non-securely hashing for dynamic problems
+    ('PROBLEM_SALT', 'CsffrLAU', None),
+
+    # Directory containing problem folders
+    ('PROBLEMS_DIR', None, None),
+
+    # Extras for the markdown2 Python module for formatting problem description and hints
+    ('MARKDOWN_EXTRAS', ('fenced-code-blocks', 'smarty-pants', 'spoiler'), None),
+
+    ### Static
+
+    # Intermediate folder for storing problem static files
+    # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
+    # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
+    ('PROBLEMS_STATIC_DIR', None, None),
+
+    # URL to serve problem static files at
+    ('PROBLEMS_STATIC_URL', None, None),
+
+)
+
+for local_name, default, settings_name in _SETTINGS:
+
+    # Default to prefixing setting names
+    if settings_name is None:
+        settings_name = _PREFIX + local_name
+
+    # Get setting, defaulting if appropriate
+    value = getattr(settings, settings_name, default)
+
+    # Set setting on this module
+    globals()[local_name] = value

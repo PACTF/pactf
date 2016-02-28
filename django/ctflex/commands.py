@@ -1,11 +1,11 @@
-"""Allow views to manipulate models"""
+"""Proxy manipulation of models by views"""
 
 import importlib.machinery
 from os.path import join
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 
+from ctflex import settings
 from ctflex import hashers
 from ctflex import models
 
@@ -21,8 +21,7 @@ def start_timer(*, team, window):
     try:
         timer.save()
 
-    except ValidationError as err:
-        print(err.messages)
+    except ValidationError:
         return False
 
     return True
@@ -54,6 +53,7 @@ class ProblemAlreadySolvedException(Exception):
 
 class FlagAlreadyTriedException(Exception):
     pass
+
 
 class EmptyFlagException(Exception):
     pass

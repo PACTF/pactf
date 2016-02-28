@@ -3,18 +3,17 @@ import logging
 from functools import partial
 from os.path import join
 
-from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
-from django.utils import timezone
 from django_countries.fields import Country
 
 from ctflex import constants
 from ctflex import hashers
 from ctflex import models
+from ctflex import settings
 
-logger = logging.getLogger(constants.QUERY_LOGGER)
+logger = logging.getLogger(constants.QUERIES_LOGGER)
 
 
 # TODO(Yatharth): Clean and document queries

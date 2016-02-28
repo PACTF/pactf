@@ -1,12 +1,12 @@
-import json
 import inspect
+import json
 from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import resolve, reverse
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseRedirect
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
@@ -18,13 +18,13 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
 from ratelimit.utils import is_ratelimited
 
+import ctflex.settings
 from ctflex import commands
 from ctflex import constants
 from ctflex import forms
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex.constants import TEAM_STATUS_NAME, TEAM_STATUS_NEW, TEAM_STATUS_OLD, WINDOW_SESSION_KEY
 
 
 # TODO: Reorder decorators
@@ -133,7 +133,7 @@ def anonyomous_users_only():
         def decorated(request, *args, **kwargs):
             if not request.user.is_anonymous():
                 messages.warning(request, "You are already logged in.")
-                return HttpResponseRedirect(reverse(constants.INVALID_STATE_REDIRECT_URL))
+                return HttpResponseRedirect(reverse(ctflex.settings.INVALID_STATE_REDIRECT_URL))
 
             return view(request, *args, **kwargs)
 
@@ -305,7 +305,7 @@ def game(request, *, window_codename):
 @never_cache
 def board(request, *, window_codename):
     # Get window
-    if window_codename == constants.OVERALL_WINDOW_NAME:
+    if window_codename == ctflex.settings.OVERALL_WINDOW_CODENAME:
         window = None
     else:
         try:
@@ -315,7 +315,7 @@ def board(request, *, window_codename):
 
     context = windowed_context(window)
     context['board'] = queries.board(window)
-    context['overall_window_codename'] = constants.OVERALL_WINDOW_NAME
+    context['overall_window_codename'] = ctflex.settings.OVERALL_WINDOW_CODENAME
 
     if window is None:
         template_name = 'ctflex/board/overall.html'
@@ -364,7 +364,7 @@ def logout_done(request, *,
 @limited_http_methods('GET')
 def password_change_done(request, *,
                          message="Your password was successfully changed.",
-                         redirect_url=constants.TEAM_CHANGE_REDIRECT_URL):
+                         redirect_url=ctflex.settings.TEAM_CHANGE_REDIRECT_URL):
     messages.success(request, message)
     return redirect(redirect_url)
 
@@ -388,6 +388,11 @@ def register(request,
              template_name='ctflex/auth/register.html',
              post_change_redirect=None,
              extra_context=None):
+    # Define constants
+    TEAM_STATUS_NAME = 'team-status'
+    TEAM_STATUS_NEW = 'new'
+    TEAM_STATUS_OLD = 'old'
+
     # Initialize redirect URL
     if post_change_redirect is None:
         post_change_redirect = resolve_url('ctflex:game', window_id=queries.get_window().id)
