@@ -48,10 +48,6 @@ Queries and commands are explained [above](#queries-and-commands). Both of them 
 
 Once the view has talked to queries and commands, it collects information up into a variable called `context` and renders a template in the context of `context`. A template is an HTML file that is preprocessed using Django Template Language and can change dynamically based on `context`.
 
-To change just the look or content of a page, you can inspect what template CTFlex uses for that page and create a template of that same name in your app’s `templates` folder. So if you were overriding a templates stored in `ctflex/templates/ctflex/foo/bar.html`, you would create the template `yourctf/templates/ctflex/foo/bar.html`.
-
-If you want to change some behavior for a URL, in your project’s `urls.py`, where you include all of CTFlex’s URLs, you can [add a preceding line](http://stackoverflow.com/a/9343212/1292652) that routes the URL to the the view CTFlex would have routed to except you decorate CTFlex’s view or entirely replace it. However, many CTFlex views [take arguments](https://docs.djangoproject.com/en/1.9/topics/http/urls/#passing-extra-options-to-view-functions) that let you customize their behavior without needing to decorate them.
-
 
 ## Development Lifecycle 
 

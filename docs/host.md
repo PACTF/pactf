@@ -172,6 +172,21 @@ A full list of other settings you can define is available in `django/ctflex/sett
 
 You must create at least one window before running your project. Otherwise, the behavior of CTFlex is undefined.
 
+#### Customizing CTFlex further
+
+You should not need to modify any source code of the CTFlex app. It is recommended not to so that you can receive updates for CTFlex, and diagnose problems more easily because you are using the same unmodified CTFlex as others. If you genuinely do want to achieve something for which you would need to modify or duplicate CTFlex functionality, consider contributing that change back to CTFlex by reading the [developer documentation](./dev.md).  
+
+To change just the look or content of a page, yoyou can inspect what [template](https://docs.djangoproject.com/en/1.9/topics/templates/) and static scripts or stylesheets CTFlex uses for that page. Then you can create templates, stylesheets or scripts of that same name in your app’s `templates` or `static` folder. So if you were overriding a templates stored in `ctflex/templates/ctflex/foo/bar.html`, you would create the template `yourctf/templates/ctflex/foo/bar.html`. Some templates in particular that you might want to change are:
+
+- `templates/ctflex/base/footer.snippet.html`
+- `templates/ctflex/text/*`
+- `templates/ctflex/text/base.template.html`
+- `static/ctflex/css/*`
+
+If you want to change some behavior for a URL, in your project’s `urls.py`, where you include all of CTFlex’s URLs, you can [add a preceding line](http://stackoverflow.com/a/9343212/1292652) that routes the URL to the the view CTFlex would have routed to except you decorate CTFlex’s view or entirely replace it. However, many CTFlex views [take arguments](https://docs.djangoproject.com/en/1.9/topics/http/urls/#passing-extra-options-to-view-functions) that let you customize their behavior without needing to decorate or duplicate them, so look into that first.
+
+
+
 
 ### Writing Problems
 
