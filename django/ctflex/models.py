@@ -289,7 +289,7 @@ class Window(models.Model):
     objects = WindowManager()
 
     id = models.AutoField(primary_key=True)
-    codename = models.CharField(max_length=30, unique=True, validators=[word_characters],
+    codename = models.CharField(max_length=30, unique=True, validators=[word_characters], blank=False,
                                 help_text="Non-user-facing human-readable identifier for window")
     verbose_name = models.CharField(max_length=30, unique=True, blank=False,
                                     help_text="User-facing title of window")

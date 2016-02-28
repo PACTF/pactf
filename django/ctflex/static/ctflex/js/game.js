@@ -27,10 +27,10 @@ function submit_flag(problem_id) {
                 // TODO: set the css so it's green or red based on the response
                 // XXX(Yatharth): Have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
                 if (response.status == 0 || response.status == 2) {
+                    jQuery("#" + problem_id + "-body").collapse();
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
-                    jQuery("#" + problem_id + " .problem-body").remove();
                 }
                 alert(response.message);
             },
