@@ -1,3 +1,5 @@
+"""Define views"""
+
 import inspect
 import json
 from functools import wraps
@@ -18,16 +20,12 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
 from ratelimit.utils import is_ratelimited
 
-import ctflex.settings
 from ctflex import commands
-from ctflex import constants
 from ctflex import forms
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
 
-
-# TODO: Reorder decorators
 
 # region Helper Methods
 
@@ -36,17 +34,19 @@ def is_competitor(user):
 
 
 def default_context(request):
-    """Return default CTFlex context
+    """Return context needed for all CTFlex templates
 
-    This context processor is included as the global context processor in settings.py; therefore, it should not be manually included.
+    This context processor is included as the global context processor in
+    `settings.py`; therefore, it should not be manually included.
     """
-    context = {}
-    context['team'] = request.user.competitor.team if is_competitor(request.user) else None
-    context['contact_email'] = settings.CONTACT_EMAIL
-    return context
+    return {
+        'team': request.user.competitor.team if is_competitor(request.user) else None,
+        'contact_email': settings.CONTACT_EMAIL,
+    }
 
 
 def windowed_context(window):
+    """Return context needed for CTFlex templates using the window dropdown"""
     return {
         'window': window,
         'windows': queries.all_windows(),
@@ -59,23 +59,30 @@ def windowed_context(window):
 # region Decorators
 
 def universal_decorator(*, methodname):
-    """Makes a decorator factory able to decorate both a function and a certain method of a class
+    """Decorates a view decorator to decorate both function- and class-based views
 
-    Usage: Apply this decorator to a decorator of your own like so:
+    Purpose:
+        If you decorate your view decorator with this decorator, your decorator
+        can be written as if only applicable to a function-based view but still
+        work on a class-based view
 
-        @universal_decorator(methodname='<some_method>')
-        def your_decorator(<arguments>):
-            def decorator(view):
-                def decorated(request, *args, **kwargs):
-                    <do things>
-                    return view(request, *args, **kwargs)
-                return decorated
-            return decorator
+    Usage:
+        Apply this decorator to a decorator of your own like so:
 
-    Drawbacks:
-    - This meta-decorator factory does NOT work on non-factory decorators (decorators that do not take arguments). Make a decorator factory that takes no arguments if you must.
+            @universal_decorator(methodname='<some_method>')
+            def your_decorator(<arguments>):
+                def decorator(view):
+                    def decorated(request, *args, **kwargs):
+                        <do things>
+                        return view(request, *args, **kwargs)
+                    return decorated
+                return decorator
 
-    For help, contact Yatharth.
+    Limitations:
+        - Your decorator must take arguments. Make your decorator take zero
+          arguments if you need to.
+
+    Author: Yatharth
     """
 
     def meta_decorator_factory(old_decorator_factory):
@@ -100,10 +107,11 @@ def universal_decorator(*, methodname):
 
 @universal_decorator(methodname='get')
 def limited_http_methods(*methods):
-    """Decorates views to check for HTTP method"""
+    """Decorate views to restrict the allowed HTTP methods"""
 
     assert set(methods).issubset({'GET', 'POST', 'PUT', 'DELETE'}), ValueError(
         "Not all methods recognized: {}".format(methods))
+
     # TODO(Yatharth): Show custom page per http://stackoverflow.com/questions/4614294
     error = HttpResponseNotAllowed('Only the following HTTP methods are allowed here: {}'.format(methods))
 
@@ -121,19 +129,20 @@ def limited_http_methods(*methods):
 
 @universal_decorator(methodname='dispatch')
 def competitors_only():
+    """Decorates views to redirect non-competitor users to the login page"""
     return user_passes_test(is_competitor)
 
 
 @universal_decorator(methodname='dispatch')
-def anonyomous_users_only():
-    """Redirect already authenticated users away"""
+def anonyomous_users_only(redirect_url=settings.INVALID_STATE_REDIRECT_URL):
+    """Decorates views to redirect already authenticated users away"""
 
     def decorator(view):
         @wraps(view)
         def decorated(request, *args, **kwargs):
             if not request.user.is_anonymous():
                 messages.warning(request, "You are already logged in.")
-                return HttpResponseRedirect(reverse(ctflex.settings.INVALID_STATE_REDIRECT_URL))
+                return HttpResponseRedirect(reverse(redirect_url))
 
             return view(request, *args, **kwargs)
 
@@ -143,6 +152,14 @@ def anonyomous_users_only():
 
 
 def defaulted_window():
+    """Decorates views to default their window paramater to the current window
+
+    Purpose:
+        Using this decorator, you can write your view to expect a `window_codename`
+        parameter, and if this parameter is not passed in, this decorator will
+        set it to the current window and then call your view.
+    """
+
     def decorator(view):
         @wraps(view)
         def decorated(request, *args, window_codename=None, **kwargs):
@@ -158,26 +175,53 @@ def defaulted_window():
     return decorator
 
 
-# region Misc Views
+# endregion
 
+# region Simple GETs
 
 @limited_http_methods('GET')
 def index(request):
-    context = {
+    return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
-    }
-    return render(request, 'ctflex/misc/index.html', context)
+    })
 
 
-# @limited_http_methods('GET')
-# def rate_limited(request, err):
-#     return render(request, 'ctflex/misc/ratelimited.html')
+@limited_http_methods('GET')
+def rate_limited(request, err):
+    """Render template for when the user has been rate limited
 
+    Usage:
+        This view is automatically called by the `ratelimit` module,
+        so nothing more needs to be done.
+    """
+    return render(request, 'ctflex/misc/ratelimited.html')
+
+
+# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
+@competitors_only()
+@limited_http_methods('GET')
+class Team(DetailView):
+    model = models.Team
+    template_name = 'ctflex/misc/team.html'
+
+    def get_object(self, **kwargs):
+        return self.request.user.competitor.team
+
+    def get_context_data(self, **kwargs):
+        context = super(Team, self).get_context_data(**kwargs)
+        return context
+
+
+# endregion
+
+# region POSTs
 
 @competitors_only()
 @limited_http_methods('POST')
 @never_cache
 def start_timer(request):
+    """Start a team’s timer and redirect to the game"""
+
     window = queries.get_window()
     team = request.user.competitor.team
 
@@ -185,7 +229,6 @@ def start_timer(request):
 
     if not success:
         messages.error(request, "Your timer could not be started.")
-        return redirect(reverse('ctflex:game'))
 
     return redirect(reverse('ctflex:game'))
 
@@ -217,16 +260,17 @@ def submit_flag(request, *, prob_id):
 
     # Grade, catching errors
     try:
-        correct, message = commands.submit_flag(prob_id=prob_id, competitor=competitor, flag=flag)
+        correct, message = commands.submit_flag(
+            prob_id=prob_id, competitor=competitor, flag=flag)
     except models.CtfProblem.DoesNotExist:
-        return HttpResponseNotFound("Problem with id {} not found".format(prob_id))
+        return HttpResponseNotFound()
     except commands.ProblemAlreadySolvedException:
         status = ALREADY_SOLVED_STATUS
         message = "Your team has already solved this problem!"
     except commands.FlagAlreadyTriedException:
         status = FAILURE_STATUS
         message = "Your team has already tried this flag!"
-    except commands.FlagSubmissionNotAllowException:
+    except commands.FlagSubmissionNotAllowedException:
         status = FAILURE_STATUS
         message = "Your timer must have expired; reload the page."
     except commands.EmptyFlagException:
@@ -235,31 +279,37 @@ def submit_flag(request, *, prob_id):
     else:
         status = SUCCESS_STATUS if correct else FAILURE_STATUS
 
-    return JsonResponse({STATUS_FIELD: status, MESSAGE_FIELD: message})
+    return JsonResponse({
+        STATUS_FIELD: status,
+        MESSAGE_FIELD: message
+    })
 
 
 # endregion
 
-# region Game
+# region Complex GETs
 
 @competitors_only()
 @defaulted_window()
 @limited_http_methods('GET')
 @never_cache
 def game(request, *, window_codename):
+    """Display problems"""
+
+    # Define countdown
     COUNTDOWN_ENDTIME_KEY = 'countdown_endtime'
     COUNTDOWN_MAX_MICROSECONDS_KEY = 'countdown_max_microseconds'
 
+    # Process request
+    team = request.user.competitor.team
     try:
         window = queries.get_window(window_codename)
     except models.Window.DoesNotExist:
         return HttpResponseNotFound()
 
-    team = request.user.competitor.team
-    problems = queries.viewable_problems(team=team, window=window)
-
+    # Initialize context
     context = windowed_context(window)
-    context['prob_list'] = problems
+    context['prob_list'] = queries.problem_list(team=team, window=window)
     js_context = {}
 
     if not window.started():
@@ -270,18 +320,26 @@ def game(request, *, window_codename):
     elif window.ended():
         template_name = 'ctflex/game/ended.html'
 
-        # Check whether current window is inactive or active
         current_window = queries.get_window()
         context['current_window'] = current_window
-        can_compete_in_current_window = current_window.started() and not current_window.ended() and (
-            not team.has_timer(window) or team.has_active_timer(window))
-        context['can_compete_in_current_window'] = can_compete_in_current_window
+
+        # Check whether the current window is (in)active and
+        # so whether the team could still solve problems
+        context['can_compete_in_current_window'] = (
+            current_window.ongoing()
+            and (
+                not team.has_timer(window)
+                or team.has_active_timer(window)
+            )
+        )
 
     elif not team.has_timer(window):
         template_name = 'ctflex/game/inactive.html'
 
         js_context[COUNTDOWN_ENDTIME_KEY] = window.end.isoformat()
-        js_context[COUNTDOWN_MAX_MICROSECONDS_KEY] = window.personal_timer_duration.total_seconds() * 1000
+        js_context[COUNTDOWN_MAX_MICROSECONDS_KEY] = (
+            window.personal_timer_duration.total_seconds() * 1000
+        )
 
     elif not team.has_active_timer(window):
         template_name = 'ctflex/game/expired.html'
@@ -295,17 +353,14 @@ def game(request, *, window_codename):
     return render(request, template_name, context)
 
 
-# endregion
-
-# region Board
-
-
-@limited_http_methods('GET')
 @defaulted_window()
+@limited_http_methods('GET')
 @never_cache
 def board(request, *, window_codename):
+    """Displays rankings"""
+
     # Get window
-    if window_codename == ctflex.settings.OVERALL_WINDOW_CODENAME:
+    if window_codename == settings.OVERALL_WINDOW_CODENAME:
         window = None
     else:
         try:
@@ -313,10 +368,12 @@ def board(request, *, window_codename):
         except models.Window.DoesNotExist:
             return HttpResponseNotFound()
 
+    # Initialize context
     context = windowed_context(window)
     context['board'] = queries.board(window)
-    context['overall_window_codename'] = ctflex.settings.OVERALL_WINDOW_CODENAME
+    context['overall_window_codename'] = settings.OVERALL_WINDOW_CODENAME
 
+    # Select correct template
     if window is None:
         template_name = 'ctflex/board/overall.html'
     elif not window.started():
@@ -327,25 +384,6 @@ def board(request, *, window_codename):
         template_name = 'ctflex/board/current.html'
 
     return render(request, template_name, context)
-
-
-# endregion
-
-# region Team
-
-# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
-@limited_http_methods('GET')
-@competitors_only()
-class Team(DetailView):
-    model = models.Team
-    template_name = 'ctflex/misc/team.html'
-
-    def get_object(self, **kwargs):
-        return self.request.user.competitor.team
-
-    def get_context_data(self, **kwargs):
-        context = super(Team, self).get_context_data(**kwargs)
-        return context
 
 
 # endregion
@@ -364,45 +402,47 @@ def logout_done(request, *,
 @limited_http_methods('GET')
 def password_change_done(request, *,
                          message="Your password was successfully changed.",
-                         redirect_url=ctflex.settings.TEAM_CHANGE_REDIRECT_URL):
+                         redirect_url=settings.TEAM_CHANGE_REDIRECT_URL):
     messages.success(request, message)
     return redirect(redirect_url)
 
 
 @limited_http_methods('GET')
-def password_reset_complete(request):
-    messages.success(request, "Your password was successfully set. You can log in now.")
-    return redirect('ctflex:login')
+def password_reset_complete(request, *,
+                            message="Your password was successfully set. You can log in now.",
+                            redirect_url='ctflex:index'):
+    messages.success(request, message)
+    return redirect(redirect_url)
 
 
-class DummyAtomicException(Exception):
-    pass
+# endregion
 
 
-@never_cache
-@sensitive_post_parameters()
-@csrf_protect
+# region Registration
+
+# TODO(Yatharth): Shorten view by extracting a command
 @anonyomous_users_only()
 @limited_http_methods('GET', 'POST')
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
 def register(request,
              template_name='ctflex/auth/register.html',
-             post_change_redirect=None,
+             post_change_redirect='ctflex:game',
              extra_context=None):
+    """Display registration form"""
+
     # Define constants
+
     TEAM_STATUS_NAME = 'team-status'
     TEAM_STATUS_NEW = 'new'
     TEAM_STATUS_OLD = 'old'
 
-    # Initialize redirect URL
-    if post_change_redirect is None:
-        post_change_redirect = resolve_url('ctflex:game', window_id=queries.get_window().id)
-    else:
-        post_change_redirect = resolve_url(post_change_redirect)
+    class DummyException(Exception):
+        pass
 
     # If POST, process submitted data
     if request.method == 'POST':
-
-        # XXX: Create command
 
         # Process POST data
 
@@ -425,7 +465,8 @@ def register(request,
             try:
                 with transaction.atomic():
 
-                    # Save form without without committing the competitor since it needs to reference the others
+                    # Save form without without committing the competitor
+                    # since it needs to reference the user and team
                     user = user_form.save()
                     team = active_team_form.save()
                     competitor = competitor_form.save(commit=False)
@@ -441,23 +482,26 @@ def register(request,
                         for msg in err.messages:
                             messages.error(request, msg)
 
-                        # Let the atomic transaction manager know that shit happened so it rolls back
-                        raise DummyAtomicException()
+                        # Raise a dummy exception to let the atomic transaction
+                        # manager know that shit happened so that it rolls back
+                        raise DummyException()
 
             # Don't do anything more with the dummy exception than
-            # what the atomic transaction manager would have already done for us
-            except DummyAtomicException:
+            # what the atomic transaction manager would already have
+            # done for us by rolling back
+            except DummyException:
                 pass
 
-            # Log in the user and redirect!
+            # If no errors were raised, log the user in and redirect!
             else:
                 auth_user = authenticate(
                     username=user_form.cleaned_data['username'],
                     password=user_form.cleaned_data['password1'],
                 )
                 auth_login(request, auth_user)
+
                 messages.success(request, "You were successfully registered!")
-                return HttpResponseRedirect(post_change_redirect)
+                return HttpResponseRedirect(reverse(post_change_redirect))
 
     # Otherwise, create blank forms
     else:
@@ -467,7 +511,7 @@ def register(request,
         new_team_form = forms.TeamCreationForm()
         existing_team_form = forms.TeamJoiningForm()
 
-    # Configure context and render
+    # Initialize context
     context = {
         'team_status': team_status,
         'user_form': user_form,
@@ -477,6 +521,7 @@ def register(request,
     }
     if extra_context is not None:
         context.update(extra_context)
+
     return render(request, template_name, context)
 
 # endregion

@@ -1,4 +1,4 @@
-"""Do what ratelimit.middleware.RatelimitMiddleware would have done, except fixing the import_module import"""
+"""Define middleware"""
 
 from importlib import import_module
 
@@ -8,7 +8,15 @@ from ratelimit.exceptions import Ratelimited
 
 
 class RatelimitMiddleware(object):
+    """Simulate `ratelimit.middleware.RatelimitMiddleware`
+
+    The reason this simulation has to happen is that the original middleware
+    would import `import_module` from a location that doesn’t work with Django 1.9.
+    """
+
     def process_exception(self, request, exception):
+        """Copied over from `ratelimit.middleware.RatelimitMiddleware.process_exception`"""
+
         if not isinstance(exception, Ratelimited):
             return
         module_name, _, view_name = settings.RATELIMIT_VIEW.rpartition('.')

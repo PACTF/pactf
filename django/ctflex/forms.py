@@ -1,5 +1,4 @@
-"""Define forms"""
-import collections
+"""Define forms to be used by views"""
 
 from django import forms
 from django.db import models as django_models
@@ -13,9 +12,18 @@ from ctflex import models
 def _model_generated(model):
     """Generate form fields from model fields
 
-    Usage: Decorate a form class with this decorator and set MODEL_GENERATED_FIELDS to a list of attribute name you would like to be generated.
+    Purpose:
+        This decorator lets you have form field attributes like
+        `max_length` copied over from a model field while being DRY.
 
-    Drawbacks: Currently, this decorator only supports CharFields.
+    Usage:
+        Decorate a form class with this decorator and set MODEL_GENERATED_FIELDS
+        to a list of attribute names you would like to be generated.
+
+    Limitations:
+        - Currently, this decorator only supports CharFields.
+
+    Author: Yatharth
     """
 
     def decorator(cls):
@@ -32,8 +40,8 @@ def _model_generated(model):
                     ('min_length', None, None),
                     ('required', 'blank', lambda value: not value),
                 }
-            # (Maybe one day this decorator will support more types of fields.)
             else:
+                # (Maybe one day this decorator will support more types of fields.)
                 raise ValueError("Unknown type of model field: {}".format(model_field_type))
 
             kwargs = {}
@@ -72,11 +80,20 @@ class CompetitorCreationForm(forms.ModelForm):
 
 
 class UserCreationForm(auth_forms.UserCreationForm):
+    """Subclass UserCreationForm and monkey-patch some fields
+
+    This class is different from its superclass in these ways:
+    - Password confirmation is not required.
+    - Help text for fields is not displayed.
+    """
     prefix = 'user'
 
     def __init__(self, *args, data=None, **kwargs):
+        # Copy `password2`’s value to `password1`
         if data is not None:
+            # Make a copy as `data` might not be mutable
             data = data.copy()
+
             data['{}-password1'.format(self.prefix)] = data.get('{}-password2'.format(self.prefix), '')
 
         super().__init__(*args, data=data, **kwargs)
@@ -109,17 +126,21 @@ class TeamJoiningForm(forms.Form):
         return data
 
     def clean(self):
+        """Check if the name and passphrase is correct"""
+
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
         passphrase = cleaned_data.get('passphrase')
 
         if not models.Team.objects.filter(name=name, passphrase=passphrase).exists():
-            # (Since clean_name checked that a team of the name existed, the passphrase must be wrong.)
+            # (Since clean_name checked that a team of the name existed,
+            #  it must be the passphrase that is wrong.)
             self.add_error('passphrase', "The passphrase is incorrect. Check again with your team creator.")
 
         return cleaned_data
 
     def save(self):
+        """Return a reference to the team"""
         return models.Team.objects.get(name=self.cleaned_data['name'], passphrase=self.cleaned_data['passphrase'])
 
 # endregion

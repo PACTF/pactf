@@ -29,7 +29,7 @@
         {% if user.is_authenticated %}
 
           {% if team %}
-            <li><p class="navbar-text">Score: {% score team %}</p></li>
+            <li><p class="navbar-text">Score: <span id="navbar-score">{% score team %}</span></p></li>
             <li><a href="{% url 'ctflex:current_team' %}">Team</a></li>
 
           {% else %}

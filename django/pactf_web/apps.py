@@ -2,8 +2,8 @@
 
 from django.apps import AppConfig
 
-from pactf_web.constants import APP_NAME
+from pactf_web import constants
 
 
 class PactfWebConfig(AppConfig):
-    name = APP_NAME
+    name = constants.APP_NAME

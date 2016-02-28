@@ -1,4 +1,4 @@
-"""Define CTFlex's models"""
+"""Define models"""
 
 import re
 import uuid
@@ -29,11 +29,17 @@ def print_time(time):
 
 
 def unique_receiver(*args, **kwargs):
-    """Wrap django.dispatch.receiver to set dispatch_uid automatically based on the receiver's name
+    """Wrap `django.dispatch.receiver` to set `dispatch_uid` automatically based on the receiver's name
 
-    Purpose: This decorator eliminates the need to set dispatch_uid automatically. It is recommended to set dispatch_uid to prevent a receiver from being run twice.
+    Purpose:
+        This decorator eliminates the need to set `dispatch_uid` for a Django
+        receiver manually. You would want to set `dispatch_uid` to prevent a
+        receiver from being run twice.
 
-    Usage: This decorator should be always used instead of django.dispatch.receiver.
+    Usage:
+        Simply substitute this decorator for `django.dispatch.receiver`. If
+        you define `dispatch_uid` yourself, this decorator will use that
+        supplied value instead of the receiver function's name.
     """
 
     def decorator(function):
@@ -48,11 +54,27 @@ def unique_receiver(*args, **kwargs):
 def pre_save_validate(sender, instance, *args, **kwargs):
     """Full clean an object before saving it
 
-    Purpose: This receiver ensures models are not accidentally manually modified and saved without being validated.
+    Purpose:
+        While forms typically full clean an object before saving it, other
+        code might not always do this. To prevent invalid objects from being
+        saved, this receiver makes saving an object full clean it first.
+
+    Usage:
+        This receiver has already been registered. Nothing more needs to
+        be done.
+
+    Implementation Notes:
+        - This receiver ignores non-CTFlex models since otherwise errors happen.
 
     Drawbacks:
-    - This receiver means that full_clean is sometimes called twice for an object.
-    - Calling update() on a query does not trigger save() and thus still doesn't trigger full_clean().
+        - This receiver means that full_clean is sometimes redundantly called
+          twice for an object.
+
+    Limitations:
+        - Calling update() on a query does not trigger save() and thus still
+          doesn't trigger full_clean().
+
+    Author: Yatharth
     """
     if sender._meta.app_label == APP_NAME:
         instance.full_clean()
@@ -61,12 +83,27 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 def cleaned(cls):
     """Call individual cleaning methods and collect all of their ValidationErrors
 
-    Usage: To use this decorator, you may define a) the list of methods MODEL_CLEANERS and/or b) the dictionary from field names to a list of methods FIELD_CLEANERS. The method signatures must be just 'self'.
+    Purpose:
+        This decorator allows you to write individual methods that do some
+        validation or cleaning without having to worry about collecting all
+        of their ValidationErrors together into a list and throwing one big
+        ValidationError from the list (as is recommended to do per the
+        Django documentation).
 
-    Purpose: This decorator calls methods in FIELD_CLEANERS or MODEL_CLEANERS along with the super class's clean_fields() or clean() method. It collects any and all of the ValidationErrors and raises them as one big ValidationError. It excludes fields in clean_fields() based on the keys in FIELD_CLEANERS.
+    Usage:
+        Decorate your class with this decorator, and then define:
+            a) the list of methods MODEL_CLEANERS (optional)
+            b) the dictionary from field names to a list of methods FIELD_CLEANERS (optional)
+        The method signatures must be just 'self'.
+
+    Implementation Notes:
+        - The superclass’s `clean_fields()` and `clean()` method will be called.
+        - The `exclude` argument passed to `clean_fields()` will be used to
+          exclude cleaning of fields based on the keys in FIELD_CLEANERS.
 
     Drawbacks:
-    - This decorator will replace any defined clean_fields() and clean() methods instead of decorate them.
+        - This decorator will replace any defined clean_fields() and clean() methods
+          (as opposed to decorating them).
     """
 
     def clean(self):
@@ -115,11 +152,15 @@ def cleaned(cls):
     return cls
 
 
-word_characters = validators.RegexValidator(r'^\w*$', "Only alphanumeric characters and underscores are allowed.")
+# Validator for restricting a field to word characters
+word_characters = validators.RegexValidator(
+    r'^\w*$'
+    "Only alphanumeric characters and underscores are allowed."
+)
 
 
 # class State(models.Model):
-#     default_category = models.ForeignKey(Category)
+#     """Track global settings in the database"""
 #
 #     def save(self, *args, **kwargs):
 #         self.id = 1
@@ -139,14 +180,14 @@ class Team(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30, unique=True,
                             verbose_name="Team Name")
-    banned = models.BooleanField(default=False)
 
     ''' Extra Data '''
 
+    banned = models.BooleanField(default=False)
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
-    # XXX(Yatharth): Help text
-    affiliation = models.CharField("Affiliation", max_length=60, blank=True)
+    affiliation = models.CharField(max_length=60, blank=True,
+                                   verbose_name="Affiliation")
 
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
@@ -157,7 +198,7 @@ class Team(models.Model):
         return self.competitor_set.count()
 
     def has_space(self):
-        return self.size() <= settings.MAX_TEAM_SIZE
+        return self.size() < settings.MAX_TEAM_SIZE
 
     def timer(self, window):
         return self.timer_set.get(window=window)
@@ -173,7 +214,9 @@ class Team(models.Model):
 class Competitor(models.Model):
     """Represent a competitor as a 'user profile' (in Django terminology)
 
-    Some of Django's User model's fields are shunned, like first_name, last_name and email. We shun the email field for easier enforcement of uniqueness. We shun Django's User model's fields in general to reduce our dependency on it for data fields. This way, the only data fields stored primarily in in Django's User model are username and password. These are few enough fields to be able to manually hack on to a ModelForm for Competitor instead of needing to combine ModelForm each for Competitor and User, for example.
+    Some of Django's User model's fields are duplicated here, like first_name,
+    last_name and email. We shun the email field for easier enforcement of
+    uniqueness. We shun the other fields to simplify forms for creating a Competitor.
     """
 
     ''' Structural Fields '''
@@ -211,7 +254,8 @@ class Competitor(models.Model):
         (HOBBYIST, "CTF Hobbyist"),
         (OTHER, "Other"),
     )
-    background = models.CharField(max_length=1, choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
+    background = models.CharField(max_length=1,
+                                  choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
 
     def __str__(self):
         return "<Competitor #{} {!r}>".format(self.id, self.user.username)
@@ -220,7 +264,10 @@ class Competitor(models.Model):
 
     def validate_state_is_given_for_us(self):
         if self.country == Country('US') and not self.state:
-            raise ValidationError("State is required if you are competing from the U.S.", code='state_is_given_for_us')
+            raise ValidationError(
+                "State is required if you are competing from the U.S.",
+                code='state_is_given_for_us',
+            )
 
     def sync_state_outside_us(self):
         if self.country != Country('US'):
@@ -241,7 +288,7 @@ class Competitor(models.Model):
 
     MODEL_CLEANERS = (
         sync_state_outside_us,
-        validate_team_has_space,  # FIXME Check if works if field_cleaner
+        validate_team_has_space,
     )
 
 
@@ -263,10 +310,11 @@ def competitor_post_save_sync_to_user(sender, instance, **kwargs):
 
 class WindowManager(models.Manager):
     def current(self):
-        """Return 'current' window
+        """Return the 'current' window
 
-        The 'current' window is defined as the window that fits the highest of the following criteria:
-        - The window is currently going on.
+        The 'current' window is defined as the window that fits the first
+        of the following criteria:
+        - The window is currently ongoing.
         - The window is the next to begin.
         - The window was the last to have ended.
         """
@@ -274,28 +322,25 @@ class WindowManager(models.Manager):
         try:
             return self.get(start__lte=now, end__gte=now)
         except Window.DoesNotExist:
-            return self.filter(start__gte=now).order_by('start').first() or \
-                   self.order_by('-start').first()
-
-    def other(self, window):
-        return self.exclude(pk=window.id)
+            return (self.filter(start__gte=now).order_by('start').first()
+                    or self.order_by('-start').first())
 
 
 @cleaned
 class Window(models.Model):
-    """Represent a Contest Window"""
+    """Represent a Window"""
 
     objects = WindowManager()
 
     id = models.AutoField(primary_key=True)
-    codename = models.CharField(max_length=30, unique=True, validators=[word_characters],
-                                help_text="Non-user-facing human-readable identifier for window")
+    codename = models.CharField(max_length=30, unique=True,
+                                validators=[word_characters],
+                                help_text="Human-readable identifier")
     verbose_name = models.CharField(max_length=30, unique=True, blank=False,
                                     help_text="User-facing title of window")
 
     start = models.DateTimeField()
     end = models.DateTimeField()
-
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
@@ -334,9 +379,9 @@ class Window(models.Model):
     def sync_timers(self):
         """Make timers update their end times per changes in the personal window duration
 
-        This method achieves two goals:
-        - Make timers update their end based on the window's personal_timer_duration;
-        - Raise ValidationErrors if the timers would be outside the window if modified;
+        Purpose:
+          - Make timers update their end based on the window's personal_timer_duration;
+          - Raise a ValidationError if the timers would be outside the window if modified;
         """
         for timer in self.timer_set.all():
             timer.save()
@@ -351,7 +396,7 @@ class Window(models.Model):
 
 @cleaned
 class Timer(models.Model):
-    """Represent a Personal Timer"""
+    """Represent a Timer"""
 
     class Meta:
         unique_together = ('window', 'team',)
@@ -378,7 +423,8 @@ class Timer(models.Model):
     def sync_start(self):
         """Set start to now if not already defined
 
-        We do not simply set auto_now=True on the start field because then we can't edit the field in th Django admin panel.
+        We don’t simply set auto_now=True on the start field because then we wouldn’t
+        be able to edit the field in the Django admin panel (`auto_now` is stupid).
         """
         if not self.start:
             self.start = timezone.now()
@@ -390,7 +436,7 @@ class Timer(models.Model):
         if self.start < self.window.start or self.end > self.window.end:
             raise ValidationError("Timer does not lie within window", code='timer_is_within_window')
 
-    # (The order of the following methods matters.)
+    # (The order  matters here.)
     MODEL_CLEANERS = (
         sync_start,
         sync_end,
@@ -411,26 +457,24 @@ class CtfProblem(models.Model):
     name = models.CharField(max_length=60)
     window = models.ForeignKey(Window)
 
-    points = models.IntegerField(
-        validators=[validators.MinValueValidator(1), ]
-    )
+    points = models.IntegerField(validators=[validators.MinValueValidator(1), ])
+
     description = models.TextField(default='', blank=True)
     description_html = models.TextField(editable=False, default='', blank=True)
     hint = models.TextField(default='', blank=True)
     hint_html = models.TextField(editable=False, default='', blank=True)
 
     grader = models.FilePathField(
+        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
         help_text="Basename of the problem's grading script in PROBLEMS_DIR",
-        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$'
     )
-    dynamic = models.FilePathField(
-        help_text="Basename of the problem's generator script in PROBLEMS_DIR",
+    generator = models.FilePathField(
         max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
         blank=True, null=True,
+        help_text="Basename of the problem's generator script in PROBLEMS_DIR",
     )
 
     # Dictionary for problem dependencies in format specified in README
-    # (`dict` is used instead of `{}` because all objects would share dict otherwise.)
     deps = psql.JSONField(blank=True, null=True)
 
     def __str__(self):
@@ -444,12 +488,15 @@ class CtfProblem(models.Model):
         return markdown2.markdown(markdown, extras=settings.MARKDOWN_EXTRAS, safe_mode='escape')
 
     @staticmethod
-    def link_static(old_text, id):
-        """Replace {% ctflexstatic ... %} directives with the appropriate static file link"""
+    def link_static(old_text, problem_id):
+        """Parse {% ctflexstatic ... %} directives for linking to static files"""
 
-        PATTERN = re.compile(r'''{% \s* ctflexstatic \s+ (['"]) (?P<basename> (?:(?!\1).)+ ) \1 \s* (%})''', re.VERBOSE)
-        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, id)
-        REPLACER = lambda match: static(REPLACEMENT.format(match.group('basename')))
+        PATTERN = re.compile(
+            r'''{% \s* ctflexstatic \s+ (['"]) (?P<filename> (?:(?!\1).)+ ) \1 \s* %}''',
+            re.VERBOSE,
+        )
+        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, problem_id)
+        REPLACER = lambda match: static(REPLACEMENT.format(match.group('filename')))
 
         return PATTERN.sub(REPLACER, old_text)
 
@@ -491,28 +538,29 @@ class CtfProblem(models.Model):
             if DEPS_THRESHOLD_FIELD not in self.deps:
                 self.deps[DEPS_THRESHOLD_FIELD] = 1
 
-            # An empty tuple is interpreted as including all problems per the spec
+            # An empty tuple is interpreted as including all problems (per the spec)
             if DEPS_PROBS_FIELD not in self.deps:
                 self.deps[DEPS_PROBS_FIELD] = ()
 
     def validate_desc_and_hint_exist_or_not(self):
-        if self.dynamic and (self.description or self.hint):
+        if self.generator and (self.description or self.hint):
             raise ValidationError(
                 "Description and hints should not be statically provided for dynamic problems",
                 code='desc_and_hint_exist_or_not'
             )
-        elif not self.dynamic and not self.description:
+        elif not self.generator and not self.description:
             raise ValidationError(
                 "Description must be provided statically for simple problems",
                 code='desc_and_hint_exist_or_not'
             )
 
     def sync_html(self):
-        if not self.dynamic:
+        if not self.generator:
             self.description_html = self.process_html(self.description)
             self.hint_html = self.process_html(self.hint)
 
     FIELD_CLEANERS = {
+        # (The order matters here.)
         'deps': (
             sync_empty_deps_fields,
             validate_deps,
@@ -530,7 +578,7 @@ class CtfProblem(models.Model):
 class Solve(models.Model):
     """Record currently applicable solves of a problem
 
-    This model is used to compute the score, among other things.
+    This model is also used to compute the score of a team.
     """
 
     class Meta:
@@ -543,7 +591,7 @@ class Solve(models.Model):
     flag = models.CharField(max_length=100, blank=False)
 
     def __str__(self):
-        return "<Solve prob={} team={}>".format(self.problem, self.competitor.team)
+        return "<Solve prob={} team={} date={}>".format(self.problem, self.competitor.team, self.date)
 
     ''' Cleaning '''
 
@@ -579,14 +627,22 @@ class Solve(models.Model):
 class Submission(models.Model):
     """Log a flag submission attempt
 
-    This model serves only as a log and is not part of the truth (as defined in the Design Doc). The one other purpose t is used for is telling a competitor they already tried a particular flag.
+    This model serves only as a log and instances may be deleted without
+    consequence. The one other purpose this model serves is telling a competitor
+    they already tried a particular flag.
 
-    There is a `p_id` field in addition to the `problem` foreign key. This enables deleting problems while not deleting Submissions. This doubling of fields is not done with the competitor field as 1) IDs are less useful for deleted competitors and 2) competitor objects are less likely to be deleter since users and usually simply have the is_active flag set to False instead of having themselves deleted.
+    There is a `p_id` field in addition to the `problem` foreign key. This enables
+    deleting problems without needing to delete the associated Submissions. This
+    doubling of fields is not done with the competitor field as
+    - IDs are less useful for deleted competitors
+    - competitor objects are less likely to be deleted since typically one would
+      simply set is_active flag of a user to False instead of deleting the objects.
     """
 
     id = models.AutoField(primary_key=True)
     p_id = models.UUIDField()
-    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL, null=True, blank=True, editable=False)
+    problem = models.ForeignKey(CtfProblem, on_delete=models.SET_NULL,
+                                null=True, blank=True, editable=False)
     competitor = models.ForeignKey(Competitor, on_delete=models.SET_NULL, null=True)
 
     time = models.DateTimeField(auto_now_add=True)

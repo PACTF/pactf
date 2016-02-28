@@ -208,6 +208,8 @@ class CTFlex(Django, Configuration):
 
     CTFLEX_SITENAME = 'PACTF'
 
+    CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
+
     ''' Problems and Staticfiles '''
 
     CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=ctflex_prefix)
@@ -274,7 +276,7 @@ class Dev(Base):
                 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': True,
             },
-            ctflex.constants.QUERIES_LOGGER: {
+            ctflex.constants.LOGGER_NAME: {
                 'handlers': ['console'],
                 'level': 'DEBUG',
                 'propagate': False,

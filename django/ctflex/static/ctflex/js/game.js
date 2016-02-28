@@ -31,6 +31,9 @@ function submit_flag(problem_id) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
                     jQuery("#" + problem_id + " .problem-body").remove();
+                    jQuery("#navbar-score").text(function(i, value) {
+                        return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
+                    });
                 }
                 alert(response.message);
             },

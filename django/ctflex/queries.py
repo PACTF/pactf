@@ -1,30 +1,28 @@
+import datetime
+import importlib
 import importlib.machinery
 import logging
+from copy import copy
 from functools import partial
 from os.path import join
 
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.db.models import Sum
-from django_countries.fields import Country
 
 from ctflex import constants
 from ctflex import hashers
 from ctflex import models
 from ctflex import settings
 
-logger = logging.getLogger(constants.QUERIES_LOGGER)
-
-
-# TODO(Yatharth): Clean and document queries
-# TODO(Yatharth): Bring back logging and set file accordingly
+logger = logging.getLogger(constants.LOGGER_NAME)
 
 
 # region General
 
-
-def get_window(window_codename=None):
-    return models.Window.objects.get(codename=window_codename) if window_codename else models.Window.objects.current()
+def get_window(codename=None):
+    if codename:
+        return models.Window.objects.get(codename=codename)
+    else:
+        return models.Window.objects.current()
 
 
 def all_windows():
@@ -33,46 +31,8 @@ def all_windows():
 
 def competitor_key(group, request):
     """Key function for ratelimiting based on competitor"""
-    return str(request.user.competitor.team.id)
+    return str(request.user.competitor.id)
 
-
-# endregion
-
-# region Game
-
-# FIXME(Yatharth): Test unlocking
-def _problem_unlocked(team, problem):
-    """Check if a team has unlocked a problem
-
-    Refer to the README for the specification.
-    """
-
-    if problem.deps is None:
-        return True
-
-    threshold = problem.deps[constants.DEPS_THRESHOLD_FIELD]
-    problems = problem.deps[constants.DEPS_PROBS_FIELD]
-
-    solves = models.Solve.objects.filter(competitor__team=team, problem__id__in=problems)
-
-    if not solves.exists():
-        return False
-
-    # Just an optimization
-    if score == 1:
-        return True
-
-    return solves.aggregate(Sum('problem__points'))['problem__points__sum'] >= threshold
-
-
-def viewable_problems(team, window):
-    return sorted(filter(partial(_problem_unlocked, team), models.CtfProblem.objects.filter(window=window)),
-                  key=lambda problem: (problem.points, problem.name.lower()))
-
-
-# endregion
-
-# region Template Tag
 
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
@@ -91,89 +51,145 @@ def score(*, team, window):
 
 # endregion
 
-# region Board
+# region Problems List
+
+def _is_unlocked(team, problem):
+    """Compute whether a team has unlocked a problem"""
+
+    # If a problem does not define any dependencies, it’s unlocked by default
+    if problem.deps is None:
+        return True
+
+    # Extract fields
+    threshold = problem.deps[constants.DEPS_THRESHOLD_FIELD]
+    problems = problem.deps[constants.DEPS_PROBS_FIELD]
+
+    # Get the list of solved problems
+    solves = models.Solve.objects.filter(competitor__team=team, problem__id__in=problems)
+
+    # (If no problems have been solved, the dependencies can’t have been met.)
+    if not solves.exists():
+        return False
+
+    # Optimize for depending on solving at least one problem
+    if threshold == 1:
+        return True
+
+    # Return whether the sum of the solved problems’ points exceeds the threshold
+    return solves.aggregate(Sum('problem__points'))['problem__points__sum'] >= threshold
 
 
-def _eligible(team):
-    return not team.banned and all(
-        competitor.country == Country('US') and competitor.background == models.Competitor.HIGHSCHOOL
-        for competitor in team.competitor_set.all()
-    )
+def problem_list(*, team, window):
+    """Return sorted list of unlocked problems
 
-
-def board(window=None):
-    teams = (team for team in models.Team.objects.iterator() if _eligible(team))
-    decorated = ((score(team=team, window=window), team.name, team) for team in teams)
-    sorted_ = sorted(decorated, reverse=True)
-    enumerated = ((i + 1, team, score_) for i, (score_, name, team) in enumerate(sorted_))
-    return enumerated
+    Problems are first sorted by points and then (case-insensitively) by their name.
+    """
+    unlocked_problems = (problem for problem in models.CtfProblem.objects.filter(window=window)
+                         if _is_unlocked(team, problem))
+    return sorted(unlocked_problems,
+                  key=lambda problem: (problem.points, problem.name.lower()))
 
 
 # endregion
 
-# region Auth
 
-def create_competitor(handle, pswd, email, team, state):
-    user = settings.AUTH_USER_MODEL.objects.create_user(handle, None, pswd)
-    try:
-        validate_password(pswd, user=user)
-        competitor = models.Competitor(user=user, team=team, email=email, state=state, first_name="dummy",
-                                       last_name="dummy")
-        competitor.full_clean()
+# region Board
 
 
-    except ValidationError:
-        user.delete()
-        # logger.warning('create_competitor: Competitor creation failed: {}'.format(handle))
-        raise
-    else:
-        competitor.save()
-        # logger.info('create_competitor: New competitor created: {}'.format(handle))
-        return competitor
+def _eligible_default(team):
+    """Determine whether a team is eligible
+
+    This is the function provided as a default for determining eligibility, and may be
+    overridden if the `CTFLEX_ELIGIBILITY_FUNCTION` setting is set.
+    """
+    return not team.banned
 
 
-def validate_team(name, password):
-    team = models.Team.objects.filter(name=name)
-    if team.exists():
-        if password == team[0].password:
-            # logger.info('validate_team: Team credentials validated for "' + name + '".')
-            return team[0], 'Success!'
-        # logger.warning('validate_team: Team credentials incorrect for "' + name + '".')
-        return None, 'Team passphrase incorrect!'
-    team = models.Team(name=name, password=password)
-    team.save()
-    # logger.info('validate_team: New team created: "' + name + '".')
-    return team, 'Success!'
+def _get_eligible():
+    """Return a reference to the eligibility function to use
+
+    If the setting CTFLEX_ELIGIBILITY_FUNCTION if defined, it’s value as a dotted path
+    to a function is used; otherwise, the default eligibility function is used.
+    """
+
+    dotted_path = settings.ELIGIBILITY_FUNCTION
+
+    if not dotted_path:
+        return _eligible_default
+
+    module, function = dotted_path.rsplit('.', 1)
+
+    module = importlib.import_module(module)
+    return getattr(module, function)
 
 
-# endregion Auth
-
-# region Game
+_eligible = _get_eligible()
 
 
-# FIXME(Yatharth): Handle such exceptions more gracefully, like use debug param in template to show faield problem names
-def _get_desc(problem, team):
-    if not problem.dynamic:
-        return problem.description_html
-    gen_path = join(settings.PROBLEMS_DIR, problem.window.codename, problem.dynamic)
-    gen = importlib.machinery.SourceFileLoader('gen', gen_path).load_module()
-    desc, hint = gen.generate(hashers.dyanamic_problem_key(team))
+def _last_solve_date(*, team, window):
+    """Return date of most recent Solve (or the minimum date if it doesn’t exist)"""
+    solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
+    if not solves.exists():
+        return datetime.datetime.min
+    return solves.order_by('-date').first().date
+
+
+def _team_ranking_key(window, team_with_score):
+    """Return key for team based on rank
+
+    The basis for ranking is, in order, is a high scores, an old most recent solve,
+    and a case-insensitively and lexicographically earlier sorted team name.
+    """
+    team, score_ = team_with_score
+    return (
+        -score_,
+        _last_solve_date(team=team, window=window),
+        team.name.lower(),
+    )
+
+
+def board(window=None):
+    """Return sorted list of eligible teams with their scores"""
+    eligible_teams_with_score = ((team, score(team=team, window=window))
+                                 for team in models.Team.objects.iterator()
+                                 if _eligible(team))
+    ranked = sorted(eligible_teams_with_score, key=partial(_team_ranking_key, window))
+    return ((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
+
+
+# endregion
+
+
+# region Problem Formatting
+
+
+# FIXME(Yatharth): Handle exceptions
+# XXX(Yatharth): Use recommended way to import from path for Python 3.5
+def _get_desc_and_hint(problem, team):
+    """Return static description and hint or generate them"""
+
+    if not problem.generator:
+        return problem.description_html, problem.hint_html
+
+    generator_path = join(settings.PROBLEMS_DIR, problem.window.codename, problem.generator)
+    generator = importlib.machinery.SourceFileLoader('gen', generator_path).load_module()
+    desc, hint = generator.generate(hashers.dyanamic_problem_key(team))
+
     return problem.process_html(desc), problem.process_html(hint)
 
 
-# TODO(Yatharth): Improve design
+# TODO(Yatharth): Redesign to avoid needing this function
 def format_problem(problem, team):
-    data = problem.__dict__
-    if not problem.dynamic:
+    """Return a problem-like object, with the description and hint generated if necessary
+
+    This function is proxied via a template tag.
+    """
+
+    if not problem.generator:
         return problem
 
-    class Dummy:
-        pass
+    data = copy(problem.__dict__)
+    data['description_html'], data['hint_html'] = _get_desc_and_hint(problem, team)
+    return data
 
-    result = Dummy()
-
-    data['description_html'], data['hint_html'] = _get_desc(problem, team)
-    result.__dict__ = data
-    return result
-
-    # endregion
+# endregion

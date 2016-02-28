@@ -13,4 +13,9 @@ class PBKDF2PasswordHasher4(PBKDF2PasswordHasher):
 
 
 def dyanamic_problem_key(team):
-    return zlib.adler32(bytes(str(team.id) + settings.PROBLEM_SALT + settings.SECRET_KEY, 'utf-8'))
+    """Compute hash for passing to dynamic problem generators and graders
+
+    adler32 is not very secure, but that’s okay.
+    """
+    data = str(team.id) + settings.PROBLEM_SALT + settings.SECRET_KEY
+    return zlib.adler32(bytes(data, 'utf-8'))

@@ -118,8 +118,8 @@ class Command(BaseCommand):
 
                     # Set paths
                     data['grader'] = join(prob_path, GRADER_BASENAME)
-                    if data.get('dynamic', False):
-                        data['dynamic'] = join(prob_path, GENERATOR_BASENAME)
+                    if data.get('generator', False):
+                        data['generator'] = join(prob_path, GENERATOR_BASENAME)
 
                     # Clean and warn about integer IDs
                     if 'id' in data:
@@ -148,7 +148,7 @@ class Command(BaseCommand):
 
                     # Add window and add defaults
                     data['window'] = Window.objects.get(codename=window_basename)
-                    data.setdefault('dynamic', None)
+                    data.setdefault('generator', None)
                     data.setdefault('description', '')
                     data.setdefault('hint', '')
 

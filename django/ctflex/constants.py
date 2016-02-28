@@ -12,14 +12,13 @@ VERBOSE_NAME = 'CTFlex'
 
 ''' Logging '''
 
-QUERIES_LOGGER = APP_NAME + '.queries'
-COMMANDS_LOGGER = APP_NAME + '.commands'
+LOGGER_NAME = APP_NAME
 
 ''' URLs '''
 
 UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
-''' Redirections '''
+''' Problems '''
 
 DEPS_PROBS_FIELD = 'probs'
 DEPS_THRESHOLD_FIELD = 'threshold'

@@ -18,7 +18,11 @@ _SETTINGS = (
     ('SECRET_KEY', None, 'SECRET_KEY'),
 
     # How many competitors can be in one team
-    ('MAX_TEAM_SIZE ', 5, None),
+    ('MAX_TEAM_SIZE', 5, None),
+
+    # Function taking a team as its sole argument and returning whether it is
+    # eligible for prizes and being ranked
+    ('ELIGIBILITY_FUNCTION', '', None),
 
     ### Metadata
 
@@ -52,8 +56,10 @@ _SETTINGS = (
     ### Static
 
     # Intermediate folder for storing problem static files
-    # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic` will collect from here to static.)
-    # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is ignored by the problem importer.)
+    # (`manage.py loadprobs` will collect files to here, and `manage.py collectstatic`
+    #  will collect from here to static.)
+    # (If this folder is to be inside `PROBLEMS_DIR`, prepend an underscore so it is
+    #  ignored by the problem importer.)
     ('PROBLEMS_STATIC_DIR', None, None),
 
     # URL to serve problem static files at

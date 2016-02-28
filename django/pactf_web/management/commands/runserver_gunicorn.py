@@ -20,7 +20,7 @@ class Command(BaseCommand):
         else:
             bind = '{}:{}'.format(settings.IP, settings.PORT)
 
-        # Note: Programs meant to be run under supervisor should not daemonize themselves
+        # (Note: Programs meant to be run under supervisor should not daemonize themselves.)
         call(((
             settings.GUNICORN,
             '{}:application'.format(DJANGO_WSGI_MODULE),

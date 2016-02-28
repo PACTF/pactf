@@ -43,7 +43,7 @@ def _grade(*, problem, flag, team):
     return correct, message
 
 
-class FlagSubmissionNotAllowException(Exception):
+class FlagSubmissionNotAllowedException(Exception):
     pass
 
 
@@ -65,7 +65,7 @@ def submit_flag(*, prob_id, competitor, flag):
     # Confirm that the team can submit flags
     window = problem.window
     if not window.ended() and not competitor.team.has_active_timer(window):
-        raise FlagSubmissionNotAllowException()
+        raise FlagSubmissionNotAllowedException()
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():

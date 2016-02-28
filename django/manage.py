@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Set up to run management commands"""
+"""Execute management commands"""
 
 import sys
 

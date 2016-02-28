@@ -11,9 +11,3 @@
 *.pyc
 __pycache__/
 /.venv
-
-# TODO(Cam, Tony): Remove from project .gitignore file
-# Cam's things
-/conv
-# Tony's things
-/.idea
