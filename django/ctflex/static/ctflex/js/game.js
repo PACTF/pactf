@@ -39,6 +39,7 @@ function submit_flag(problem_id) {
                     jQuery("#navbar-score").text(function(i, value) {
                         return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
                     });
+                    style = "success";
                 }
                 jQuery.notify(response.message, style);
             },
