@@ -16,7 +16,7 @@
 
   <title>
     {% block title %}
-      {% include 'ctflex/title.txt' %}
+      {% include 'ctflex/text/title.txt' %}
     {% endblock %}
   </title>
 
@@ -89,10 +89,7 @@
 <footer>
   <div class="container">
     <p class="text-muted">
-      © PACTF 2016
-      | <a href="https://pactf.statuspage.io/">StatusPage.io</a>
-      | <a href="mailto:{{ contact_email }}">Contact Us</a>
-      | Hosted from <a href="https://www.andover.edu/">Phillips Academy</a>
+      {% include 'ctflex/base/footer.snippet.html' %}
     </p>
   </div>
 </footer>
