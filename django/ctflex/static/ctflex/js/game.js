@@ -28,7 +28,7 @@ function submit_flag(problem_id) {
 
             // XXX(Yatharth): Review
             success: function (response) {
-                var style = "warn";
+                var style = "error";
                 // XXX(Yatharth): Have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
                 if (response.status == 0 || response.status == 2) {
                     jQuery("#" + problem_id + "-body").collapse();
@@ -37,17 +37,18 @@ function submit_flag(problem_id) {
                     });
                     style = "success";
                 }
-                $.notify(response.message, style);
+                jQuery.notify(response.message, style);
             },
 
             // TODO: handle rate limiting
             error: function (xhr, msg, err) {
-                $.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "warn");
+                jQuery.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "error");
             }
         });
 
     }
     catch (e) {
+        jQuery.notify("Error contacting the PACTF server. Please wait and try again.", "warn");
         console.log(e);
     }
 }
