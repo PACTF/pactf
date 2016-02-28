@@ -28,20 +28,21 @@ function submit_flag(problem_id) {
 
             // XXX(Yatharth): Review
             success: function (response) {
-                // TODO: set the css so it's green or red based on the response
+                var style = "warn";
                 // XXX(Yatharth): Have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
                 if (response.status == 0 || response.status == 2) {
                     jQuery("#" + problem_id + "-body").collapse();
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
+                    style = "success";
                 }
-                alert(response.message);
+                $.notify(response.message, style);
             },
 
             // TODO: handle rate limiting
             error: function (xhr, msg, err) {
-                alert("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!");
+                $.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "warn");
             }
         });
 
