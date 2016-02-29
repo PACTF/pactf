@@ -2,6 +2,13 @@ jQuery(document).ready(function () {
 
     // Hint visibility toggling
     Array.prototype.forEach.call(jQuery(".problem"), function (prob) {
+<<<<<<< Updated upstream
+=======
+        // there is definitely a better way to do this
+        if (jQuery(".problem-solved-status", prob).html().includes("Solved")) {
+            jQuery(".problem-body", prob).collapse("hide");
+        }
+>>>>>>> Stashed changes
         jQuery(".hint-button", prob).on('click', function (event) {
             jQuery('.hint-content', prob).toggle('show');
         });
@@ -30,7 +37,7 @@ function submit_flag(problem_id) {
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
-                    jQuery("#" + problem_id + " .problem-body").remove();
+                    jQuery("#" + problem_id + " .problem-body").collapse();
                     jQuery("#navbar-score").text(function(i, value) {
                         return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
                     });
