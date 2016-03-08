@@ -1,0 +1,18 @@
+{% extends 'ctflex/base/base.template.html' %}
+{% load static from staticfiles %}
+
+{% block content %}
+  {% for annonce in announcements %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="container-fluid">
+          <div class="pull-left">{{ annonce.title|safe }}</div>
+          <div class="pull-right">{{ annonce.posted }}</div>
+        </div>
+      </div>
+      <div class="panel-body" style="text-align:left;">
+        {{ annonce.body|safe }}
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}

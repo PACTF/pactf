@@ -49,6 +49,10 @@
   {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
   {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
   {#          crossorigin="anonymous"></script>#}
+  <script src="{% static "ctflex/js/notify.min.js" %}"></script>
+  {% if team %}
+  <script src="{% static "ctflex/js/announce.js" %}" type="text/javascript"></script>
+  {% endif %}
 
   {% block extra_js %}{% endblock %}
 

@@ -16,6 +16,8 @@ ctf_urls = [
     url('^$', views.index, name='index'),
 
     url(r'^game/{}?$'.format(WINDOW_CODE_TOKEN), views.game, name='game'),
+    url(r'^news/$', views.news, name='news'),
+    url(r'^check_news/$', views.check_news, name='check_news'),
     url(r'^scoreboard/{}?$'.format(WINDOW_CODE_TOKEN), views.board, name='scoreboard'),
 
     url(r'^submit_flag/(?P<prob_id>{})/$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),

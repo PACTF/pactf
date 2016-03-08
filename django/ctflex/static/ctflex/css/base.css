@@ -1,5 +1,13 @@
 /* TODO(Yatharth): Switch to LESS */
 
+
+/* General */
+
+/* thanks to http://stackoverflow.com/a/26495054/1393858 */
+.label-as-badge {
+    border-radius: 1em;
+}
+
 /* Body */
 
 body {

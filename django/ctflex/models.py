@@ -225,6 +225,7 @@ class Competitor(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
+    unread_announcements = models.ManyToManyField('Announcement')
 
     ''' Extra Data '''
 
@@ -667,6 +668,22 @@ class Submission(models.Model):
 
 # endregion
 
+# region misc
+
+@cleaned
+class Announcement(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=80, blank=False)
+    body = models.TextField(blank=False)
+    posted = models.DateTimeField(auto_now_add=True)
+    problems = models.ManyToManyField(CtfProblem)
+
+    def save(self):
+        self.body = markdown2.markdown(self.body, extras=settings.MARKDOWN_EXTRAS)
+        self.title = markdown2.markdown(self.title.replace('\n', ' '), extras=settings.MARKDOWN_EXTRAS)
+        super(Announcement, self).save()
+
+# endregion
 
 # region Permissions and Groups (old)
 #

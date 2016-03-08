@@ -530,3 +530,23 @@ def register(request,
     return render(request, template_name, context)
 
 # endregion
+
+# region Misc
+
+@limited_http_methods('GET')
+def news(request):
+    context = default_context(request)
+    context['announcements'] = queries.all_announcements()
+    if is_competitor(request.user):
+        request.user.competitor.unread_announcements.clear()
+    return render(request, 'ctflex/misc/news.html', context)
+
+@limited_http_methods('GET')
+def check_news(request):
+    if not is_competitor(request.user):
+        return JsonResponse({ 'num_unread' : 0 })
+    return JsonResponse({
+        'num_unread' : request.user.competitor.unread_announcements.count()
+    })
+
+# endregion

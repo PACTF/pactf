@@ -19,8 +19,21 @@
       <ul class="nav navbar-nav">
 
         {# TODO: Active classes #}
-        <li><a href="{% url 'ctflex:game' %} ">Game</a></li>
+        <li><a href="{% url 'ctflex:game' %}">Game</a></li>
         <li><a href="{% url 'ctflex:scoreboard' %}">Scoreboard</a></li>
+        <li>
+          <a href="{% url 'ctflex:news' %}">
+            <!--
+              XXX(Cam): I'm not sure whether it's better to use the
+              label-as-badge css committed with this; stackoverflow
+              says that it's strictly better but IMO it honestly
+              looks worse.
+            -->
+            <span class="badge alert-danger" id="unread-news-badge" style="display:none">
+            </span>
+            News
+          </a>
+        </li>
 
       </ul>
 

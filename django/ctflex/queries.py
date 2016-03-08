@@ -193,3 +193,10 @@ def format_problem(problem, team):
     return data
 
 # endregion
+
+# region announcements
+
+def all_announcements():
+    return models.Announcement.objects.order_by('-posted')
+
+# endregion
