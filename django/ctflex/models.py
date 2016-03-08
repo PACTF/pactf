@@ -154,8 +154,9 @@ def cleaned(cls):
 
 # Validator for restricting a field to word characters
 word_characters = validators.RegexValidator(
-    r'^\w*$'
-    "Only alphanumeric characters and underscores are allowed."
+    regex=r'^\w*$',
+    code='word_characters',
+    message="Only alphanumeric characters and underscores are allowed."
 )
 
 

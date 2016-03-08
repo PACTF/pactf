@@ -21,12 +21,12 @@
   {% include 'ctflex/game/countdown.snippet.html' %}
 
   <p>
-    When it starts, your team will be able to pick any {% include 'ctflex/timer_length.adjective.txt' %} span within the round to solve problems. Until then, you can:
+    When it starts, your team will be able to pick any {% include 'ctflex/text/timer_length.adjective.txt' %} span within the round to solve problems. Until then, you can:
   </p>
   <ul>
     <li>Look at past rounds’ problems using the dropdown above.</li>
     <li>Find out all of the roundss’ schedules on the <a href="{% url 'ctflex:index' %}">homepage</a>.</li>
-    <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/title.txt' %}!
+    <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/text/title.txt' %}!
     </li>
   </ul>
 {% endblock %}

@@ -7,7 +7,7 @@
 
 {% block content %}
   <p>
-    <strong>Your team’s {% include 'ctflex/timer_length.adjective.txt' %} timer for this round has expired!</strong>
+    <strong>Your team’s {% include 'ctflex/text/timer_length.adjective.txt' %} timer for this round has expired!</strong>
   </p>
   <p>
     You will be able to look at this round’s problems again when the round ends on
@@ -20,7 +20,7 @@
     {# TODO(Yatharth): Make link expand dropdown #}
     <li>Look at past rounds’ problems using the dropdown above.</li>
     <li>Find out when the next round starts on the <a href="{% url 'ctflex:index' %}">homepage</a>.</li>
-    <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/title.txt' %}!
+    <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/text/title.txt' %}!
     </li>
   </ul>
 {% endblock %}
