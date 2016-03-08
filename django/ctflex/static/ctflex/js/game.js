@@ -4,7 +4,7 @@ jQuery(document).ready(function () {
     Array.prototype.forEach.call(jQuery(".problem"), function (prob) {
         // there is definitely a better way to do this
         if (jQuery(".problem-solved-status", prob).html().includes("Solved")) {
-            jQuery(".problem-body", prob).collapse("hide");
+            jQuery(".problem-body", prob).toggle("show");
         }
         jQuery(".hint-button", prob).on('click', function (event) {
             jQuery('.hint-content', prob).toggle('show');
@@ -31,10 +31,11 @@ function submit_flag(problem_id) {
                 var style = "error";
                 // XXX(Yatharth): Have a blanket except as "internal server error" and add "could not communicate" error if can't parse on client side
                 if (response.status == 0 || response.status == 2) {
+                    jQuery("#" + problem_id + "-body").collapse();
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
-                    jQuery("#" + problem_id + " .problem-body").collapse();
+                    jQuery("#" + problem_id + " .problem-body").remove();
                     jQuery("#navbar-score").text(function(i, value) {
                         return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
                     });
@@ -45,15 +46,13 @@ function submit_flag(problem_id) {
 
             // TODO: handle rate limiting
             error: function (xhr, msg, err) {
-                jQuery.notify(
-                  "There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!",
-                  "warn"
-                );
+                jQuery.notify("There was an error (" + xhr.status + ") processing your request. Try refreshing the page. If that doesn't work, please email us!", "error");
             }
         });
 
     }
     catch (e) {
+        jQuery.notify("Error contacting the PACTF server. Please wait and try again.", "warn");
         console.log(e);
     }
 }

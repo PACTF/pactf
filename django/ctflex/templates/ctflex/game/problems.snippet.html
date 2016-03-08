@@ -6,8 +6,9 @@
     {% solved raw_prob team as has_solved %}
 
     <div class="problem well well-sm" id="{{ prob.id }}">
-
-      <div class="problem-header">
+      <div id="{{ prob.id }}-alert" style="display:none">
+      </div>
+      <div class="problem-header" data-toggle="collapse" data-target="#{{ prob.id }}-body">
         <h3>
           <span class="problem-title">{{ prob.name }}</span>
           <span class="problem-header-right">
@@ -18,36 +19,33 @@
         </h3>
       </div>
 
-      <div class="problem-body">
+      <div class="problem-body collapse in" id="{{ prob.id }}-body" height="161px">
+        <div class="problem-description">
+          {{ prob.description_html|safe }}
+        </div>
 
-        {% if not has_solved %}
-          <div class="problem-description">
-            {{ prob.description_html|safe }}
+        <input type="button" class="btn btn-primary hint-button" value="Toggle Hint"/>
+        <div class="hint-content">
+          {{ prob.hint_html|safe }}
+        </div>
+
+        <form class="problem-form">
+          {% csrf_token %}
+
+          <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
+          <div class="input-group">
+            <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
+                   required/>
+             <span class="input-group-btn">
+
+                Setting onclick changed the behaviour for hitting enter in a text input too
+                False is returned to prevent non-AJAX form submission
+              <input class="btn btn-primary" id="submit-{{ prob.id }}" type="submit" value="Check!"
+                     onclick="submit_flag('{{ prob.id|escapejs }}'); return false;"/>
+
+            </span>
           </div>
-
-          <input type="button" class="btn btn-primary hint-button" value="Toggle Hint"/>
-          <div class="hint-content">
-            {{ prob.hint_html|safe }}
-          </div>
-
-          <form class="problem-form">
-            {% csrf_token %}
-
-            <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
-            <div class="input-group">
-              <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
-                     required/>
-               <span class="input-group-btn">
-
-                  Setting onclick changed the behaviour for hitting enter in a text input too
-                  False is returned to prevent non-AJAX form submission
-                <input class="btn btn-primary" id="submit-{{ prob.id }}" type="submit" value="Check!"
-                       onclick="submit_flag('{{ prob.id|escapejs }}'); return false;"/>
-
-              </span>
-            </div>
-          </form>
-        {% endif %}
+        </form>
 
       </div>
 
