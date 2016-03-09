@@ -1,21 +1,23 @@
 {% extends 'ctflex/base/base.template.html' %}
 
 
-{% block _header_wrapper %}
+{% block content_wrapper %}
+
   <header class="page-title">
     <div class="container">
       <h1>
         {% block header %}
         {% endblock %}
       </h1>
+
+      {% block extra_header %}{% endblock%}
     </div>
   </header>
-{% endblock %}
 
-{% block content_wrapper %}
   {% include 'ctflex/base/messages.snippet.html' %}
 
   <div id="content">
     {% block content %}{% endblock %}
   </div>
+
 {% endblock %}
