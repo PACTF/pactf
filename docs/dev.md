@@ -67,7 +67,14 @@ Run `manage.py reloaddata`. If it fails, you can try running `manage.py reset_db
 In your [fork](https://help.github.com/articles/fork-a-repo/) of this repository, create a branch with your changes and submit a [pull request](https://help.github.com/articles/using-pull-requests/). You may contact us at the emails specific in the [README](../README.md).
 
 
-## Where do I start?
+## What else?
+
+### State of the Documentation
+
+The templates and `settings.py` are relatively undocumented; everything else should be documented (if not, create an issue!).
+
+
+### Where do I start?
 
 Start by looking at:
  
@@ -83,4 +90,4 @@ This should conclude your basic tour of the lifecycle of a request. You might th
 - `ctflex/settings.py`
 - `settings.py`
 
-The rest of the files you can look at as needed/come across. 
+The rest of the files you can look at as needed/come across.
