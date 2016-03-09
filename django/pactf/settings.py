@@ -1,12 +1,16 @@
-"""Define (default) configuration for the project"""
+"""Define (default) configuration for the project
+
+This file uses django-configurations.
+"""
+
 import os
-from os.path import join, dirname
+from os.path import join
 
 from configurations import Configuration, values
 from django.contrib import messages
 
-from pactf.constants import BASE_DIR
 import ctflex.constants
+from pactf.constants import BASE_DIR
 
 
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
