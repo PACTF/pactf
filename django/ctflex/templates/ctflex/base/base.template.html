@@ -1,4 +1,4 @@
-{# Define base template for all CTFlex templates
+{% comment %} Define base template for all CTFlex templates
 
 Purpose:
   Most pages SHOULD derive from `base/windowed.template.html` instead, which
@@ -23,13 +23,13 @@ Style Guidelines (for all template files):
 
     The `.snippet` part is to be included when the template does not stand on
     its own but instead is only to be included in another template (be it via
-    an `{% include %}` tag in a template or in Python code for a template tag).
+    an `{ % include % }` tag in a template (spaces added to avoid parsing) or
+    in Python code for a template tag).
 
     The `.template` part is to be included when the template is not intended to
     ever be used directly but only be derived from in some other template. This
     is similar to the notion of Abstract Base Classes in Python.
-
-#}
+{% endcomment %}
 
 {% load static from staticfiles %}
 {% load ctflex %}
@@ -82,7 +82,8 @@ Style Guidelines (for all template files):
           integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
           crossorigin="anonymous"></script>
   {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
-  {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf" crossorigin="anonymous"></script>#}
+  {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
+  {#          crossorigin="anonymous"></script>#}
 
   {% block extra_js %}{% endblock %}
 
@@ -97,14 +98,14 @@ Style Guidelines (for all template files):
 <!-- Content -->
 
 {% block content_wrapper %}
-  {# Hook for content
+  {% comment %} Hook for content
 
   Implementation Notes:
     - You SHOULD include the following line somewhere:
 
         {% include 'ctflex/base/messages.snippet.html' %}
 
-  #}
+  {% endcomment %}
 {% endblock %}
 
 
@@ -119,7 +120,8 @@ Style Guidelines (for all template files):
 </footer>
 
 <!-- JS Context -->
-{#
+{% comment %}
+
   Purpose:
     The following snippet allows views to pass context to JavaScript.
 
@@ -145,7 +147,8 @@ Style Guidelines (for all template files):
     - The value of the `js_context` you set in your view will be parsed as a
       Javascript literal. It is your responsibility to make sure the value is
       safe to evaluate.
-#}
+
+{% endcomment %}
 {% if js_context %}
   <script type="text/javascript">
     (function () {
