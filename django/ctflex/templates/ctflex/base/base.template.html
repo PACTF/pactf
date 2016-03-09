@@ -1,3 +1,36 @@
+{# Define base template for all CTFlex templates
+
+Purpose:
+  Most pages SHOULD derive from `base/windowed.template.html` instead, which
+  limits the width of the body and supports adding headers to the page. Derive
+  from this template directly when you need more control. As an example, the
+  index page directly derives from this tempate.
+
+XXX(Yatharth): Mention RFC 2119 in docs
+Style Guidelines (for all template files):
+
+  - Separate semantically different sections of HTML with headers for those
+    sections. Use HTML comments for these headers.
+
+  - Use DTL comments for other comments like TODOs, explanatations etc.
+
+  - Name templates as so:
+
+      <basename>[.snippet][.template].<extension>
+
+    `<basename>` is a descriptive name like `windowed` or `game`. `extension`
+    is the file type, e.g., `txt` or `html`.
+
+    The `.snippet` part is to be included when the template does not stand on
+    its own but instead is only to be included in another template (be it via
+    an `{% include %}` tag in a template or in Python code for a template tag).
+
+    The `.template` part is to be included when the template is not intended to
+    ever be used directly but only be derived from in some other template. This
+    is similar to the notion of Abstract Base Classes in Python.
+
+#}
+
 {% load static from staticfiles %}
 {% load ctflex %}
 
@@ -6,12 +39,13 @@
 
 <head>
 
-  <!-- Meta Tags -->
+  <!-- Meta Info -->
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="description" content="PACTF: Phillips Academy Capture The Flag, an online computer security competition">
+  <meta name="description"
+        content="PACTF: Phillips Academy Capture The Flag, an online computer security competition">
   <meta name="author" content="PACTF">
 
   <title>
@@ -19,6 +53,9 @@
       {% include 'ctflex/text/title.txt' %}
     {% endblock %}
   </title>
+
+  {# XXX(Yatharth): Figure out what resources we actually need #}
+  {# XXX(Yatharth): Download resources locally #}
 
   <!-- CSS -->
 
@@ -28,7 +65,6 @@
         integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.2/yeti/bootstrap.min.css"
         integrity="sha384-fpdlABSRXJUeEO2RMarntvPfwn7UlIhDODwZ6w/1g9YFAIYgVL0jAarUL2f/DfBy" crossorigin="anonymous">
-
 
   <link href="{% static "ctflex/css/base.css" %}" rel="stylesheet">
 
@@ -45,10 +81,10 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
           integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
           crossorigin="anonymous"></script>
-  {# TODO(Yatharth): This script loads too slowly! Download this locally (and the other ones too) #}
   {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
   {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
   {#          crossorigin="anonymous"></script>#}
+
   <script src="{% static "ctflex/js/notify.min.js" %}"></script>
   {% if team %}
   <script src="{% static "ctflex/js/announce.js" %}" type="text/javascript"></script>
@@ -64,27 +100,19 @@
 
 {% include 'ctflex/base/navbar.snippet.html' %}
 
-<!-- Header-->
+<!-- Content -->
 
-{% block _header_wrapper %}
+{% block content_wrapper %}
+  {# Hook for content
+
+  Implementation Notes:
+    - You SHOULD include the following line somewhere:
+
+        {% include 'ctflex/base/messages.snippet.html' %}
+
+  #}
 {% endblock %}
 
-<div id="body">
-
-  {# content is just content_wrapper but with padding and max-width #}
-  {% block content_wrapper %}
-
-    <!-- Messages (using Bootstrap Alerts) -->
-    {% include 'ctflex/base/messages.snippet.html' %}
-
-    <!-- Content -->
-    <div id="content">
-      {% block content %}{% endblock %}
-    </div>
-
-  {% endblock %}
-
-</div>
 
 <!-- Footer -->
 
@@ -97,11 +125,38 @@
 </footer>
 
 <!-- JS Context -->
+{#
+  Purpose:
+    The following snippet allows views to pass context to JavaScript.
+
+  Usage:
+    In your view, where you pass the context to your template, set `js_context`
+    to some Javascript literal. A JSON-serialized dictionary is recommended.
+
+    In your Javascript, include the following code
+
+      if (document.addEventListener) {
+        document.addEventListener('js_context', <your_callback>, false);
+      } else {
+        document.attachEvent('js_context', <your_callback>);
+      }
+
+    Here,the function `<your_callback>` will be called when the `js_context` is
+    ready to be used by Javascript code.
+
+    Once it is ready, you can access `js_context` as `window.js_context`.
+
+  Implementation Notes:
+    - The template must (ultimately) derive from this template.
+    - The value of the `js_context` you set in your view will be parsed as a
+      Javascript literal. It is your responsibility to make sure the value is
+      safe to evaluate.
+#}
 {% if js_context %}
   <script type="text/javascript">
     (function () {
       window.js_context = {{ js_context|safe }};
-
+      // TODO(Yatharth): Figure out PyCharm’s “Interface cannot be instantiated warning”
       document.dispatchEvent(new Event('js_context'));
     })();
   </script>
