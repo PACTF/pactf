@@ -242,15 +242,16 @@ def submit_flag(request, *, prob_id):
     # Define constants
     STATUS_FIELD = 'status'
     MESSAGE_FIELD = 'message'
-    SUCCESS_STATUS = 0
-    FAILURE_STATUS = 1
-    ALREADY_SOLVED_STATUS = 2
+    ALREADY_SOLVED_STATUS = -1
+    CORRECT_STATUS = 0
+    INCORRECT_STATUS = 1
+    ERROR_STATUS = 2
 
     # Rate-limit
     if is_ratelimited(request, fn=submit_flag,
                       key=queries.competitor_key, rate='2/s', increment=True):
         return JsonResponse({
-            STATUS_FIELD: FAILURE_STATUS,
+            STATUS_FIELD: ERROR_STATUS,
             MESSAGE_FIELD: "You are submitting flags too fast. Slow down!"
         })
 
@@ -268,16 +269,19 @@ def submit_flag(request, *, prob_id):
         status = ALREADY_SOLVED_STATUS
         message = "Your team has already solved this problem!"
     except commands.FlagAlreadyTriedException:
-        status = FAILURE_STATUS
+        status = ERROR_STATUS
         message = "Your team has already tried this flag!"
     except commands.FlagSubmissionNotAllowedException:
-        status = FAILURE_STATUS
+        status = ERROR_STATUS
         message = "Your timer must have expired; reload the page."
     except commands.EmptyFlagException:
-        status = FAILURE_STATUS
+        status = ERROR_STATUS
         message = "The flag was empty."
+    except:
+        status = ERROR_STATUS
+        message = "Something went wrong; please report this to us if it persists."
     else:
-        status = SUCCESS_STATUS if correct else FAILURE_STATUS
+        status = CORRECT_STATUS if correct else INCORRECT_STATUS
 
     return JsonResponse({
         STATUS_FIELD: status,
