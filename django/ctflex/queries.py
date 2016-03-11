@@ -177,8 +177,8 @@ def board(window=None):
 # region Problem Formatting
 
 
-# FIXME(Yatharth): Handle exceptions
-# XXX(Yatharth): Use recommended way to import from path for Python 3.5
+# XXX(Yatharth): Handle exceptions
+# TODO(Yatharth): Use recommended way to import from path for Python 3.5
 def _get_desc_and_hint(problem, team):
     """Return static description and hint or generate them"""
 

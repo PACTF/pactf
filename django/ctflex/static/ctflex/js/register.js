@@ -1,7 +1,5 @@
 var NEW_TEAM_STATUS = 'new',
-    EXISTING_TEAM_STATUS = 'old';
-
-// TODO: Rename all of existing to 'old'
+    OLD_TEAM_STATUS = 'old';
 
 jQuery(document).ready(function () {
 
@@ -13,7 +11,7 @@ jQuery(document).ready(function () {
     });
 
     jQuery('#existing-team-btn').click(function () {
-        status_input.val(EXISTING_TEAM_STATUS);
+        status_input.val(OLD_TEAM_STATUS);
         syncTeamStatus();
     });
 
@@ -24,7 +22,7 @@ function syncTeamStatus() {
     var status = jQuery('#team-status').val();
     if (status == NEW_TEAM_STATUS) {
         var show_bit = 'new', hide_bit = 'existing';
-    } else if (status == EXISTING_TEAM_STATUS) {
+    } else if (status == OLD_TEAM_STATUS) {
         var show_bit = 'existing', hide_bit = 'new';
     } else {
         console.log("Did not recognize team status: '" + status + "'");

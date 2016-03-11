@@ -22,7 +22,6 @@ class FormFieldNode(template.Node):
         extra_html = self.nodelist.render(template_context)
         template_instance = get_template(template_name='ctflex/forms/field.snippet.html')
         custom_context = Context({'field': field, 'extra_html': extra_html})
-        # TODO: fix warning
         custom_context.update(template_context)
         return template_instance.render(custom_context)
 

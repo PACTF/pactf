@@ -14,7 +14,7 @@ from ctflex import queries
 # region Misc
 
 def start_timer(*, team, window):
-    # TODO(Yatharth): Email other team members
+    # XXX(Yatharth): Email other team members
 
     if not window.started() or window.ended() or team.has_timer(window):
         return False

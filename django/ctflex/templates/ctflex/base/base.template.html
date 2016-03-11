@@ -56,8 +56,7 @@
     {% endblock %}
   </title>
 
-  {# XXX(Yatharth): Figure out what resources we actually need #}
-  {# XXX(Yatharth): Download resources locally #}
+  {# TODO(Yatharth): Figure out what resources we actually need #}
 
   <!-- CSS -->
 
@@ -163,7 +162,6 @@
   <script type="text/javascript">
     (function () {
       window.js_context = {{ js_context|safe }};
-      // TODO(Yatharth): Figure out PyCharm’s “Interface cannot be instantiated warning”
       document.dispatchEvent(new Event('js_context'));
     })();
   </script>

@@ -109,7 +109,6 @@ def limited_http_methods(*methods):
     assert set(methods).issubset({'GET', 'POST', 'PUT', 'DELETE'}), ValueError(
         "Not all methods recognized: {}".format(methods))
 
-    # TODO(Yatharth): Show custom page per http://stackoverflow.com/questions/4614294
     error = HttpResponseNotAllowed('Only the following HTTP methods are allowed here: {}'.format(methods))
 
     def decorator(view):
@@ -207,8 +206,6 @@ def announcements(request, *, window_codename):
 
     return render(request, 'ctflex/misc/announcements.html', context)
 
-
-# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
 
 @limited_http_methods('GET')
 @competitors_only()

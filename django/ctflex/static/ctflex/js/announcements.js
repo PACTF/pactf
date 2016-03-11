@@ -12,6 +12,7 @@ jQuery(document).ready(function () {
 
 function updateCount(url) {
 
+    // TODO(Cam): Make it a POST request instead of GET
     $.ajax({
         url: url,
         type: "GET",

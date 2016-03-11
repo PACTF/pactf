@@ -247,7 +247,7 @@ class Dev(Base):
         {
             'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
             'OPTIONS': {
-                'min_length': 5,
+                'min_length': 2,
             }
         },
         {
@@ -265,7 +265,7 @@ class Dev(Base):
             # 'file': {
             #     'level': 'DEBUG',
             #     'class': 'logging.FileHandler',
-            #     'f®ilename': join(BASE_DIR, 'logs', 'django.log'),
+            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
             # },
             'console': {
                 'class': 'logging.StreamHandler',
@@ -289,7 +289,6 @@ class Dev(Base):
 class Prod(Base):
     """Secure and quite settings for production"""
 
-    # Security
     DEBUG = False
     ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
