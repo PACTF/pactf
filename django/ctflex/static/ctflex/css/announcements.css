@@ -1,0 +1,12 @@
+.announcement .panel-heading p {
+    margin-bottom: 0;
+}
+
+.announcement hr {
+    margin: 0;
+}
+
+.affected-problems .label {
+    border-radius: 1em;
+    margin-left: 0.5em;
+}

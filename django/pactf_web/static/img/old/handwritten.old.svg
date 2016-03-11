@@ -1,0 +1,48 @@
+<?xml version="1.0" standalone="yes"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+	viewBox="0.0 0.0 197.6981627296588 140.7217847769029">
+
+<defs>
+	<g>
+		<path id="a-path" d="
+    	m 19.38189 141.19554
+    	l 21.952755 -77.54331
+    	l 21.952759 77.54331
+    	z">
+	</g>
+</defs>
+
+
+<g stroke-width="6.0" stroke-linejoin="round" stroke-linecap="round">
+
+	<clippath id="p-clip">
+  		<use xlink:href="#p"/>
+	</clippath>
+    <path d="
+    	m -0.0131233595, 0
+    	l 195.08661, 14.782703
+    	l -195.08661 40.587376
+    	z" />
+	<g clippath="url(#p-clip)">
+    	<path id="p" d="
+    	m 0 1.8871275
+    	l 13.165355 0
+    	l 0 139.33858
+    	l -13.165355 0
+    	z"/>
+    </g>
+    <!-- <path d="
+    	m 0 1.8871275
+    	l 13.165355 0
+    	l 195.08661, 14.782703	
+    	l -195.08661 40.587376
+    	l 0 139.33858
+    	l -13.165355 0
+    	z"/> -->
+    <use xlink:href="#a-path" />
+    <use xlink:href="#a-path" />
+    <path fill="#222" stroke="#000"  d="m91.485565 63.543327l-32.188976 38.88189l32.188976 38.88188z"/>
+    <path d="m97.34252 63.65354l21.952751 77.54331l21.952759 -77.54331z"/>
+    <path d="m149.6378 63.65354l44.34645 0l-44.34645 77.54331z"/>
+</g>
+</svg>

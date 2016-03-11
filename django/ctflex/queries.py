@@ -8,7 +8,7 @@ from os.path import join
 
 from django.db.models import Sum
 
-from ctflex import constants
+from ctflex import constants, models
 from ctflex import hashers
 from ctflex import models
 from ctflex import settings
@@ -18,6 +18,10 @@ logger = logging.getLogger(constants.LOGGER_NAME)
 
 # region General
 
+def is_competitor(user):
+    return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
+
+
 def get_window(codename=None):
     if codename:
         return models.Window.objects.get(codename=codename)
@@ -26,7 +30,7 @@ def get_window(codename=None):
 
 
 def all_windows():
-    return models.Window.objects.order_by('start').all
+    return models.Window.objects.order_by('start')
 
 
 def competitor_key(group, request):
@@ -47,6 +51,16 @@ def score(*, team, window):
         for solve in solves:
             score += solve.problem.points
     return score
+
+
+def announcements(window):
+    return window.announcement_set.order_by('-date')
+
+
+def unread_announcements(*, window, user):
+    if not is_competitor(user):
+        return 0
+    return user.competitor.unread_announcements.filter(window=window)
 
 
 # endregion
@@ -189,14 +203,9 @@ def format_problem(problem, team):
         return problem
 
     data = copy(problem.__dict__)
+
     data['description_html'], data['hint_html'] = _get_desc_and_hint(problem, team)
+
     return data
-
-# endregion
-
-# region announcements
-
-def all_announcements():
-    return models.Announcement.objects.order_by('-posted')
 
 # endregion

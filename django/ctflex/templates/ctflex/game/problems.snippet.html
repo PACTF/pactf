@@ -5,13 +5,21 @@
     {% format_problem raw_prob team as prob %}
     {% solved raw_prob team as has_solved %}
 
-    <div class="problem well well-sm" id="{{ prob.id }}">
-      <div id="{{ prob.id }}-alert" style="display:none">
-      </div>
-      <div class="problem-header" data-toggle="collapse" data-target="#{{ prob.id }}-body">
-        <h3>
-          <span class="problem-title">{{ prob.name }}</span>
-          <span class="problem-header-right">
+    <div class="problem {% if has_solved %}problem-solved{% endif %} well well-sm" id="{{ prob.id }}">
+
+      <!-- Problem Header -->
+      <div class="problem-header">
+        <h3 class="container-fluid">
+          <span class="pull-left">
+            <span class="problem-title">{{ prob.name }}</span>
+            <span class="header-link">
+              <a href="#{{ prob.id }}">
+                <span class="glyphicon glyphicon-link"></span>
+                <span class="sr-only">Problem Permalink</span>
+              </a>
+            </span>
+          </span>
+          <span class="pull-right">
             <span class="problem-solved-status">{% if has_solved %}Solved{% else %}Unsolved{% endif %}</span>
             —
             <span class="problem-points">{{ prob.points }}</span>
@@ -19,36 +27,50 @@
         </h3>
       </div>
 
-      <div class="problem-body collapse in" id="{{ prob.id }}-body" height="161px">
+      <div id="{{ prob.id }}-body" class="problem-body">
+
+        <!-- Announcements -->
+        {# TODO(Cam): Display relevant announcements #}
+
+        <!-- Description -->
         <div class="problem-description">
           {{ prob.description_html|safe }}
         </div>
 
+        <!-- Hint -->
         <input type="button" class="btn btn-primary hint-button" value="Toggle Hint"/>
         <div class="hint-content">
           {{ prob.hint_html|safe }}
         </div>
 
-        <form class="problem-form">
-          {% csrf_token %}
+        <!-- Flag Submission -->
+        {% if has_solved %}
+          <br/>
+          <p>Your team has already solved this problem!</p>
+        {% else %}
+          <form class="problem-form">
+            {% csrf_token %}
 
-          <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
-          <div class="input-group">
-            <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
-                   required/>
+            <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
+            <div class="input-group">
+              <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
+                     required/>
              <span class="input-group-btn">
 
-                Setting onclick changed the behaviour for hitting enter in a text input too
-                False is returned to prevent non-AJAX form submission
+               {# Setting onclick changes the behaviour for hitting enter in a text input too. #}
+               {# False is returned to prevent non-AJAX form submission. #}
               <input class="btn btn-primary" id="submit-{{ prob.id }}" type="submit" value="Check!"
                      onclick="submit_flag('{{ prob.id|escapejs }}'); return false;"/>
 
             </span>
-          </div>
-        </form>
+            </div>
+
+          </form>
+        {% endif %}
 
       </div>
 
     </div>
+
   {% endfor %}
 </div>

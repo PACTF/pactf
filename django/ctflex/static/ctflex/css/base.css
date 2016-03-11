@@ -1,13 +1,5 @@
 /* TODO(Yatharth): Switch to LESS */
 
-
-/* General */
-
-/* thanks to http://stackoverflow.com/a/26495054/1393858 */
-.label-as-badge {
-    border-radius: 1em;
-}
-
 /* Body */
 
 body {
@@ -102,6 +94,11 @@ p.navbar-text {
         margin: 0;
         padding: 10px 15px;
     }
+}
+
+#unread-announcements-badge {
+    margin-left: 3px;
+    display: none;
 }
 
 /* Forms */

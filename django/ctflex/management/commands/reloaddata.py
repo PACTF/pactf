@@ -26,8 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
 
-        if options['debug']:
-            helpers.debug_with_pdb()
+        helpers.debug_with_pdb(**options)
 
         try:
             with transaction.atomic():
@@ -55,3 +54,6 @@ class Command(BaseCommand):
         except Exception as err:
             self.stderr.write("Exception encountered; rolling back")
             raise err
+
+        else:
+            self.stdout.write("Successfully (re)loaded all fixtures and problems")

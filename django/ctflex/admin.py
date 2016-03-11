@@ -45,3 +45,5 @@ admin.site.register(models.Submission)
 
 admin.site.register(models.Timer, TimerAdmin)
 admin.site.register(models.Window)
+
+admin.site.register(models.Announcement)

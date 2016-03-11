@@ -20,6 +20,7 @@ During each window, each team can view and solve problems only while their **Per
 
 **Note:** The front-end for CTFlex/PACTF uses the word **‘rounds’** and ‘timers’ based on what later user testing revealed to be most self-explanatory words. However, the code and documentation for CTFlex/PACTF refers to ‘rounds’ as ‘windows’ or ‘Contest Windows’ and timers as ‘Personal Timers.’
 
+
 #### Possible States of the Competition
 
 A window can be in one of the following states:
@@ -67,6 +68,7 @@ The website consists of multiple pages, including the:
 - **Landing Page:** As the index of the website and the first thing visitors hit, this page pitches your CTF and lists the dates of its rounds.
 - **Game:** This page lists the problems a team has unlocked and takes flag submissions assuming a team has started their timer which has not yet expired etc. 
 - **Scoreboard:** This page ranks all teams eligible to win prizes.
+- **News:** This page lists all announcements for that window.
 
 #### Windows and the URL schema
 
@@ -88,6 +90,12 @@ The Game page displays different based on the state of the window and team:
 - **Active:** Competitors can view and solve problems, improving their ranking.
 - **Done:** Competitors cannot view problems for that round. This was decided in order to reduce confusion about when correct flag submissions improve rankings and when they don't. It also mirrors [USACO][usaco]’s Contest Windows.
 - **Past:** Competitors can view problems, submit flags, and increase their displayed score, but their ranking and score on the scoreboard for that window will not change since the window has ended.
+
+## Announcements
+
+Announcements for a window will be displayed on the News page. Announcements can also be associated with particular problems; they will then be displayed inline with the problems on the Game page.
+ 
+**Note:** The front-end for CTFlex/PACTF uses the word **‘news’** based on what later user testing revealed to be most self-explanatory word. However, the code and documentation for CTFlex/PACTF uses the word ‘announcement’.
 
 
 ## Using CTFlex

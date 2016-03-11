@@ -67,6 +67,41 @@ Run `manage.py reloaddata`. If it fails, you can try running `manage.py reset_db
 In your [fork](https://help.github.com/articles/fork-a-repo/) of this repository, create a branch with your changes and submit a [pull request](https://help.github.com/articles/using-pull-requests/). You may contact us at the emails specific in the [README](../README.md).
 
 
+## Style Guidelines
+
+### Docstrings
+
+Write a docstring for any function or class whose implementation is longer than a few lines and whose purpose is not blindingly obvious.
+Write a docstring for all Python files except for files defining Django management commands, which much be documented in the help attribute of the commands’ respective classes.
+
+Format docstrings as sp:
+
+    """Compute the side length of a square given its area
+    
+    Purpose:
+        <Explanation of why the documented thing exists>
+        
+    Usage:
+        <Full description of interface of the documented thing (or whether it is automatically called etc.)>
+        
+    Implementation Notes:
+        - <Particular choices made as relevant to the interface>
+        - ...
+    """
+    
+### Imports
+
+Imports for Python files fall into one of the following categories:
+
+- Standard Library modules
+- Django modules included with Django (or part of the `contribs` package)
+- 3rd-party non-Django modules
+- 3rd-party Django modules
+- 1st-party/your/intra-package modules
+
+Group imports of the same category. Separate such groups with a blank line. Order the groups in the order above.
+
+
 ## What else?
 
 ### State of the Documentation

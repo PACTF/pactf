@@ -20,7 +20,7 @@ from ctflex import settings
 from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD
 
 
-# region Helpers and General
+# region Helpers
 
 
 def print_time(time):
@@ -29,7 +29,7 @@ def print_time(time):
 
 
 def unique_receiver(*args, **kwargs):
-    """Wrap `django.dispatch.receiver` to set `dispatch_uid` automatically based on the receiver's name
+    """Decorate by wrapping `django.dispatch.receiver` to set `dispatch_uid` automatically
 
     Purpose:
         This decorator eliminates the need to set `dispatch_uid` for a Django
@@ -40,6 +40,10 @@ def unique_receiver(*args, **kwargs):
         Simply substitute this decorator for `django.dispatch.receiver`. If
         you define `dispatch_uid` yourself, this decorator will use that
         supplied value instead of the receiver function's name.
+
+    Implementation Notes:
+        - The default value for `dispatch_uid` (if you do not provide it
+          yourself) is ‘ctflex’ composed with the receiver function’s name.
     """
 
     def decorator(function):
@@ -48,36 +52,6 @@ def unique_receiver(*args, **kwargs):
         return _receiver(*args, **kwargs)(function)
 
     return decorator
-
-
-@unique_receiver(pre_save)
-def pre_save_validate(sender, instance, *args, **kwargs):
-    """Full clean an object before saving it
-
-    Purpose:
-        While forms typically full clean an object before saving it, other
-        code might not always do this. To prevent invalid objects from being
-        saved, this receiver makes saving an object full clean it first.
-
-    Usage:
-        This receiver has already been registered. Nothing more needs to
-        be done.
-
-    Implementation Notes:
-        - This receiver ignores non-CTFlex models since otherwise errors happen.
-
-    Drawbacks:
-        - This receiver means that full_clean is sometimes redundantly called
-          twice for an object.
-
-    Limitations:
-        - Calling update() on a query does not trigger save() and thus still
-          doesn't trigger full_clean().
-
-    Author: Yatharth
-    """
-    if sender._meta.app_label == APP_NAME:
-        instance.full_clean()
 
 
 def cleaned(cls):
@@ -160,12 +134,25 @@ word_characters = validators.RegexValidator(
 )
 
 
-# class State(models.Model):
-#     """Track global settings in the database"""
-#
-#     def save(self, *args, **kwargs):
-#         self.id = 1
-#         super().save(*args, **kwargs)
+def markdown_to_html(markdown):
+    """Convert Markdown to HTML, quoting any existing HTML """
+    return markdown2.markdown(markdown, extras=settings.MARKDOWN_EXTRAS, safe_mode='escape')
+
+
+def link_static(text, *, static_prefix, text_prefix):
+    """Parse {% ctflexstatic ... %} directives for linking to static files"""
+
+    TAG = 'ctflexstatic'
+    FILENAME_GROUP = 'filename'
+    PATTERN = re.compile(
+        r'''{{% \s* {} \s+ (['"]) (?P<{}> (?:(?!\1).)+ ) \1 \s* %}}'''
+            .format(TAG, FILENAME_GROUP),
+        re.VERBOSE,
+    )
+    REPLACEMENT = r'{}/{}/{{}}'.format(static_prefix, text_prefix)
+    REPLACER = lambda match: static(REPLACEMENT.format(match.group(FILENAME_GROUP)))
+
+    return PATTERN.sub(REPLACER, text)
 
 
 # endregion
@@ -182,7 +169,7 @@ class Team(models.Model):
     name = models.CharField(max_length=30, unique=True,
                             verbose_name="Team Name")
 
-    ''' Extra Data '''
+    ''' Data Fields '''
 
     banned = models.BooleanField(default=False)
     passphrase = models.CharField(max_length=30,
@@ -225,7 +212,6 @@ class Competitor(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
-    unread_announcements = models.ManyToManyField('Announcement')
 
     ''' Extra Data '''
 
@@ -425,7 +411,7 @@ class Timer(models.Model):
     def sync_start(self):
         """Set start to now if not already defined
 
-        We don’t simply set auto_now=True on the start field because then we wouldn’t
+        We don’t simply set auto_now_add=True on the start field because then we wouldn’t
         be able to edit the field in the Django admin panel (`auto_now` is stupid).
         """
         if not self.start:
@@ -455,8 +441,11 @@ class Timer(models.Model):
 class CtfProblem(models.Model):
     """Represent a CTF Problem"""
 
+    class Meta:
+        verbose_name = "Problem"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=100)
     window = models.ForeignKey(Window)
 
     points = models.IntegerField(validators=[validators.MinValueValidator(1), ])
@@ -483,24 +472,6 @@ class CtfProblem(models.Model):
         return "<Problem #{} {!r}>".format(self.id, self.name)
 
     ''' Helpers '''
-
-    @staticmethod
-    def markdown_to_html(markdown):
-        """Convert Markdown to HTML, quoting any existing HTML """
-        return markdown2.markdown(markdown, extras=settings.MARKDOWN_EXTRAS, safe_mode='escape')
-
-    @staticmethod
-    def link_static(old_text, problem_id):
-        """Parse {% ctflexstatic ... %} directives for linking to static files"""
-
-        PATTERN = re.compile(
-            r'''{% \s* ctflexstatic \s+ (['"]) (?P<filename> (?:(?!\1).)+ ) \1 \s* %}''',
-            re.VERBOSE,
-        )
-        REPLACEMENT = r'{}/{}/{{}}'.format(settings.PROBLEMS_STATIC_URL, problem_id)
-        REPLACER = lambda match: static(REPLACEMENT.format(match.group('filename')))
-
-        return PATTERN.sub(REPLACER, old_text)
 
     def process_html(self, html):
         return self.markdown_to_html(self.link_static(html, self.id))
@@ -557,9 +528,15 @@ class CtfProblem(models.Model):
             )
 
     def sync_html(self):
+        processor = lambda text: link_static(
+            markdown_to_html(text),
+            static_prefix=settings.PROBLEMS_STATIC_URL,
+            text_prefix=self.id,
+        )
+
         if not self.generator:
-            self.description_html = self.process_html(self.description)
-            self.hint_html = self.process_html(self.hint)
+            self.description_html = processor(self.description)
+            self.hint_html = processor(self.hint)
 
     FIELD_CLEANERS = {
         # (The order matters here.)
@@ -666,22 +643,123 @@ class Submission(models.Model):
         sync_problem,
     )
 
+
 # endregion
 
-# region misc
+# region Miscellaneous
+
+
+@unique_receiver(pre_save)
+def pre_save_validate(sender, instance, *args, **kwargs):
+    """Full clean an object before saving it
+
+    Purpose:
+        While forms typically full clean an object before saving it, other
+        code might not always do this. To prevent invalid objects from being
+        saved, this receiver makes saving an object full clean it first.
+
+    Usage:
+        This receiver has already been registered. Nothing more needs to
+        be done.
+
+    Implementation Notes:
+        - This receiver ignores non-CTFlex models since otherwise errors happen.
+
+    Drawbacks:
+        - This receiver means that full_clean is sometimes redundantly called
+          twice for an object.
+
+    Limitations:
+        - Calling update() on a query does not trigger save() and thus still
+          doesn't trigger full_clean().
+
+    Author: Yatharth
+    """
+    if sender._meta.app_label == APP_NAME:
+        instance.full_clean()
+
+
+# class State(models.Model):
+#     """Track global settings in the database"""
+#
+#     def save(self, *args, **kwargs):
+#         self.id = 1
+#         super().save(*args, **kwargs)
+
 
 @cleaned
 class Announcement(models.Model):
-    id = models.IntegerField(primary_key=True)
-    title = models.CharField(max_length=80, blank=False)
-    body = models.TextField(blank=False)
-    posted = models.DateTimeField(auto_now_add=True)
-    problems = models.ManyToManyField(CtfProblem)
+    """Represent an announcement for a window (and maybe some problems)"""
 
-    def save(self):
-        self.body = markdown2.markdown(self.body, extras=settings.MARKDOWN_EXTRAS)
-        self.title = markdown2.markdown(self.title.replace('\n', ' '), extras=settings.MARKDOWN_EXTRAS)
-        super(Announcement, self).save()
+    ''' Structural Fields '''
+
+    id = models.AutoField(primary_key=True)
+    window = models.ForeignKey(Window, on_delete=models.CASCADE)
+    competitors = models.ManyToManyField(Competitor, related_name='unread_announcements',
+                                         blank=True)
+    problems = models.ManyToManyField(CtfProblem, blank=True)
+
+    ''' Data Fields '''
+
+    date = models.DateTimeField()
+
+    title = models.CharField(max_length=100)
+    title_html = models.CharField(max_length=100, editable=False, blank=True)
+    body = models.TextField(blank=False)
+    body_html = models.TextField(editable=False, default='', blank=True)
+
+    def __str__(self):
+        return "<Announcement #{} window={!r} {}>".format(self.id, self.window, print_time(self.date))
+
+    ''' Cleaning '''
+
+    def sync_date(self):
+        """Set date to now if not already defined
+
+        We don’t simply set auto_now_add=True on the start field because then we wouldn’t
+        be able to edit the field in the Django admin panel (`auto_now` is stupid).
+        """
+        if not self.date:
+            self.date = timezone.now()
+
+    # def sync_title_is_single_line(self):
+    #     self.title = self.title.replace('\n', ' ')
+
+    def sync_html(self):
+        self.body_html = markdown_to_html(self.body)
+        self.title_html = markdown_to_html(self.title)
+
+    def validate_windows(self):
+        """Validate that the announcement window and any problem windows are the same
+
+        Usage:
+            1. Begin a transaction with `with transaction.atomic()`
+            2. Make your many-to-many field changes to `problems`
+            3. Call this method
+
+            This method may raise a ValidationError, which you may catch
+            outside (NOT inside) the transaction manager.
+
+        Limitations:
+            - This validation cannot be performed automatically, so you must
+              code it in yourself.
+        """
+        if self.problems:
+            problem_windows = set(obj['window'] for obj in self.problems.values('window'))
+            if not problem_windows.issubset({self.window.id}):
+                raise ValidationError("Associated problems’ windows must match the announcement’s window",
+                                      code='window')
+
+    FIELD_CLEANERS = {
+        'date': (
+            sync_date,
+        ),
+    }
+
+    # (Order doesn’t matter.)
+    MODEL_CLEANERS = (
+        sync_html,
+    )
 
 # endregion
 

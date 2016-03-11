@@ -8,11 +8,14 @@ from django.core.exceptions import ValidationError
 from ctflex import settings
 from ctflex import hashers
 from ctflex import models
+from ctflex import queries
 
 
 # region Misc
 
 def start_timer(*, team, window):
+    # TODO(Yatharth): Email other team members
+
     if not window.started() or window.ended() or team.has_timer(window):
         return False
 
@@ -26,6 +29,9 @@ def start_timer(*, team, window):
 
     return True
 
+def mark_announcements_read(user):
+    if queries.is_competitor(user):
+        user.competitor.unread_announcements.clear()
 
 # endregion
 
