@@ -94,6 +94,19 @@ The Game page displays different based on the state of the window and team:
 ## Announcements
 
 Announcements for a window will be displayed on the News page. Announcements can also be associated with particular problems; they will then be displayed inline with the problems on the Game page.
+
+To make an announcement, run `manage.py announce foo.yaml` where `foo.yaml` file follows the format:
+
+    id: 102  # This field is optional but recommended
+    title: You can use Markdown here
+    
+    window: web
+    problems:  # This field is optional
+      - 51e7003e-d833-4dd8-b241-cf744965cd56
+    
+    body: >
+        You can use Markdown here too.
+
  
 **Note:** The front-end for CTFlex/PACTF uses the word **‘news’** based on what later user testing revealed to be most self-explanatory word. However, the code and documentation for CTFlex/PACTF uses the word ‘announcement’.
 
