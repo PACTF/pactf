@@ -1,4 +1,4 @@
-name: 'problem5'
+name: Problem5
 points: 40
 description: |
   [Static files]({% ctflexstatic 'static.txt' %}) should work. Also, begin your flag with the number 5.

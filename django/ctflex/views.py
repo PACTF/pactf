@@ -202,7 +202,6 @@ def announcements(request, *, window_codename):
     window = queries.get_window(window_codename)
     context = windowed_context(window)
     context['announcements'] = queries.announcements(window)
-    context['unread_announcements_count'] = queries.unread_announcements(window=window, user=request.user).count()
 
     commands.mark_announcements_read(request.user)
 
