@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseRedirect
 from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
-from django.shortcuts import render, redirect, resolve_url
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -29,9 +29,6 @@ from ctflex import settings
 
 # region Helper Methods
 
-def is_competitor(user):
-    return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
-
 
 def default_context(request):
     """Return context needed for all CTFlex templates
@@ -40,7 +37,7 @@ def default_context(request):
     `settings.py`; therefore, it should not be manually included.
     """
     return {
-        'team': request.user.competitor.team if is_competitor(request.user) else None,
+        'team': request.user.competitor.team if queries.is_competitor(request.user) else None,
         'contact_email': settings.CONTACT_EMAIL,
     }
 
@@ -130,7 +127,7 @@ def limited_http_methods(*methods):
 @universal_decorator(methodname='dispatch')
 def competitors_only():
     """Decorates views to redirect non-competitor users to the login page"""
-    return user_passes_test(is_competitor)
+    return user_passes_test(queries.is_competitor)
 
 
 @universal_decorator(methodname='dispatch')
@@ -197,9 +194,24 @@ def rate_limited(request, err):
     return render(request, 'ctflex/misc/ratelimited.html')
 
 
-# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
-@competitors_only()
 @limited_http_methods('GET')
+@defaulted_window()
+def announcements(request, *, window_codename):
+    """List all announcements of window and mark them as read"""
+
+    window = queries.get_window(window_codename)
+    context = windowed_context(window)
+    context['announcements'] = queries.announcements(window)
+
+    commands.mark_announcements_read(request.user)
+
+    return render(request, 'ctflex/misc/announcements.html', context)
+
+
+# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
+
+@limited_http_methods('GET')
+@competitors_only()
 class Team(DetailView):
     model = models.Team
     template_name = 'ctflex/misc/team.html'
@@ -216,9 +228,9 @@ class Team(DetailView):
 
 # region POSTs
 
-@competitors_only()
-@limited_http_methods('POST')
 @never_cache
+@limited_http_methods('POST')
+@competitors_only()
 def start_timer(request):
     """Start a team’s timer and redirect to the game"""
 
@@ -233,9 +245,9 @@ def start_timer(request):
     return redirect(reverse('ctflex:game'))
 
 
-@competitors_only()
-@limited_http_methods('POST')
 @never_cache
+@limited_http_methods('POST')
+@competitors_only()
 def submit_flag(request, *, prob_id):
     """Grade a flag submission and return a JSON response"""
 
@@ -289,14 +301,24 @@ def submit_flag(request, *, prob_id):
     })
 
 
+@never_cache
+@limited_http_methods('GET')
+def unread_announcements(request, *, window_codename):
+    window = queries.get_window(window_codename)
+    count = queries.unread_announcements(window=window, user=request.user).count()
+    return JsonResponse({
+        'count': count,
+    })
+
+
 # endregion
 
 # region Complex GETs
 
-@competitors_only()
-@defaulted_window()
-@limited_http_methods('GET')
 @never_cache
+@limited_http_methods('GET')
+@defaulted_window()
+@competitors_only()
 def game(request, *, window_codename):
     """Display problems"""
 
@@ -357,9 +379,9 @@ def game(request, *, window_codename):
     return render(request, template_name, context)
 
 
-@defaulted_window()
-@limited_http_methods('GET')
 @never_cache
+@limited_http_methods('GET')
+@defaulted_window()
 def board(request, *, window_codename):
     """Displays rankings"""
 
@@ -392,7 +414,6 @@ def board(request, *, window_codename):
 
 # endregion
 
-
 # region Auth
 
 @limited_http_methods('GET')
@@ -421,15 +442,14 @@ def password_reset_complete(request, *,
 
 # endregion
 
-
 # region Registration
 
 # TODO(Yatharth): Shorten view by extracting a command
-@anonyomous_users_only()
-@limited_http_methods('GET', 'POST')
+@never_cache
 @sensitive_post_parameters()
 @csrf_protect
-@never_cache
+@limited_http_methods('GET', 'POST')
+@anonyomous_users_only()
 def register(request,
              template_name='ctflex/auth/register.html',
              post_change_redirect='ctflex:game',

@@ -27,6 +27,7 @@ class Django:
 
         # Django Extensions
         'django.contrib.postgres',
+        'django.contrib.humanize',
 
         # Django 3rd-party
         'django_countries',
@@ -65,10 +66,6 @@ class Django:
     )
 
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
-    ROOT_URLCONF = 'pactf.urls'
-
-    WSGI_APPLICATION = 'pactf.wsgi.application'
 
     TEMPLATES = [
         {

@@ -5,13 +5,14 @@ import sys
 import textwrap
 import traceback
 from os.path import join, isfile, isdir
-import yaml
-import yaml.parser
 
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+
+import yaml
+import yaml.parser
 
 from ctflex import constants
 from ctflex import settings
@@ -74,13 +75,10 @@ class Command(BaseCommand):
         # Initialize list for problems we came across from the files
         processed_problems = []
 
-        # Initialize error handling-related variables
+        # Initialize error handling
         self.errored = False
-        self.debug = options['debug']
-
-        # Get ready to give user a shell on exception if in debug mode
-        if self.debug:
-            helpers.debug_with_pdb()
+        self.debug = options[helpers.DEBUG_OPTION_NAME]
+        helpers.debug_with_pdb(**options)
 
         # Delete any existing files after confirmation
         if isdir(PROBLEMS_STATIC_DIR):
@@ -100,6 +98,9 @@ class Command(BaseCommand):
             write("Deleting all files in the intermediate location\n\n")
             shutil.rmtree(PROBLEMS_STATIC_DIR)
         os.makedirs(PROBLEMS_STATIC_DIR, exist_ok=True)
+
+        class DummyForeseenException(Exception):
+            pass
 
         try:
 
@@ -219,6 +220,12 @@ class Command(BaseCommand):
                         # We made it!
                         write("Successfully imported problem for '{}'".format(prob_basename))
 
+                # Stop if errors were encountered
+                if self.errored:
+                    write("")
+                    self.stderr.write("Foreseen exceptions were encountered; rolled back transaction")
+                    raise DummyForeseenException()
+
                 # Delete existing problems that were not updated if clear option was given
                 # (This action is so dangerous that even passing in '--no-input' shouldn't automatically approve it.)
                 unprocessed_problems = CtfProblem.objects.exclude(pk__in=processed_problems).all()
@@ -247,20 +254,16 @@ class Command(BaseCommand):
                         for problem in unprocessed_problems:
                             problem.delete()
 
-                if self.errored:
-                    write("")
-                    self.stderr.write("Foreseen exceptions were encountered; rolling back transaction")
-
-
                 # Collect all static files to final location
-                else:
-                    write("")
-                    write("Collecting static files to final location")
-                    management.call_command('collectstatic', *helpers.filter_dict({
-                        '--no-input': not options['interactive'],
-                        '--clear': options['clear'],
-                    }))
+                write("")
+                write("Collecting static files to final location")
+                management.call_command('collectstatic', *helpers.filter_dict({
+                    '--no-input': not options['interactive'],
+                    '--clear': options['clear'],
+                }))
 
+        except DummyForeseenException:
+            pass
         except Exception as err:
-            self.stderr.write("An unforeseen exception was encountered; rolling back transaction")
+            self.stderr.write("An unforeseen exception was encountered; rolled back transaction")
             self.handle_error(err)

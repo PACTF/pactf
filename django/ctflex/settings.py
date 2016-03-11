@@ -51,7 +51,8 @@ _SETTINGS = (
     ('PROBLEMS_DIR', None, None),
 
     # Extras for the markdown2 Python module for formatting problem description and hints
-    ('MARKDOWN_EXTRAS', ('fenced-code-blocks', 'smarty-pants', 'spoiler'), None),
+    # TODO: Download 2.3.1 of markdown2 to get spoiler goodiness
+    ('MARKDOWN_EXTRAS', ('fenced-code-blocks', 'smarty-pants', 'spoiler', 'strike'), None),
 
     ### Static
 

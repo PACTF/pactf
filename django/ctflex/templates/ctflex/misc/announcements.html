@@ -1,0 +1,64 @@
+{% extends 'ctflex/base/windowed.template.html' %}
+{% load static from staticfiles %}
+{% load humanize %}
+
+{% block title %}
+  News - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  News
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static "ctflex/css/announcements.css" %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+  {% if announcements %}
+    {% for annonce in announcements %}
+      <div class="announcement panel panel-default">
+
+        <div class="panel-heading">
+          <div class="container-fluid">
+            <div class="pull-left">{{ annonce.title_html|safe }}</div>
+            <div class="pull-right">
+            <span title="{{ annonce.date|date:'g:i A e \o\n j F Y' }}">
+              {{ annonce.date|naturaltime }}
+            </span>
+            </div>
+          </div>
+        </div>
+
+        {% if annonce.problems.exists %}
+          <div class="affected-problems panel-body">
+            The following problems are affected:
+          <span>
+            {% for prob in annonce.problems.all %}
+              <a href="{% url 'ctflex:game' window_codename=window.codename %}#{{ prob.id }}"
+                 class="label label-primary">
+                {{ prob.name }}
+              </a>
+            {% endfor %}
+          </span>
+          </div>
+          <hr>
+        {% endif %}
+
+        <div class="panel-body">
+          {{ annonce.body_html|safe }}
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+
+    <p>
+      <strong>There are no announcements for this round right now.</strong>
+      You can look at announcements for other rounds using the dropdown above
+    </p>
+
+  {% endif %}
+{% endblock %}

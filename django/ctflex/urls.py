@@ -12,15 +12,21 @@ app_name = APP_NAME
 
 WINDOW_CODE_TOKEN = r'(?:(?P<window_codename>\w+)/)'
 
-ctf_urls = [
-    url('^$', views.index, name='index'),
-
-    url(r'^game/{}?$'.format(WINDOW_CODE_TOKEN), views.game, name='game'),
-    url(r'^scoreboard/{}?$'.format(WINDOW_CODE_TOKEN), views.board, name='scoreboard'),
-
+api_urls = [
     url(r'^submit_flag/(?P<prob_id>{})/$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
-    url(r'^start_timer/$', views.start_timer, name='start_timer'),
+    url(r'^unread_announcements/{}$'.format(WINDOW_CODE_TOKEN), views.unread_announcements,
+        name='unread_announcements'),
+]
 
+windowed_urls = [
+    url(r'^game/{}?$'.format(WINDOW_CODE_TOKEN), views.game, name='game'),
+    url(r'^news/{}?$'.format(WINDOW_CODE_TOKEN), views.announcements, name='announcements'),
+    url(r'^scoreboard/{}?$'.format(WINDOW_CODE_TOKEN), views.board, name='scoreboard'),
+]
+
+misc_urls = [
+    url('^$', views.index, name='index'),
+    url(r'^start_timer/$', views.start_timer, name='start_timer'),
     url(r'^team/$', views.Team.as_view(), name='current_team'),
 ]
 
@@ -70,5 +76,7 @@ auth_urls = [
 
 urlpatterns = [
     url(r'', include(auth_urls)),
-    url(r'', include(ctf_urls)),
+    url(r'', include(misc_urls)),
+    url(r'', include(windowed_urls)),
+    url(r'api/', include(api_urls)),
 ]

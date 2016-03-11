@@ -5,7 +5,10 @@ import sys
 from IPython.core import ultratb
 
 
+DEBUG_OPTION_NAME = 'debug'
+
 # region Misc
+
 
 def filter_dict(kwargs):
     """Return only the keys of a dictionary whose values are truthy"""
@@ -13,8 +16,14 @@ def filter_dict(kwargs):
 
 
 def debug_with_pdb(**options):
-    """On error, give the user a PDB shell to examine the error instead of printing the stacktrace and quitting"""
-    sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
+    """Debug errors interactively if debug option is true
+
+    If the debug option is truthy, the Python exception handler will be set to
+    give the user a PDB shell to examine the error (instead of to print the
+    stacktrace and quit).
+    """
+    if options[DEBUG_OPTION_NAME]:
+        sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=1)
 
 
 # endregion
@@ -30,7 +39,7 @@ def add_no_input_argument(parser):
 
 def add_debug_argument(parser):
     parser.add_argument('--debug', '-d',
-                        action='store_true', dest='debug', default=False,
+                        action='store_true', dest=DEBUG_OPTION_NAME, default=False,
                         help="Launch a pdb session on encountering an exception.")
 
 

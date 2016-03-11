@@ -1,10 +1,4 @@
-.problem-header-right {
-    float: right;
-}
-
-.problem-points {
-    font-weight: bold;
-}
+/* Header */
 
 .problem-header {
     background-color: #008cba;
@@ -16,13 +10,22 @@
     padding-left: 10px;
     padding-right: 10px;
 
-    margin-bottom: 1em;
+    margin-bottom: 0em;
 }
 
-.problem-header h3 {
+.problem-header h3.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+
     margin-top: 0;
     margin-bottom: 0;
 }
+
+.problem-points {
+    font-weight: bold;
+}
+
+/* General */
 
 .problem {
     margin-bottom: 10px;
@@ -34,4 +37,32 @@
 
 .hint-button {
     margin-bottom: 10px;
+}
+
+.problem-description {
+    /* Yatharth: If you are setting a margin on problem-header, you need this
+                 to fix a visual glitch in (un)collapsing; no idea why */
+    /*border: 1px solid transparent;*/
+}
+
+.problem-solved .problem-body {
+    display: none;
+}
+
+/* Header Link */
+
+.problem-header h3 .header-link {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out 0.05s;
+}
+
+.problem-header .glyphicon {
+    color: white;
+    margin-left: 0.25em;
+    font-size: 0.70em;
+    vertical-align: 0.15em;
+}
+
+.problem-header h3:hover .header-link {
+    opacity: 1;
 }

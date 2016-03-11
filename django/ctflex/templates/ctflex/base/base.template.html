@@ -1,34 +1,36 @@
 {% comment %} Define base template for all CTFlex templates
 
-Purpose:
+  Purpose:
   Most pages SHOULD derive from `base/windowed.template.html` instead, which
   limits the width of the body and supports adding headers to the page. Derive
   from this template directly when you need more control. As an example, the
   index page directly derives from this tempate.
 
-XXX(Yatharth): Mention RFC 2119 in docs
-Style Guidelines (for all template files):
+  XXX(Yatharth): Mention RFC 2119 in docs
+  Style Guidelines (for all template files):
 
   - Separate semantically different sections of HTML with headers for those
-    sections. Use HTML comments for these headers.
+  sections. Use HTML comments for these headers.
 
   - Use DTL comments for other comments like TODOs, explanatations etc.
 
   - Name templates as so:
 
-      <basename>[.snippet][.template].<extension>
+  <basename>[.snippet][.template].
+  <extension>
 
-    `<basename>` is a descriptive name like `windowed` or `game`. `extension`
-    is the file type, e.g., `txt` or `html`.
+  `
+  <basename>` is a descriptive name like `windowed` or `game`. `extension`
+  is the file type, e.g., `txt` or `html`.
 
-    The `.snippet` part is to be included when the template does not stand on
-    its own but instead is only to be included in another template (be it via
-    an `{ % include % }` tag in a template (spaces added to avoid parsing) or
-    in Python code for a template tag).
+  The `.snippet` part is to be included when the template does not stand on
+  its own but instead is only to be included in another template (be it via
+  an `{ % include % }` tag in a template (spaces added to avoid parsing) or
+  in Python code for a template tag).
 
-    The `.template` part is to be included when the template is not intended to
-    ever be used directly but only be derived from in some other template. This
-    is similar to the notion of Abstract Base Classes in Python.
+  The `.template` part is to be included when the template is not intended to
+  ever be used directly but only be derived from in some other template. This
+  is similar to the notion of Abstract Base Classes in Python.
 {% endcomment %}
 
 {% load static from staticfiles %}
@@ -78,12 +80,17 @@ Style Guidelines (for all template files):
   <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"
           integrity="sha384-vIp38BeRN82wlvPB8/vo/5e0J1/gn7WfUf1Qq9bdh79iMPxjry99thNkscQG1b8C"
           crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-          integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-          crossorigin="anonymous"></script>
+  <script src="{% static 'ctflex/js/lib/bootstrap.min.js' %}"
+          integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"></script>
+  {# Commented because it took too long to load #}
   {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
   {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
   {#          crossorigin="anonymous"></script>#}
+  <script src="{% static "ctflex/js/lib/notify.min.js" %}"></script>
+
+  {% if team %}
+    <script src="{% static "ctflex/js/announcements.js" %}" type="text/javascript"></script>
+  {% endif %}
 
   {% block extra_js %}{% endblock %}
 
@@ -100,10 +107,10 @@ Style Guidelines (for all template files):
 {% block content_wrapper %}
   {% comment %} Hook for content
 
-  Implementation Notes:
+    Implementation Notes:
     - You SHOULD include the following line somewhere:
 
-        {% include 'ctflex/base/messages.snippet.html' %}
+    {% include 'ctflex/base/messages.snippet.html' %}
 
   {% endcomment %}
 {% endblock %}
@@ -123,30 +130,33 @@ Style Guidelines (for all template files):
 {% comment %}
 
   Purpose:
-    The following snippet allows views to pass context to JavaScript.
+  The following snippet allows views to pass context to JavaScript.
 
   Usage:
-    In your view, where you pass the context to your template, set `js_context`
-    to some Javascript literal. A JSON-serialized dictionary is recommended.
+  In your view, where you pass the context to your template, set `js_context`
+  to some Javascript literal. A JSON-serialized dictionary is recommended.
 
-    In your Javascript, include the following code
+  In your Javascript, include the following code
 
-      if (document.addEventListener) {
-        document.addEventListener('js_context', <your_callback>, false);
-      } else {
-        document.attachEvent('js_context', <your_callback>);
-      }
+  if (document.addEventListener) {
+  document.addEventListener('js_context',
+  <your_callback>, false);
+  } else {
+  document.attachEvent('js_context',
+  <your_callback>);
+  }
 
-    Here,the function `<your_callback>` will be called when the `js_context` is
-    ready to be used by Javascript code.
+  Here,the function `
+  <your_callback>` will be called when the `js_context` is
+  ready to be used by Javascript code.
 
-    Once it is ready, you can access `js_context` as `window.js_context`.
+  Once it is ready, you can access `js_context` as `window.js_context`.
 
   Implementation Notes:
-    - The template must (ultimately) derive from this template.
-    - The value of the `js_context` you set in your view will be parsed as a
-      Javascript literal. It is your responsibility to make sure the value is
-      safe to evaluate.
+  - The template must (ultimately) derive from this template.
+  - The value of the `js_context` you set in your view will be parsed as a
+  Javascript literal. It is your responsibility to make sure the value is
+  safe to evaluate.
 
 {% endcomment %}
 {% if js_context %}

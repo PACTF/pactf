@@ -19,8 +19,14 @@
       <ul class="nav navbar-nav">
 
         {# TODO: Active classes #}
-        <li><a href="{% url 'ctflex:game' %} ">Game</a></li>
+        <li><a href="{% url 'ctflex:game' %}">Game</a></li>
         <li><a href="{% url 'ctflex:scoreboard' %}">Scoreboard</a></li>
+        <li>
+          <a href="{% url 'ctflex:announcements' %}">
+            News
+            <span class="badge alert-danger" id="unread-announcements-badge">0</span>
+          </a>
+        </li>
 
       </ul>
 
