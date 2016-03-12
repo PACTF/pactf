@@ -13,8 +13,13 @@
 
     {% include 'ctflex/base/messages.snippet.html' %}
 
+    <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
+
     <div id="jumbotron-img">
-      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">
+{#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
+      <div class="logo">
+        {% include 'ctflex/logo.svg' %}
+      </div>
     </div>
     <h3>
       <strong>{% include 'ctflex/text/title.txt' %}</strong> is an online <b>computer security</b> competition for
