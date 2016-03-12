@@ -473,8 +473,12 @@ class CtfProblem(models.Model):
 
     ''' Helpers '''
 
-    def process_html(self, html):
-        return self.markdown_to_html(self.link_static(html, self.id))
+    def process_html(self, text):
+        return link_static(
+            markdown_to_html(text),
+            static_prefix=settings.PROBLEMS_STATIC_URL,
+            text_prefix=self.id,
+        )
 
     ''' Cleaning '''
 
@@ -528,15 +532,9 @@ class CtfProblem(models.Model):
             )
 
     def sync_html(self):
-        processor = lambda text: link_static(
-            markdown_to_html(text),
-            static_prefix=settings.PROBLEMS_STATIC_URL,
-            text_prefix=self.id,
-        )
-
         if not self.generator:
-            self.description_html = processor(self.description)
-            self.hint_html = processor(self.hint)
+            self.description_html = self.process_html(self.description)
+            self.hint_html = self.process_html(self.hint)
 
     FIELD_CLEANERS = {
         # (The order matters here.)
