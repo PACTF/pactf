@@ -302,7 +302,10 @@ def submit_flag(request, *, prob_id):
 @limited_http_methods('GET')
 @defaulted_window()
 def unread_announcements(request, *, window_codename):
-    window = queries.get_window(window_codename)
+    try:
+        window = queries.get_window(window_codename)
+    except models.Window.DoesNotExist:
+        window = queries.get_window()
     count = queries.unread_announcements(window=window, user=request.user).count()
     return JsonResponse({
         'count': count,
