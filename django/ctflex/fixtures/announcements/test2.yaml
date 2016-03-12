@@ -1,11 +1,9 @@
 id: 102
-title: Test2 is broken
+title: Test 5 is broken
 
 window: web
 problems:
-  - 51e7003e-d833-4dd8-b241-cf744965cd56
+  - e336045a-b9cc-4e6b-ade4-d893e102f3fc
 
 body: >
-  This problem is broken. Seriously. Sorry about that...
-
-  >! JK IT’S NOT!
+  Static files should be fixed now.
