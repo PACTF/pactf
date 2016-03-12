@@ -204,7 +204,7 @@ To change just the look or content of a page, yoyou can inspect what [template](
 - `templates/ctflex/text/base.template.html`
 - `static/ctflex/css/*`
 
-If you want to change some behavior for a URL, in your project’s `urls.py`, where you include all of CTFlex’s URLs, you can [add a preceding line](http://stackoverflow.com/a/9343212/1292652) that routes the URL to the the view CTFlex would have routed to except you decorate CTFlex’s view or entirely replace it. However, many CTFlex views [take arguments](https://docs.djangoproject.com/en/1.9/topics/http/urls/#passing-extra-options-to-view-functions) that let you customize their behavior without needing to decorate or duplicate them, so look into that first.
+If you want to change some behavior for a URL, in your project’s `urls.py`, where you include all of CTFlex’s URLs, you can [add a preceding line](https://stackoverflow.com/a/9343212/1292652) that routes the URL to the the view CTFlex would have routed to except you decorate CTFlex’s view or entirely replace it. However, many CTFlex views [take arguments](https://docs.djangoproject.com/en/1.9/topics/http/urls/#passing-extra-options-to-view-functions) that let you customize their behavior without needing to decorate or duplicate them, so look into that first.
 
 
 
@@ -237,5 +237,5 @@ The `dynamic` field is a boolean that defaults to False. If true, a Python scrip
 The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `problems` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `problems` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `score` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `score` is not provided, it defaults to 1. 
 
 
-  [usaco]: http://usaco.org/
+  [usaco]: https://usaco.org/
   [deployment]: https://docs.google.com/document/d/1O-HpONG-if3xE7YQqYMVFYkE4mwYZmL-9rpbEDD16M0/edit?usp=sharing

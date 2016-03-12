@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 250 165" xmlns="http://www.w3.org/2000/svg"><defs xmlns="http://www.w3.org/1999/xhtml"><style type="text/css"><![CDATA[
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns:xlink="https://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 250 165" xmlns="https://www.w3.org/2000/svg"><defs xmlns="https://www.w3.org/1999/xhtml"><style type="text/css"><![CDATA[
 .ui-helper-hidden { display: none; }
 .ui-helper-hidden-accessible { border: 0px; clip: rect(0px 0px 0px 0px); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; }
 .ui-helper-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }

@@ -10,7 +10,7 @@ body {
 }
 
 .page-title > .container, #content, #messages {
-    /* TODO(Yatharth): Look into http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
+    /* TODO(Yatharth): Look into https://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
     max-width: 55em;
     margin: 0 auto;
 }
