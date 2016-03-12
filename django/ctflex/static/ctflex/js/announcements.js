@@ -7,7 +7,7 @@ jQuery(document).ready(function () {
 
     setInterval(function () {
         updateCount(url)
-    }, 1000 * 2);
+    }, 1000 * 20);
 });
 
 function updateCount(url) {
