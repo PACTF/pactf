@@ -266,4 +266,4 @@ class Command(BaseCommand):
             pass
         except Exception as err:
             self.stderr.write("An unforeseen exception was encountered; rolled back transaction")
-            self.handle_error(err)
+            raise CommandError(err)

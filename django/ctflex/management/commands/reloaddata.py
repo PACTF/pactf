@@ -1,7 +1,7 @@
 from os.path import join, dirname, abspath
 
 from django.core import management
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from ctflex.management.commands import helpers
@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
         except Exception as err:
             self.stderr.write("Exception encountered; rolling back")
-            raise err
+            raise CommandError(err)
 
         else:
             self.stdout.write("Successfully (re)loaded all fixtures and problems")
