@@ -300,6 +300,7 @@ def submit_flag(request, *, prob_id):
 
 @never_cache
 @limited_http_methods('GET')
+@defaulted_window()
 def unread_announcements(request, *, window_codename):
     window = queries.get_window(window_codename)
     count = queries.unread_announcements(window=window, user=request.user).count()
