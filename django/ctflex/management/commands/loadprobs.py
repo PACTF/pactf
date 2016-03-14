@@ -106,7 +106,7 @@ class Command(BaseCommand):
 
             with transaction.atomic():
 
-                # Rotate over window folders
+                # Rotate over problem folders
                 for window_basename, window_path in self.walk(PROBLEMS_DIR):
                     for prob_basename, prob_path in self.walk(window_path):
 

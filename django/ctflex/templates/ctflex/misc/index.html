@@ -16,7 +16,7 @@
     <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
 
     <div id="jumbotron-img">
-{#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
+      {#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
       <div class="logo">
         {% include 'ctflex/logo.svg' %}
       </div>
@@ -62,7 +62,9 @@
             There will be a list of ‘problems’ for you to solve. On solving a problem, you should end up with a string as an answer called a ‘flag’ (hence the term ‘Capture the Flag’). You can submit this flag using the text box next to the problem description for points and fun!
           </p>
           <p>
-            <img src="{% static 'ctflex/img/go_forth.jpg' %}"/>
+            <a href="{% url 'ctflex:register' %}">
+              <img src="{% static 'ctflex/img/go_forth.jpg' %}"/>
+            </a>
           </p>
           <p class="text-muted">
             <em>Some text adapted from <a href="https://picoctf.com">PicoCTF</a>.</em>
@@ -74,7 +76,8 @@
           {% include 'ctflex/text/title.txt' %} is different
         </h2>
         <p>
-          Experienced CTFer? Or new to Capture The Flags? Either way, want to solve problems and win prizes without spending fourteen consecutive days on a CTF?
+          Experienced CTFer? Or new to Capture The Flags? Either way, want to solve problems and win prizes
+          <em>without</em> spending fourteen consecutive days on a CTF?
         </p>
         <p>
           <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#pactf-info">Find out how</a>
@@ -90,6 +93,9 @@
             <strong>There are scoreboards</strong>
             for each individual round, and there is an overall all-time scoreboard. Prizes will be given to the top-ranking teams of the individual rounds and the overall CTF, so whether you are a specialist or an all-rounder, there's something for you!
           </p>
+          <div class="text-center">
+            <a href="{% url 'ctflex:register' %}" class="btn btn-primary">Register Now!</a>
+          </div>
         </div>
       </div>
     </div>
