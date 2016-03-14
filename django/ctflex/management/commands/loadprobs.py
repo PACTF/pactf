@@ -169,9 +169,14 @@ class Command(BaseCommand):
                             self.handle_error(err)
                             continue
 
+                        # Add defaults for fields
                         data.setdefault('generator', None)
                         data.setdefault('description', '')
                         data.setdefault('hint', '')
+
+                        # Remove extra fields
+                        for attr in set(data.keys()) - set(CtfProblem._meta.get_all_field_names()):
+                            del data[attr]
 
                         # If problem exists, update it
                         query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
