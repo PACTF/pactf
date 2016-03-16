@@ -16,6 +16,8 @@ from pactf.constants import BASE_DIR
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
 
 class _Django:
+    """Configure basic Django things"""
+
     INSTALLED_APPS = [
         # Django Defaults
         'django.contrib.admin',
@@ -116,8 +118,6 @@ class _Django:
     # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
     STATIC_ROOT = join(BASE_DIR, 'static')
 
-    # Where all to collect static files from
-
     RATELIMIT_VIEW = values.Value('ctflex.views.ratelimited')
 
     # For Boostrap Alerts
@@ -140,8 +140,12 @@ class _Django:
     DEFAULT_FROM_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=email_prefix)
     SERVER_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=None)
 
+    EMAIL_BACKEND = values.Value('email_log.backends.EmailBackend', environ_prefix=None)
+
 
 class _Security:
+    """Configure security"""
+
     SECRET_KEY = values.SecretValue()
 
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
@@ -262,7 +266,6 @@ class Dev(_Base):
 
     ''' Logging '''
 
-    EMAIL_BACKEND = 'email_log.backends.EmailBackend'
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -293,6 +296,8 @@ class Dev(_Base):
 
 class Prod(_Base):
     """Secure and quite settings for production"""
+
+    ''' Security '''
 
     DEBUG = False
     ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
