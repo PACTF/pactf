@@ -6,6 +6,7 @@ from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -18,7 +19,9 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
+
 from ratelimit.utils import is_ratelimited
+from ratelimit.decorators import ratelimit
 
 from ctflex import commands
 from ctflex import forms
@@ -39,6 +42,7 @@ def default_context(request):
     return {
         'team': request.user.competitor.team if queries.is_competitor(request.user) else None,
         'contact_email': settings.CONTACT_EMAIL,
+        'js_context': '{}',
     }
 
 
@@ -182,13 +186,13 @@ def index(request):
     })
 
 
-@limited_http_methods('GET')
-def rate_limited(request, err):
+def ratelimited(request, err=None):
     """Render template for when the user has been rate limited
 
     Usage:
-        This view is automatically called by the `ratelimit` module,
-        so nothing more needs to be done.
+        This view is automatically called by the `ratelimit` module on
+        encountering a Ratelimited exception, so you SHOULD raise that
+        exception instead of calling this method directly.
     """
     return render(request, 'ctflex/misc/ratelimited.html')
 
@@ -417,6 +421,15 @@ def board(request, *, window_codename):
 
 # region Auth
 
+password_change = limited_http_methods('GET', 'POST')(
+    ratelimit(key='user', method='POST', rate='4/m', block=True)(
+        auth_views.password_change))
+
+password_reset = limited_http_methods('GET', 'POST')(
+    ratelimit(method='POST', key='ip', rate='4/m', block=True)(
+        auth_views.password_reset))
+
+
 @limited_http_methods('GET')
 def logout_done(request, *,
                 message="You have been logged out.",
@@ -440,6 +453,30 @@ def password_reset_complete(request, *,
     messages.success(request, message)
     return redirect(redirect_url)
 
+
+# def password_reset(request,
+#                    template_name='ctflex/auth/password_reset.html',
+#                    email_template_name='ctflex/auth/password_reset_email.txt',
+#                    subject_template_name='ctflex/auth/password_reset_email_subject.txt',
+#                    post_reset_redirect='ctflex:password_reset_done',
+#                    extra_email_context=None):
+#     """Wrap password_reset, setting parameters and rate-limiting POSTs"""
+#
+#     # Set extra_email_context
+#     real_extra_email_context = {
+#         'support_email': settings.SUPPORT_EMAIL,
+#         'site_name': settings.SITENAME,
+#     }
+#     if extra_email_context is not None:
+#         real_extra_email_context.update(extra_email_context)
+#
+#     return auth_views.password_reset(request,
+#                                      template_name=template_name,
+#                                      email_template_name=email_template_name,
+#                                      subject_template_name=subject_template_name,
+#                                      post_reset_redirect=post_reset_redirect,
+#                                      extra_email_context=real_extra_email_context,
+#                                      )
 
 # endregion
 

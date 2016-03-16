@@ -118,7 +118,7 @@ class _Django:
 
     # Where all to collect static files from
 
-    RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
+    RATELIMIT_VIEW = values.Value('ctflex.views.ratelimited')
 
     # For Boostrap Alerts
     MESSAGE_TAGS = {
