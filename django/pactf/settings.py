@@ -181,24 +181,25 @@ class _Gunicorn:
     """Configure Gunicorn"""
 
     # As whom Gunicorn should run the server
-    USER = values.Value()
-    GROUP = values.Value()
+    GUNICORN_USER = values.Value(environ_prefix=None)
+    GUNICORN_GROUP = values.Value(environ_prefix=None)
 
     # Path to Gunicorn
-    GUNICORN = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn')
+    GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None)
 
     # Whether to use a socket or serve directly to an address
-    USE_SOCKFILE = values.BooleanValue(False)
+    GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
 
     # Socket to communicate with
-    SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'), check_exists=False)
+    GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
+                                         check_exists=False, environ_prefix=None)
 
     # Url to directly serve to
-    IP = values.IPValue('127.0.0.1')
-    PORT = values.IntegerValue(8001)
+    GUNICORN_IP = values.IPValue('127.0.0.1', environ_prefix=None)
+    GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
 
     # Number of worker processes Gunicorn should spawn
-    NUM_WORKERS = values.IntegerValue(3)
+    GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
 
 
 class _CTFlex(_Django, Configuration):
