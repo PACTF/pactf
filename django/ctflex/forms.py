@@ -76,7 +76,7 @@ class CompetitorCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Competitor
-        fields = ('email', 'first_name', 'last_name', 'country', 'state', 'background')
+        fields = ('email', 'first_name', 'last_name')
 
 
 class UserCreationForm(auth_forms.UserCreationForm):
@@ -108,7 +108,7 @@ class TeamCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Team
-        fields = ('name', 'passphrase', 'affiliation')
+        fields = ('name', 'passphrase', 'affiliation', 'country', 'background')
 
 
 @_model_generated(models.Team)

@@ -53,6 +53,7 @@ def windowed_context(window):
         'windows': queries.all_windows(),
     }
 
+
 # endregion
 
 # region Indirectly-called Views
@@ -67,8 +68,10 @@ def ratelimited(request, err=None):
     """
     return render(request, 'ctflex/misc/ratelimited.html')
 
+
 def incubating(request):
     return render(request, 'ctflex/misc/incubating.html')
+
 
 # endregion
 
@@ -581,6 +584,8 @@ def register(request,
     # Initialize context
     context = {
         'team_status': team_status,
+        'max_team_size': settings.MAX_TEAM_SIZE,
+
         'user_form': user_form,
         'competitor_form': competitor_form,
         'new_team_form': new_team_form,

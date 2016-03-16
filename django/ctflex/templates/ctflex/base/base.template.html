@@ -82,16 +82,12 @@
           integrity="sha384-vIp38BeRN82wlvPB8/vo/5e0J1/gn7WfUf1Qq9bdh79iMPxjry99thNkscQG1b8C"
           crossorigin="anonymous"></script>
   <script src="{% static 'ctflex/js/lib/bootstrap.min.js' %}"></script>
-  {# Commented because it took too long to load #}
-  {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
-  {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
-  {#          crossorigin="anonymous"></script>#}
+  <script src="{% static 'ctflex/js/lib/jquery.cookie.min.js' %}"></script>
   <script src="{% static "ctflex/js/lib/notify.min.js" %}"></script>
 
-  {# The if condition is not necessary; it is just an optimization. #}
-{#  {% if team %}#}
+  {% if team %}
     <script src="{% static "ctflex/js/announcements.js" %}" type="text/javascript"></script>
-{#  {% endif %}#}
+  {% endif %}
 
   {% block extra_js %}{% endblock %}
 

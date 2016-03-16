@@ -177,6 +177,26 @@ class Team(models.Model):
     affiliation = models.CharField(max_length=60, blank=True,
                                    verbose_name="Affiliation")
 
+    # FIXME: Change fixtures
+
+    US_COUNTRY = 'U'
+    OTHER_COUNTRY = 'O'
+    COUNTRY_CHOICES = (
+        (US_COUNTRY, "United States of America"),
+        (OTHER_COUNTRY, "Other (ineligible for prizes)"),
+    )
+    country = models.CharField(max_length=1,
+                               choices=COUNTRY_CHOICES, default=US_COUNTRY)
+
+    SCHOOL_BACKGROUND = 'S'
+    OTHER_BACKGROUND = 'O'
+    BACKGROUND_CHOICES = (
+        (SCHOOL_BACKGROUND, "Middle-school/High-school"),
+        (OTHER_BACKGROUND, "Other (ineligible for prizes)"),
+    )
+    background = models.CharField(max_length=1,
+                                  choices=BACKGROUND_CHOICES, default=SCHOOL_BACKGROUND)
+
     def __str__(self):
         return "<Team #{} {!r}>".format(self.id, self.name)
 
@@ -219,47 +239,47 @@ class Competitor(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
-    country = CountryField(default='US')
-    state = USStateField(blank=True, null=True)
+    # country = CountryField(default='US')
+    # state = USStateField(blank=True, null=True)
 
-    MIDDLESCHOOL = 'M'
-    HIGHSCHOOL = 'H'
-    HOMESCHOOLED = 'E'
-    UNDERGRAD = 'U'
-    GRADUATE = 'G'
-    TEACHER = 'T'
-    PROFESSIONAL = 'P'
-    HOBBYIST = 'Y'
-    OTHER = 'O'
-    BACKGROUND_CHOICES = (
-        (MIDDLESCHOOL, "Middle School Student"),
-        (HIGHSCHOOL, "High School Student"),
-        (HOMESCHOOLED, "Homeschooled"),
-        (UNDERGRAD, "Undergraduate"),
-        (GRADUATE, "Graduate Student"),
-        (TEACHER, "Teacher"),
-        (PROFESSIONAL, "Security Professional"),
-        (HOBBYIST, "CTF Hobbyist"),
-        (OTHER, "Other"),
-    )
-    background = models.CharField(max_length=1,
-                                  choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
+    # MIDDLESCHOOL = 'M'
+    # HIGHSCHOOL = 'H'
+    # HOMESCHOOLED = 'E'
+    # UNDERGRAD = 'U'
+    # GRADUATE = 'G'
+    # TEACHER = 'T'
+    # PROFESSIONAL = 'P'
+    # HOBBYIST = 'Y'
+    # OTHER = 'O'
+    # BACKGROUND_CHOICES = (
+    #     (MIDDLESCHOOL, "Middle School Student"),
+    #     (HIGHSCHOOL, "High School Student"),
+    #     (HOMESCHOOLED, "Homeschooled"),
+    #     (UNDERGRAD, "Undergraduate"),
+    #     (GRADUATE, "Graduate Student"),
+    #     (TEACHER, "Teacher"),
+    #     (PROFESSIONAL, "Security Professional"),
+    #     (HOBBYIST, "CTF Hobbyist"),
+    #     (OTHER, "Other"),
+    # )
+    # background = models.CharField(max_length=1,
+    #                               choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
 
     def __str__(self):
         return "<Competitor #{} {!r}>".format(self.id, self.user.username)
 
     ''' Cleaning '''
 
-    def validate_state_is_given_for_us(self):
-        if self.country == Country('US') and not self.state:
-            raise ValidationError(
-                "State is required if you are competing from the U.S.",
-                code='state_is_given_for_us',
-            )
-
-    def sync_state_outside_us(self):
-        if self.country != Country('US'):
-            self.state = None
+    # def validate_state_is_given_for_us(self):
+    #     if self.country == Country('US') and not self.state:
+    #         raise ValidationError(
+    #             "State is required if you are competing from the U.S.",
+    #             code='state_is_given_for_us',
+    #         )
+    #
+    # def sync_state_outside_us(self):
+    #     if self.country != Country('US'):
+    #         self.state = None
 
     def validate_team_has_space(self):
         try:
@@ -271,11 +291,11 @@ class Competitor(models.Model):
                 raise ValidationError("The team is already full.")
 
     FIELD_CLEANERS = {
-        'state': [validate_state_is_given_for_us],
+        # 'state': [validate_state_is_given_for_us],
     }
 
     MODEL_CLEANERS = (
-        sync_state_outside_us,
+        # sync_state_outside_us,
         validate_team_has_space,
     )
 
