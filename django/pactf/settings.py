@@ -15,7 +15,7 @@ from pactf.constants import BASE_DIR
 
 # TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
 
-class Django:
+class _Django:
     INSTALLED_APPS = [
         # Django Defaults
         'django.contrib.admin',
@@ -117,16 +117,6 @@ class Django:
     STATIC_ROOT = join(BASE_DIR, 'static')
 
     # Where all to collect static files from
-    STATICFILES_DIRS = values.ListValue([])
-
-    # Email
-    EMAIL_HOST = values.Value('smtp.gmail.com')
-    EMAIL_PORT = values.IntegerValue(587)
-    DEFAULT_FROM_EMAIL = values.Value('ctflex2@gmail.com')
-    SERVER_EMAIL = values.Value('ctflex2@gmail.com')
-    EMAIL_HOST_USER = values.Value('ctflex2@gmail.com')
-    EMAIL_HOST_PASSWORD = values.SecretValue()
-    EMAIL_USE_TLS = values.BooleanValue(True)
 
     RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
 
@@ -134,9 +124,24 @@ class Django:
     MESSAGE_TAGS = {
         messages.ERROR: 'danger'
     }
+    STATICFILES_DIRS = values.ListValue([])
+
+    ''' Email '''
+
+    email_prefix = 'EMAIL'
+
+    EMAIL_HOST = values.Value('smtp.zoho.com', environ_prefix=None)
+    EMAIL_PORT = values.IntegerValue(587, environ_prefix=None)
+    EMAIL_USE_TLS = values.BooleanValue(True, environ_prefix=None)
+
+    EMAIL_HOST_USER = values.Value('noreply@pactf.com', environ_prefix=None)
+    EMAIL_HOST_PASSWORD = values.SecretValue(environ_prefix=None)
+
+    DEFAULT_FROM_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=email_prefix)
+    SERVER_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=None)
 
 
-class Security:
+class _Security:
     SECRET_KEY = values.SecretValue()
 
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
@@ -172,8 +177,8 @@ class Security:
     ]
 
 
-class Gunicorn:
-    """Settings for running PACTF with Gunicorn"""
+class _Gunicorn:
+    """Configure Gunicorn"""
 
     # As whom Gunicorn should run the server
     USER = values.Value()
@@ -196,10 +201,7 @@ class Gunicorn:
     NUM_WORKERS = values.IntegerValue(3)
 
 
-ctflex_prefix = ctflex.constants.APP_NAME.capitalize()
-
-
-class CTFlex(Django, Configuration):
+class _CTFlex(_Django, Configuration):
     """Configure CTFlex"""
 
     ''' General '''
@@ -213,7 +215,7 @@ class CTFlex(Django, Configuration):
 
     ''' Problems and Staticfiles '''
 
-    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'))
+    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
     CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
     CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
 
@@ -232,11 +234,12 @@ class CTFlex(Django, Configuration):
 
 
 # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
-class Base(Security, CTFlex, Gunicorn, Django, Configuration):
+class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
+    """Extract common sub-classes of any full user-facing settings class"""
     pass
 
 
-class Dev(Base):
+class Dev(_Base):
     """Insecure and noisy settings for development"""
 
     ''' Security '''
@@ -254,6 +257,7 @@ class Dev(Base):
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
+    RATELIMIT_ENABLE = values.Value(True)
 
     ''' Logging '''
 
@@ -286,15 +290,15 @@ class Dev(Base):
     }
 
 
-class Prod(Base):
+class Prod(_Base):
     """Secure and quite settings for production"""
 
     DEBUG = False
     ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
-    https = True  # For settings that should only be true when using HTTPS
-    SESSION_COOKIE_SECURE = https
-    CSRF_COOKIE_SECURE = https
+    https = values.Value(True)  # For settings that should only be true when using HTTPS
+    SESSION_COOKIE_SECURE = https.value
+    CSRF_COOKIE_SECURE = https.value
 
-    # (Only enable this if nginx is properly configured with HTTPS.)
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    https_headers = values.Value(False)  # Only enable this if nginx is properly configured with HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
