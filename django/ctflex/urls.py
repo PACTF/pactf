@@ -2,11 +2,10 @@
 
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
-from ratelimit.decorators import ratelimit
 
 from ctflex import settings
 from ctflex.views import anonyomous_users_only
-from ctflex.constants import APP_NAME, UUID_REGEX
+from ctflex.constants import APP_NAME, UUID_REGEX, API_NAMESPACE
 from ctflex import views
 
 app_name = APP_NAME
@@ -79,5 +78,5 @@ urlpatterns = [
     url(r'', include(auth_urls)),
     url(r'', include(misc_urls)),
     url(r'', include(windowed_urls)),
-    url(r'api/', include(api_urls)),
+    url(r'^api/', include(api_urls, namespace=API_NAMESPACE)),
 ]

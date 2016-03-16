@@ -89,9 +89,9 @@
   <script src="{% static "ctflex/js/lib/notify.min.js" %}"></script>
 
   {# The if condition is not necessary; it is just an optimization. #}
-  {% if team %}
+{#  {% if team %}#}
     <script src="{% static "ctflex/js/announcements.js" %}" type="text/javascript"></script>
-  {% endif %}
+{#  {% endif %}#}
 
   {% block extra_js %}{% endblock %}
 

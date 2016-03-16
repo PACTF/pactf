@@ -60,6 +60,9 @@ class _Django:
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
+
+        # Local
+        'ctflex.middleware.IncubatingMiddleware',
     )
 
     STATICFILES_FINDERS = (
@@ -218,6 +221,8 @@ class _CTFlex(_Django, Configuration):
 
     CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
 
+    CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
+
     ''' Problems and Staticfiles '''
 
     CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
@@ -251,6 +256,7 @@ class Dev(_Base):
 
     DEBUG = True
     ALLOWED_HOSTS = values.ListValue(['*'])
+    RATELIMIT_ENABLE = values.Value(False)
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -262,7 +268,6 @@ class Dev(_Base):
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
-    RATELIMIT_ENABLE = values.Value(True)
 
     ''' Logging '''
 

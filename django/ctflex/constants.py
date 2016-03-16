@@ -17,6 +17,7 @@ LOGGER_NAME = APP_NAME
 ''' URLs '''
 
 UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+API_NAMESPACE = 'api'
 
 ''' Problems '''
 

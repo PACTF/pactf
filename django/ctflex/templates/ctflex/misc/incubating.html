@@ -1,0 +1,17 @@
+{% extends 'ctflex/base/headered.template.html' %}
+
+{% block title %}
+  Incubating - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Incubating…
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>This page is not ready yet.</strong>
+    Check back again when the competition <a href="{% url 'ctflex:index' %}">starts</a>.
+  </p>
+{% endblock %}

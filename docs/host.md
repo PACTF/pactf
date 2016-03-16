@@ -147,6 +147,9 @@ Add `ctflex.middleware.RatelimitMiddleware` to `MIDDLEWARE_CLASSES` as so:
 	
 	        # CTFlex
 	        'ctflex.middleware.RatelimitMiddleware',
+	        
+	        # Local
+	        'ctflex.middleware.IncubatingMiddleware',
 	    )
 
 Add `ctflex.views.default_context` to `TEMPLATES` as so:

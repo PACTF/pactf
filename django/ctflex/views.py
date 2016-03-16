@@ -30,7 +30,7 @@ from ctflex import queries
 from ctflex import settings
 
 
-# region Helper Methods
+# region Context Processors
 
 
 def default_context(request):
@@ -53,6 +53,22 @@ def windowed_context(window):
         'windows': queries.all_windows(),
     }
 
+# endregion
+
+# region Indirectly-called Views
+
+def ratelimited(request, err=None):
+    """Render template for when the user has been rate limited
+
+    Usage:
+        This view is automatically called by the `ratelimit` module on
+        encountering a Ratelimited exception, so you SHOULD raise that
+        exception instead of calling this method directly.
+    """
+    return render(request, 'ctflex/misc/ratelimited.html')
+
+def incubating(request):
+    return render(request, 'ctflex/misc/incubating.html')
 
 # endregion
 
@@ -184,17 +200,6 @@ def index(request):
     return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
     })
-
-
-def ratelimited(request, err=None):
-    """Render template for when the user has been rate limited
-
-    Usage:
-        This view is automatically called by the `ratelimit` module on
-        encountering a Ratelimited exception, so you SHOULD raise that
-        exception instead of calling this method directly.
-    """
-    return render(request, 'ctflex/misc/ratelimited.html')
 
 
 @limited_http_methods('GET')

@@ -24,6 +24,9 @@ _SETTINGS = (
     # eligible for prizes and being ranked
     ('ELIGIBILITY_FUNCTION', '', None),
 
+    # Whether the incubating middleware is enabled
+    ('INCUBATING', False, None),
+
     ### Metadata
 
     # Name used for site in emails sent out
