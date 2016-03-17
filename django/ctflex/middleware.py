@@ -39,6 +39,7 @@ class IncubatingMiddleware:
     ALLOWED_URLS = (
         'index',
         'register',
+        'register_done',
         'logout',
     )
 

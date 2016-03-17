@@ -2,10 +2,15 @@
 
 from django.template import Context
 from django.template.loader import get_template
-
+from django.forms.fields import CheckboxInput
 from django import template
 
 register = template.Library()
+
+
+# @register.filter
+# def is_checkbox(value):
+#     return isinstance(value, CheckboxInput)
 
 
 class FormFieldNode(template.Node):

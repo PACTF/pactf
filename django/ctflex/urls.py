@@ -72,6 +72,8 @@ auth_urls = [
     url(r'^reset/done/$', views.password_reset_complete, name='password_reset_complete'),
 
     url(r'^register/$', views.register, name='register'),
+
+    url(r'^register/done/$', views.register_done, name='register_done'),
 ]
 
 urlpatterns = [

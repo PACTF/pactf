@@ -490,7 +490,6 @@ def password_reset_complete(request, *,
 
 # region Registration
 
-# TODO(Yatharth): Shorten view by extracting a command
 @never_cache
 @sensitive_post_parameters()
 @csrf_protect
@@ -498,7 +497,7 @@ def password_reset_complete(request, *,
 @anonyomous_users_only()
 def register(request,
              template_name='ctflex/auth/register.html',
-             post_change_redirect='ctflex:game',
+             post_change_redirect='ctflex:register_done',
              extra_context=None):
     """Display registration form"""
 
@@ -530,6 +529,7 @@ def register(request,
             existing_team_form = forms.TeamJoiningForm()
             active_team_form = new_team_form
 
+        # FIXME(Yatharth): Shorten view by extracting a command
         # If valid, begin a transaction
         if user_form.is_valid() and active_team_form.is_valid() and competitor_form.is_valid():
             try:
@@ -564,13 +564,17 @@ def register(request,
 
             # If no errors were raised, log the user in and redirect!
             else:
-                auth_user = authenticate(
-                    username=user_form.cleaned_data['username'],
-                    password=user_form.cleaned_data['password1'],
-                )
-                auth_login(request, auth_user)
 
-                messages.success(request, "You were successfully registered!")
+                # Only log the user in if not incubating
+                if not settings.INCUBATING:
+                    auth_user = authenticate(
+                        username=user_form.cleaned_data['username'],
+                        password=user_form.cleaned_data['password1'],
+                    )
+                    auth_login(request, auth_user)
+
+                # FIXME(Yatharth): Send email
+
                 return HttpResponseRedirect(reverse(post_change_redirect))
 
     # Otherwise, create blank forms
@@ -595,5 +599,10 @@ def register(request,
         context.update(extra_context)
 
     return render(request, template_name, context)
+
+
+@limited_http_methods('GET')
+def register_done(request):
+    return render(request, 'ctflex/auth/register_done.html')
 
 # endregion
