@@ -3,9 +3,6 @@ jQuery(document).ready(function () {
     initEligibility();
 });
 
-var ELIGIBLE_GLYPH = 'glyphicon-ok-sign',
-    INELIGIBLE_GLYPH = 'glyphicon-info-sign';
-
 function initEligibility() {
     var country = $('#id_new_team-country');
     var background = $('#id_new_team-background');
@@ -24,6 +21,9 @@ function initEligibility() {
 var eligibility_timeout = -1;
 
 function syncEligibility(country, background, eligible) {
+    var ELIGIBLE_GLYPH = 'glyphicon-ok-sign',
+        INELIGIBLE_GLYPH = 'glyphicon-info-sign';
+
     var message = eligible.find('#eligible-message');
     var glyph = eligible.find('#eligible-glyph');
 
@@ -33,7 +33,7 @@ function syncEligibility(country, background, eligible) {
         glyph.removeClass(INELIGIBLE_GLYPH).removeClass(ELIGIBLE_GLYPH);
         glyph.addClass('glyphicon-refresh').addClass('spinning');
         message.text("Computing eligiblity…")
-        eligibility_timeout = setTimeout(function() {
+        eligibility_timeout = setTimeout(function () {
             message.text(new_text);
             glyph.removeClass('glyphicon-refresh').removeClass('spinning');
             glyph.addClass(new_class);
