@@ -219,7 +219,7 @@ class _CTFlex(_Django, Configuration):
 
     CTFLEX_SITENAME = 'PACTF'
 
-    CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
+    # CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
 
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
 

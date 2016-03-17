@@ -110,34 +110,38 @@ def problem_list(*, team, window):
 # region Board
 
 
-def _eligible_default(team):
-    """Determine whether a team is eligible
+# def _eligible_default(team):
+#     """Determine whether a team is eligible
+#
+#     This is the function provided as a default for determining eligibility, and may be
+#     overridden if the `CTFLEX_ELIGIBILITY_FUNCTION` setting is set.
+#     """
+#     return not team.banned
+#
+#
+# def _get_eligible():
+#     """Return a reference to the eligibility function to use
+#
+#     If the setting CTFLEX_ELIGIBILITY_FUNCTION if defined, it’s value as a dotted path
+#     to a function is used; otherwise, the default eligibility function is used.
+#     """
+#
+#     dotted_path = settings.ELIGIBILITY_FUNCTION
+#
+#     if not dotted_path:
+#         return _eligible_default
+#
+#     module, function = dotted_path.rsplit('.', 1)
+#
+#     module = importlib.import_module(module)
+#     return getattr(module, function)
+#
+#
+# _eligible = _get_eligible()
 
-    This is the function provided as a default for determining eligibility, and may be
-    overridden if the `CTFLEX_ELIGIBILITY_FUNCTION` setting is set.
-    """
-    return not team.banned
-
-
-def _get_eligible():
-    """Return a reference to the eligibility function to use
-
-    If the setting CTFLEX_ELIGIBILITY_FUNCTION if defined, it’s value as a dotted path
-    to a function is used; otherwise, the default eligibility function is used.
-    """
-
-    dotted_path = settings.ELIGIBILITY_FUNCTION
-
-    if not dotted_path:
-        return _eligible_default
-
-    module, function = dotted_path.rsplit('.', 1)
-
-    module = importlib.import_module(module)
-    return getattr(module, function)
-
-
-_eligible = _get_eligible()
+_eligible = lambda team: (not team.banned
+                          and team.country == team.US_COUNTRY
+                          and team.background == team.SCHOOL_BACKGROUND)
 
 
 def _last_solve_date(*, team, window):

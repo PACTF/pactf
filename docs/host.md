@@ -91,7 +91,9 @@ The Game page displays different based on the state of the window and team:
 - **Done:** Competitors cannot view problems for that round. This was decided in order to reduce confusion about when correct flag submissions improve rankings and when they don't. It also mirrors [USACO][usaco]’s Contest Windows.
 - **Past:** Competitors can view problems, submit flags, and increase their displayed score, but their ranking and score on the scoreboard for that window will not change since the window has ended.
 
-## Announcements
+### Miscellanous
+
+#### Announcements
 
 Announcements for a window will be displayed on the News page. Announcements can also be associated with particular problems; they will then be displayed inline with the problems on the Game page.
 
@@ -109,6 +111,10 @@ To make an announcement, run `manage.py announce foo.yaml` where `foo.yaml` file
 
  
 **Note:** The front-end for CTFlex/PACTF uses the word **‘news’** based on what later user testing revealed to be most self-explanatory word. However, the code and documentation for CTFlex/PACTF uses the word ‘announcement’.
+
+#### Incubating
+
+You can set the incubating setting to True to only let the index, registration and API views work; the rest will display an “incubating; check back later” page.
 
 
 ## Using CTFlex

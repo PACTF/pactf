@@ -27,12 +27,12 @@
   <p>Otherwise, sign up for a personal account, and either create a new team or join an existing one.</p>
 
   {% with extra_group_class='col-sm-6' extra_label_class='col-sm-4' extra_input_class='col-sm-8' extra_help_class='col-sm-8 col-sm-offset-4' %}
-    <form method="post" class="form-horizontal" role="form">
+    <form method="post" role="form">
       {% csrf_token %}
 
       {% non_form_field_errors competitor_form user_form existing_team_form new_team_form %}
 
-      <div id="competitor-container">
+      <div id="competitor-container" class="form-horizontal">
 
         {% formfield competitor_form.first_name %}{% endformfield %}
         {% formfield competitor_form.last_name %}{% endformfield %}
@@ -42,12 +42,9 @@
         {% formfield user_form.password2 %}{% endformfield %}
         <div class="clearfix hidden-xs"></div>
 
-        {% formfield competitor_form.email %}{% endformfield %}
-        {% formfield competitor_form.background %}{% endformfield %}
-        <div class="clearfix hidden-xs"></div>
-
-        {% formfield competitor_form.country %}{% endformfield %}
-        {% formfield competitor_form.state %}{% endformfield %}
+        {% with extra_group_class='col-sm-12' extra_label_class='col-sm-2' extra_input_class='col-sm-10' extra_help_class='col-sm-10 col-sm-offset-2' %}
+          {% formfield competitor_form.email %}{% endformfield %}
+        {% endwith %}
         <div class="clearfix hidden-xs"></div>
 
       </div>
@@ -61,8 +58,8 @@
       </div>
 
 
-      <div id="new-team-container">
-        <p>Here's how you would register your team of <strong>1 to 5 competitors</strong>:</p>
+      <div id="new-team-container" class="form-horizontal">
+        <p>Here's how you would register your team of <strong>1 to {{ max_team_size }} competitors</strong>:</p>
         <ol>
           <li>One member of your team creates a new team, choosing a Team Name and Passphrase.</li>
           <li>The team creator shares the Team Name and Passphrase with other members of the team.</li>
@@ -79,22 +76,40 @@
         {% formfield new_team_form.passphrase %}{% endformfield %}
         <div class="clearfix hidden-xs"></div>
 
+        {% formfield new_team_form.country %}{% endformfield %}
+        {% formfield new_team_form.background %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
 
         {% with extra_group_class='col-sm-12' extra_label_class='col-sm-2' extra_input_class='col-sm-10' extra_help_class='col-sm-10 col-sm-offset-2' %}
           {% formfield new_team_form.affiliation %}{% endformfield %}
+          <div class="clearfix hidden-xs"></div>
         {% endwith %}
-        <div class="clearfix hidden-xs"></div>
 
+        <div id="eligible-container" class="col-sm-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span id="eligible-glyph" class="glyphicon"></span>
+              <span id="eligible-message"></span>
+            </div>
+            <div class="panel-footer">
+
+          <p class="text-muted">
+            Teams are eligible if all of its competitors are middle-schoolers and high-schoolers living in the United States of America.
+            Only eligible teams are ranked on the scoreboards and can win prizes.
+          </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div id="existing-team-container">
+      <div id="existing-team-container" class="form-horizontal">
 
         {% formfield existing_team_form.name %}{% endformfield %}
         {% formfield existing_team_form.passphrase %}{% endformfield %}
 
       </div>
 
-      <div id="common-team-container">
+      <div id="common-team-container" class="form-horizontal">
 
         <div class="text-center">
           <input class="btn btn-primary" type="submit" value="Register"/>

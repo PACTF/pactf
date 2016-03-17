@@ -1,8 +1,57 @@
+jQuery(document).ready(function () {
+    initTeamStatus();
+    initEligibility();
+});
+
+var ELIGIBLE_GLYPH = 'glyphicon-ok-sign',
+    INELIGIBLE_GLYPH = 'glyphicon-info-sign';
+
+function initEligibility() {
+    var country = $('#id_new_team-country');
+    var background = $('#id_new_team-background');
+    var eligible = $('#eligible-container');
+
+    var syncer = function () {
+        syncEligibility(country, background, eligible);
+    };
+
+    country.change(syncer);
+    background.change(syncer);
+
+    syncer();
+}
+
+var eligibility_timeout = -1;
+
+function syncEligibility(country, background, eligible) {
+    var message = eligible.find('#eligible-message');
+    var glyph = eligible.find('#eligible-glyph');
+
+    clearTimeout(eligibility_timeout);
+
+    function setClass(new_text, new_class) {
+        glyph.removeClass(INELIGIBLE_GLYPH).removeClass(ELIGIBLE_GLYPH);
+        glyph.addClass('glyphicon-refresh').addClass('spinning');
+        message.text("Computing eligiblity…")
+        eligibility_timeout = setTimeout(function() {
+            message.text(new_text);
+            glyph.removeClass('glyphicon-refresh').removeClass('spinning');
+            glyph.addClass(new_class);
+        }, 250);
+    }
+
+    if (country[0].value == 'U' && background[0].value == 'S') {
+        setClass("Your team is eligible to win prizes!", ELIGIBLE_GLYPH);
+    } else {
+        setClass("Your team is ineligible to win prizes.", INELIGIBLE_GLYPH);
+
+    }
+}
+
 var NEW_TEAM_STATUS = 'new',
     OLD_TEAM_STATUS = 'old';
 
-jQuery(document).ready(function () {
-
+function initTeamStatus() {
     status_input = jQuery('#team-status');
 
     jQuery('#new-team-btn').click(function () {
@@ -16,7 +65,7 @@ jQuery(document).ready(function () {
     });
 
     syncTeamStatus();
-});
+}
 
 function syncTeamStatus() {
     var status = jQuery('#team-status').val();
