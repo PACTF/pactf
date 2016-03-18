@@ -193,9 +193,10 @@ class _Security:
     MANAGERS = ADMINS.value
 
     IGNORABLE_404_URLS = values.ListValue([
-        re.compile(r'^/favicon.ico$'),
+        re.compile(r'^/apple-touch-icon.*\.png$'),
+        re.compile(r'^/favicon\.ico$'),
+        re.compile(r'^/robots\.txt$'),
     ])
-
 
 
 class _Gunicorn:

@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
     var parser = document.createElement('a');
     parser.href = window.location.href;
-    var url = "/api/unread_announcements/" + parser.pathname.split('/').slice(-2)[0];
+    var url = "/api/unread_announcements/"; // + parser.pathname.split('/').slice(-2)[0];
 
     updateCount(url);
 
