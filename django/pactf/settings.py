@@ -13,8 +13,6 @@ import ctflex.constants
 from pactf.constants import BASE_DIR
 
 
-# TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
-
 class _Django:
     """Configure basic Django things"""
 
@@ -57,6 +55,9 @@ class _Django:
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
+
+        # Django Extensions
+        'django.middleware.common.BrokenLinkEmailsMiddleware'
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
@@ -182,6 +183,16 @@ class _Security:
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
+
+    ''' Logging '''
+
+    ADMINS = values.ListValue([
+        ('Yatharth', 'yatharth999+pactf@gmail.com')
+    ])
+    MANAGERS = ADMINS.value
+
+    IGNORABLE_404_URLS = values.ListValue([])
+
 
 
 class _Gunicorn:
