@@ -17,7 +17,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
 
 from ratelimit.utils import is_ratelimited
@@ -564,6 +564,8 @@ def register(request,
 
             # If no errors were raised, log the user in and redirect!
             else:
+
+                2/0
 
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:
