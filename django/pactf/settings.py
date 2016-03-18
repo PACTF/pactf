@@ -57,7 +57,7 @@ class _Django:
         'django.middleware.security.SecurityMiddleware',
 
         # Django Extensions
-        'django.middleware.common.BrokenLinkEmailsMiddleware'
+        'django.middleware.common.BrokenLinkEmailsMiddleware',
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
