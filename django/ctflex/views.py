@@ -565,8 +565,6 @@ def register(request,
             # If no errors were raised, log the user in and redirect!
             else:
 
-                2/0
-
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:
                     auth_user = authenticate(

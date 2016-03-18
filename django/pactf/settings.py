@@ -4,6 +4,7 @@ This file uses django-configurations.
 """
 
 import os
+import re
 from os.path import join
 
 from configurations import Configuration, values
@@ -191,7 +192,9 @@ class _Security:
     ])
     MANAGERS = ADMINS.value
 
-    IGNORABLE_404_URLS = values.ListValue([])
+    IGNORABLE_404_URLS = values.ListValue([
+        re.compile(r'^/favicon.ico$'),
+    ])
 
 
 
