@@ -24,7 +24,10 @@ def is_competitor(user):
 
 def get_window(codename=None):
     if codename:
-        return models.Window.objects.get(codename=codename)
+        try:
+            return models.Window.objects.get(codename=codename)
+        except models.Window.DoesNotExist:
+            return models.Window.objects.current()
     else:
         return models.Window.objects.current()
 
