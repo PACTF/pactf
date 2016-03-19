@@ -694,7 +694,7 @@ class Announcement(models.Model):
     ''' Structural Fields '''
 
     id = models.AutoField(primary_key=True)
-    window = models.ForeignKey(Window, on_delete=models.CASCADE)
+    window = models.ForeignKey(Window, on_delete=models.CASCADE, null=True)
     competitors = models.ManyToManyField(Competitor, related_name='unread_announcements',
                                          blank=True)
     problems = models.ManyToManyField(CtfProblem, blank=True)
