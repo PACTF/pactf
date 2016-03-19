@@ -1,0 +1,58 @@
+{% extends 'ctflex/base/headered.template.html' %}
+{% load static from staticfiles %}
+{% load ctflex %}
+
+{% block title %}
+  Account — {{ block.super }}
+{% endblock %}
+
+{% block extra_js %}
+  <script type="text/javascript" src="{% static 'ctflex/js/acct.js' %}"></script>
+{% endblock %}
+
+{% block header %}
+  Account Settings
+{% endblock %}
+
+{% block content %}
+ <div class="panel-group">
+   <div class="panel panel-primary">
+     <div class="panel-heading">My Team</div>
+     <div class="panel-body">
+       <p>Check <a href="{% url 'ctflex:current_team' %}">here</a> for your team's public profile.</p>
+       <ul class="list-group">
+         {% for usr in team.competitor_set.all %}
+          <li class="list-group-item">
+            <span><strong>{{ usr.first_name }} {{ usr.last_name }}</strong></span>
+            <span class="pull-right">{{ usr.user.email }}</span>
+            </br><span>{{ usr.user.username }}</span>
+          </li>
+         {% endfor %}
+       </ul>
+       <p>To add people to your team, give them the passphrase <strong>{{ team.passphrase }}</strong>.
+         There'll a place to enter it when they first register.</p>
+     </div>
+   </div>
+ </div>
+ <div class="panel-group">
+   <div class="panel panel-primary">
+     <div class="panel-heading">My Account - {{ user.username }}</div>
+     <div class="panel-body">
+       <ul class="list-group">
+         <li class="list-group-item">
+           <span><strong>Email:</strong></span>
+           <span class="pull-right">{{ user.email }}</span>
+         </li>
+         <li class="list-group-item">
+           <span><strong>Name:</strong></span>
+           <span class="pull-right">{{ user.competitor.first_name }} {{ user.competitor.last_name }}</span>
+         </li>
+         <li class="list-group-item">
+           <span><strong>Password:</strong></span>
+           <span class="pull-right"><a href="{% url 'ctflex:password_change' %}">Change</a></span>
+         </li>
+       </ul>
+     </div>
+   </div>
+ </div>
+{% endblock %}

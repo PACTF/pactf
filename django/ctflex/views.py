@@ -223,6 +223,14 @@ class Team(DetailView):
         context = super(Team, self).get_context_data(**kwargs)
         return context
 
+@limited_http_methods('GET')
+@competitors_only()
+def acct_info(request):
+    """View the account/team details page."""
+    context = default_context((request))
+    context['user'] = request.user
+    context['competitor'] = request.user.competitor
+    return render(request, 'ctflex/misc/acct.html', context)
 
 # endregion
 
