@@ -41,10 +41,3 @@ function updateCount(url) {
         }
     });
 }
-
-
-(function () {
-
-
-})();
-
