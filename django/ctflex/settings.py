@@ -32,6 +32,7 @@ _SETTINGS = (
     # Name used for site in emails sent out
     ('SITENAME', 'CTFlex', None),
 
+    ('REGISTER_EMAIL', 'example@example.com', None),
     ('SUPPORT_EMAIL', 'example@example.com', None),
     ('CONTACT_EMAIL', 'example@example.com', None),
 

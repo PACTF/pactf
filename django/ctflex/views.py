@@ -27,6 +27,7 @@ from ctflex import commands
 from ctflex import forms
 from ctflex import models
 from ctflex import queries
+from ctflex import mail
 from ctflex import settings
 
 
@@ -580,8 +581,8 @@ def register(request,
                         password=user_form.cleaned_data['password1'],
                     )
                     auth_login(request, auth_user)
-
-                # FIXME(Yatharth): Send email
+                    # XXX(Cam) - We really should do this somewhere other than here.
+                    mail.confirm(user, team, competitor)
 
                 return HttpResponseRedirect(reverse(post_change_redirect))
 

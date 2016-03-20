@@ -229,6 +229,7 @@ class _CTFlex(_Django, Configuration):
 
     ''' General '''
 
+    CTFLEX_REGISTER_EMAIL = 'registrar@pactf.com'
     CTFLEX_SUPPORT_EMAIL = 'support@pactf.com'
     CTFLEX_CONTACT_EMAIL = 'contact@pactf.com'
 
