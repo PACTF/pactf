@@ -11,7 +11,7 @@
   {% for rank, team, score in board %}
     <tr>
       <td>{{ rank }}.</td>
-      <td>{{ team.name }}</td>
+      <td><a href="{% url 'ctflex:team_view' team_id=team.id %}">{{ team.name }}</a></td>
       <td>{{ team.affiliation }}</td>
       <td>{{ score }}</td>
     </tr>
