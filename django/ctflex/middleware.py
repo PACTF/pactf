@@ -6,8 +6,12 @@ from django.conf import settings
 
 from ratelimit.exceptions import Ratelimited
 
+from ctflex import constants
+from ctflex import views
+import ctflex.settings
 
-class RatelimitMiddleware(object):
+
+class RatelimitMiddleware:
     """Simulate `ratelimit.middleware.RatelimitMiddleware`
 
     The reason this simulation has to happen is that the original middleware
@@ -23,3 +27,39 @@ class RatelimitMiddleware(object):
         module = import_module(module_name)
         view = getattr(module, view_name)
         return view(request, exception)
+
+
+class IncubatingMiddleware:
+    """Conditionally enabled CTFlex’s incubating mode
+
+    Incubating mode means only bare functionality needed leading up to a
+    contest is enabled.
+    """
+
+    ALLOWED_URLS = (
+        'index',
+        'register',
+        'register_done',
+        'logout',
+    )
+
+    def process_response(self, request, response):
+
+        if not ctflex.settings.INCUBATING:
+            return response
+
+        if not request.resolver_match:
+            return response
+
+        if not (request.resolver_match.namespaces
+                and request.resolver_match.namespaces[0] == constants.APP_NAME):
+            return response
+
+        if request.resolver_match.url_name in self.ALLOWED_URLS:
+            return response
+
+        if (len(request.resolver_match.namespaces) >= 2
+            and request.resolver_match.namespaces[1] == constants.API_NAMESPACE):
+            return response
+
+        return views.incubating(request)

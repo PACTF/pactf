@@ -5,7 +5,7 @@ from django.contrib.auth import views as auth_views
 
 from ctflex import settings
 from ctflex.views import anonyomous_users_only
-from ctflex.constants import APP_NAME, UUID_REGEX
+from ctflex.constants import APP_NAME, UUID_REGEX, API_NAMESPACE
 from ctflex import views
 
 app_name = APP_NAME
@@ -14,7 +14,7 @@ WINDOW_CODE_TOKEN = r'(?:(?P<window_codename>\w+)/)'
 
 api_urls = [
     url(r'^submit_flag/(?P<prob_id>{})/$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
-    url(r'^unread_announcements/{}$'.format(WINDOW_CODE_TOKEN), views.unread_announcements,
+    url(r'^unread_announcements/{}?$'.format(WINDOW_CODE_TOKEN), views.unread_announcements,
         name='unread_announcements'),
 ]
 
@@ -42,21 +42,21 @@ auth_urls = [
 
     url(r'^logout/done/$', views.logout_done, name='logout_done'),
 
-    url(r'^password_change/$', auth_views.password_change, name='password_change', kwargs={
+    url(r'^password_change/$', views.password_change, name='password_change', kwargs={
         'template_name': 'ctflex/auth/password_change.html',
         'post_change_redirect': 'ctflex:password_change_done',
     }),
 
     url(r'^password_change/done/$', views.password_change_done, name='password_change_done'),
 
-    url(r'^password_reset/$', auth_views.password_reset, name='password_reset', kwargs={
+    url(r'^password_reset/$', views.password_reset, name='password_reset', kwargs={
         'template_name': 'ctflex/auth/password_reset.html',
         'email_template_name': 'ctflex/auth/password_reset_email.txt',
         'subject_template_name': 'ctflex/auth/password_reset_email_subject.txt',
         'post_reset_redirect': 'ctflex:password_reset_done',
         'extra_email_context': {
             'support_email': settings.SUPPORT_EMAIL,
-            'sitename': settings.SITENAME,
+            'site_name': settings.SITENAME,
         },
     }),
 
@@ -73,11 +73,13 @@ auth_urls = [
     url(r'^reset/done/$', views.password_reset_complete, name='password_reset_complete'),
 
     url(r'^register/$', views.register, name='register'),
+
+    url(r'^register/done/$', views.register_done, name='register_done'),
 ]
 
 urlpatterns = [
     url(r'', include(auth_urls)),
     url(r'', include(misc_urls)),
     url(r'', include(windowed_urls)),
-    url(r'api/', include(api_urls)),
+    url(r'^api/', include(api_urls, namespace=API_NAMESPACE)),
 ]

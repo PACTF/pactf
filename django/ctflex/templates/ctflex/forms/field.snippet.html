@@ -1,18 +1,20 @@
-{% load widget_tweaks %}
+{#{% load ctflex_forms %}#}
 
 <div class="form-group row {% if field.errors %}has-error has-feedback{% endif %} {{ extra_group_class }}">
 
-  <label for="{{ field.auto_id }}" class="control-label {{ extra_label_class }}">
-    {{ field.label }}{% if field.field.required %}*{% endif %}
-  </label>
+  {#  {% if not field.field.widget|is_checkbox %}#}
+  {% include 'ctflex/forms/label.snippet.html' %}
+  {#  {% else %}#}
+  {#    {% include 'ctflex/forms/input.snippet.html' %}#}
+  {#  {% endif %}#}
 
-  <div class="{{ extra_input_class }}">
-    {% if field.field.required %}
-      {{ field|add_class:"form-control"|attr:"required" }}
-    {% else %}
-      {{ field|add_class:"form-control" }}
-    {% endif %}
+  <div class="field-input-container {{ extra_input_class }}">
 
+    {#    {% if not field.field.widget|is_checkbox %}#}
+    {% include 'ctflex/forms/input.snippet.html' %}
+    {#    {% else %}#}
+    {#      {% include 'ctflex/forms/label.snippet.html' %}#}
+    {#    {% endif %}#}
 
     {% if field.errors %}
       <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
@@ -22,7 +24,7 @@
 
   <div class="clearfix"></div>
 
-  <div class="{{ extra_help_class }}">
+  <div class="field-other-container {{ extra_help_class }}">
 
     {% if field.errors %}
       <ul class="errorlist list-unstyled">

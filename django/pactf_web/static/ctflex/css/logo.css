@@ -1,0 +1,64 @@
+/* Colors */
+
+/*Andover colors:
+  001428: Light
+  005591 / 004b8e About the same
+  283c78 Dark
+  142d41: Too dark
+  */
+
+/*Bootstrap Yeti colors:
+  008cba
+  006687
+  add8e6
+  */
+
+/* Base */
+
+.logo svg {
+    height: 100%;
+}
+
+#container {
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-width: 10px;
+
+    fill: none;
+    stroke: none;
+}
+
+/* Normal */
+
+.outline {
+    stroke: #007caa;
+}
+
+.fill {
+    fill: #008cba;
+}
+
+.inline {
+    stroke: none;
+}
+
+/* Inverted */
+
+.logo-inverted .outline {
+    stroke: white;
+}
+
+.logo-inverted .fill {
+    fill: white;
+}
+
+.logo-inverted .inline {
+    stroke: #aaa;
+    stroke-width: 4px;
+}
+
+
+@media screen and (max-width: 30px) {
+    .logo-inverted .inline {
+    }
+}

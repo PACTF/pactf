@@ -1,5 +1,16 @@
+/* General */
+
 .jumbotron h3 {
-    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+}
+
+.jumbotron {
+    padding-top: 1em;
+}
+
+#jumbotron-paddding {
+    height: 1em;
 }
 
 #date-headings {
@@ -13,17 +24,58 @@
 }
 
 #ctf-info img {
-
     /* Center image */
     display: block;
     margin: auto;
 }
 
-#jumbotron-img img {
-
+#jumbotron-img {
+    width: 100%;
+    max-width: 30em;
     padding-left: 1em;
     padding-right: 1em;
+    margin: 0 auto;
+}
+
+/* Overlayed Image (old) *//*
+
+#jumbotron-img {
+    position: relative;
+    height: 20em;
 
     width: 100%;
     max-width: 1000px;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin: 0 auto;
+
 }
+
+#jumbotron-img img {
+}
+
+#jumbotron-img .logo svg {
+    z-index: 10;
+
+    height: 90%;
+
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+#jumbotron-img img, #jumbotron-img svg {
+
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+*/

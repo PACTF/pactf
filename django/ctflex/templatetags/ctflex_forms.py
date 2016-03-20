@@ -2,10 +2,15 @@
 
 from django.template import Context
 from django.template.loader import get_template
-
+from django.forms.fields import CheckboxInput
 from django import template
 
 register = template.Library()
+
+
+# @register.filter
+# def is_checkbox(value):
+#     return isinstance(value, CheckboxInput)
 
 
 class FormFieldNode(template.Node):
@@ -22,7 +27,6 @@ class FormFieldNode(template.Node):
         extra_html = self.nodelist.render(template_context)
         template_instance = get_template(template_name='ctflex/forms/field.snippet.html')
         custom_context = Context({'field': field, 'extra_html': extra_html})
-        # TODO: fix warning
         custom_context.update(template_context)
         return template_instance.render(custom_context)
 

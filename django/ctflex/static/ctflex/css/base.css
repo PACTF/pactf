@@ -10,7 +10,7 @@ body {
 }
 
 .page-title > .container, #content, #messages {
-    /* XXX(Yatharth): Look into http://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
+    /* TODO(Yatharth): Look into https://stackoverflow.com/questions/9730263/setting-max-width-for-body-using-bootstrap */
     max-width: 55em;
     margin: 0 auto;
 }
@@ -127,7 +127,7 @@ p.navbar-text {
 /* Messages */
 
 .jumbotron #messages {
-    margin-top: -30px;
+    /*margin-top: -30px;*/
     padding-top: 0;
 }
 
@@ -172,4 +172,15 @@ body.modal-open div.modal-backdrop {
 
 #window-dropdown-container {
     float: right;
+}
+
+/* Misc */
+
+.text-muted a {
+    color: #999;
+    text-decoration: underline;
+}
+
+.text-muted a:hover {
+    color: #00526e;
 }

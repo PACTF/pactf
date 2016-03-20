@@ -20,9 +20,12 @@ _SETTINGS = (
     # How many competitors can be in one team
     ('MAX_TEAM_SIZE', 5, None),
 
-    # Function taking a team as its sole argument and returning whether it is
-    # eligible for prizes and being ranked
-    ('ELIGIBILITY_FUNCTION', '', None),
+    # # Function taking a team as its sole argument and returning whether it is
+    # # eligible for prizes and being ranked
+    # ('ELIGIBILITY_FUNCTION', '', None),
+
+    # Whether the incubating middleware is enabled
+    ('INCUBATING', False, None),
 
     ### Metadata
 

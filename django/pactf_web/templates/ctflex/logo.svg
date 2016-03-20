@@ -1,0 +1,139 @@
+<?xml version="1.0" standalone="yes"?>
+<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink"
+    version="1.1" viewBox="0 0 250 165">
+
+<defs>
+    <clipPath id="t-mask">
+        <polygon points="
+            -100 0
+            -100 95
+            200 95
+            200 0
+            "/>
+    </clipPath>
+    <clipPath id="f-mask">
+        <polygon points="
+            5 5
+            5 100
+            50 100
+            50 5
+            "/>
+    </clipPath>
+</defs>
+
+<g id="container">
+    <g id="p">
+        <g id="pole" transform="
+            translate(5 65)
+            ">
+            <polyline class="outline" points="
+                0 95
+                10 95
+                10 -60
+                0 -60
+                0 95
+                "/>
+        </g>
+        <g id="flag" transform="
+            translate(15, 5)
+            ">
+            <polygon class="fill" points="
+                0 0
+                230 50
+                0 50
+                "/>
+            <polyline class="outline" points="
+                0 0
+                230 50
+                0 50
+                "/>
+        </g>
+        <polyline class="inline" points="
+            10 155
+            10 14
+            177 46
+            10 46
+            "/>
+    </g>
+    <g id="actf">
+        <g id="a" transform="
+            translate(29, 65)
+            ">
+            <polygon class="fill" points="
+                0, 100
+                25, 0
+                50, 100
+                "/>
+            <polyline class="outline" points="
+                1, 95
+                25, 5
+                49, 95
+                "/>
+            <polyline class="inline" points="
+                10, 92
+                25, 30
+                40, 92
+                "/>
+        </g>
+        <g id="c" transform="
+            translate(81, 65)
+            ">
+            <polygon class="fill" points="
+                44, 95
+                0, 50
+                44, 5
+                "/>
+            <polyline class="outline" points="
+                39, 95
+                1, 50
+                39, 5
+                "/>
+            <polyline class="inline" points="
+                37, 85
+                10, 50
+                37, 15
+                "/>
+        </g>
+        <g id="t" transform="
+            translate(135, 65)
+            ">
+            <polygon class="fill" clip-path="url(#t-mask)" points="
+                -5 5
+                55 5
+                25 113
+                "/>
+            <polyline class="outline" points="
+                0 5
+                50 5
+                25 5
+                25 95
+                "/>
+            <polyline class="inline" points="
+                5 10
+                45 10
+                25 10
+                25 80
+                "/>
+        </g>
+        <g id="f" transform="
+            translate(200 65)
+            ">
+            <polygon class="fill" clip-path="url(#f-mask)" points="
+                53 0
+                -5 0
+                -5 116
+                "/>
+            <polyline class="outline" points="
+                45 5
+                0 5
+                0 95
+                "/>
+            <polyline class="inline" points="
+                40 10
+                5 10
+                5 80
+                "/>
+        </g>
+    </g>
+</g>
+</svg>
