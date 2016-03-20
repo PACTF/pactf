@@ -22,14 +22,13 @@ windowed_urls = [
     url(r'^game/{}?$'.format(WINDOW_CODE_TOKEN), views.game, name='game'),
     url(r'^news/{}?$'.format(WINDOW_CODE_TOKEN), views.announcements, name='announcements'),
     url(r'^scoreboard/{}?$'.format(WINDOW_CODE_TOKEN), views.board, name='scoreboard'),
-    url(r'^team/{}?$'.format(WINDOW_CODE_TOKEN), views.Team.as_view(), name='team_view')
 ]
 
 misc_urls = [
     url('^$', views.index, name='index'),
     url(r'^start_timer/$', views.start_timer, name='start_timer'),
-    url(r'^team/{}?$'.format(WINDOW_CODE_TOKEN), views.Team.as_view(), name='current_team'),
     url(r'^account/$', views.acct_info, name='account'),
+    url(r'^team/(?P<team_id>\d+)$', views.view_team, name='team_view'),
 ]
 
 auth_urls = [

@@ -2,27 +2,44 @@
 {% load ctflex %}
 
 {% block title %}
-  Team — {{ block.super }}
+  Team Profile — {{ block.super }}
 {% endblock %}
 
 {% block header %}
-  Team
+  {{ team.name }}
 {% endblock %}
 
 {% block content %}
-  <p>
-    You are {{ user.username }} and part of team {{ object.name }}. You have
-    {% score object %} points!
-  </p>
-  <p>
-    The members of your team are:
-  </p>
-  <ul>
-    {% for teammate in object.competitor_set.all %}
-      <li>{{ teammate.user.username }}</li>
-    {% endfor %}
-  </ul>
-  <p>
-    For new members to join, give them the passphrase <em>{{ team.passphrase }}</em>. You can also <a href="{% url 'ctflex:password_change' %}">change your personal password</a>.
-  </p>
+  <div class="panel panel-primary">
+    <div class="panel-body">
+      <h3>General Information</h3>
+      <table class="table table-striped">
+        <tr>
+          <td><strong>Team Name</strong></td><td>{{ team.name }}</td>
+        </tr>
+        <tr>
+          <td><strong>Affiliation</strong></td><td>{{ team.affiliation }}</td>
+        </tr>
+        <tr>
+          <td><strong>Overall Score</strong></td><td>{{ total_score }}</td>
+        </tr>
+        <tr>
+          <td><strong>Members</strong></td>
+          <td><ul style="list-style:none; padding-left:0;">
+            {% for usr in team.competitor_set.all %}
+            <li>
+              {{ usr.first_name }} {{ usr.last_name }}</br>
+              <span style="font-size:8pt">{{ usr.user.username }}</span>
+            </li>
+            {% endfor %}
+          </ul></td>
+        </tr>
+      </table>
+      </br>
+      <h3>Scores by Round</h3>
+      <div class="panel-group" id="rounds-accordion">
+        <div class="panel-heading"></div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

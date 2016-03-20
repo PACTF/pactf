@@ -208,28 +208,21 @@ def announcements(request, *, window_codename):
     return render(request, 'ctflex/misc/announcements.html', context)
 
 
-# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
-
 @limited_http_methods('GET')
-@competitors_only()
-class Team(DetailView):
-    model = models.Team
-    template_name = 'ctflex/misc/team.html'
+def view_team(request, *, team_id):
+    """View the given team's data."""
+    context = default_context(request)
+    team = models.Team.objects.get(id=team_id)
+    context['team'] = team
+    context['total_score'] = queries.score(team=team, window=None)
+    return render(request, 'ctflex/misc/team.html', context)
 
-    def get_object(self, **kwargs):
-        return self.request.user.competitor.team
-
-    def get_context_data(self, **kwargs):
-        context = super(Team, self).get_context_data(**kwargs)
-        return context
 
 @limited_http_methods('GET')
 @competitors_only()
 def acct_info(request):
     """View the account/team details page."""
-    context = default_context((request))
-    context['user'] = request.user
-    context['competitor'] = request.user.competitor
+    context = default_context(request)
     return render(request, 'ctflex/misc/acct.html', context)
 
 # endregion

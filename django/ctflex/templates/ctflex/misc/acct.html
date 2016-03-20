@@ -19,7 +19,7 @@
    <div class="panel panel-primary">
      <div class="panel-heading">My Team</div>
      <div class="panel-body">
-       <p>Check <a href="{% url 'ctflex:current_team' %}">here</a> for your team's public profile.</p>
+       <p>Check <a href="{% url 'ctflex:team_view' team_id=team.id %}">here</a> for your team's public profile.</p>
        <ul class="list-group">
          {% for usr in team.competitor_set.all %}
           <li class="list-group-item">
