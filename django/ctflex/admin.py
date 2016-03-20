@@ -7,6 +7,22 @@ from django.contrib.auth.models import User
 from ctflex import models
 
 
+# region Helpers
+
+class AllFieldModelAdmin(admin.ModelAdmin):
+    EXCLUDE = ('id',)
+
+    def __init__(self, model, admin_site):
+        self.list_display = [field.name for field in model._meta.fields
+                             if field.name not in self.EXCLUDE]
+        super(AllFieldModelAdmin, self).__init__(model, admin_site)
+
+
+# endregion
+
+
+# region Admin Classes
+
 class CompetitorInline(admin.StackedInline):
     model = models.Competitor
     can_delete = False
@@ -21,29 +37,64 @@ class UserAdmin(BaseUserAdmin):
         personal_info = self.fieldsets[1][1]
         personal_info['fields'] = tuple(field for field in personal_info['fields'] if field != 'email')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.remove_email_field()
 
-def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.remove_email_field()
+
+class TeamAdmin(AllFieldModelAdmin):
+    EXCLUDE = ('id', 'passphrase',)
 
 
-class TimerAdmin(admin.ModelAdmin):
+class WindowAdmin(AllFieldModelAdmin):
+    date_hierarchy = 'start'
+
+
+class TimerAdmin(AllFieldModelAdmin):
+    EXCLUDE = ()
     readonly_fields = ('end',)
+    date_hierarchy = 'start'
 
 
-class SubmissionAdmin(admin.ModelAdmin):
-    readonly_fields = ('time',)
+class CtfProblemAdmin(AllFieldModelAdmin):
+    EXCLUDE = ('id', 'description', 'description_html', 'hint', 'hint_html', 'grader')
 
+
+class SolveAdmin(AllFieldModelAdmin):
+    EXCLUDE = ()
+    date_hierarchy = 'date'
+
+
+class SubmissionAdmin(AllFieldModelAdmin):
+    EXCLUDE = ('id', 'p_id')
+    date_hierarchy = 'date'
+    readonly_fields = ('date',)
+    list_display_links = ('date',)
+
+
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ('title', 'date', 'window')
+    date_hierarchy = 'date'
+    list_display_links = ('title',)
+    filter_horizontal = ('competitors', 'problems')
+
+
+# endregion
+
+
+# region Registration
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(models.Team)
+admin.site.register(models.Team, TeamAdmin)
 
-admin.site.register(models.CtfProblem)
-admin.site.register(models.Solve)
-admin.site.register(models.Submission)
-
+admin.site.register(models.Window, WindowAdmin)
 admin.site.register(models.Timer, TimerAdmin)
-admin.site.register(models.Window)
 
-admin.site.register(models.Announcement)
+admin.site.register(models.CtfProblem, CtfProblemAdmin)
+admin.site.register(models.Solve, SolveAdmin)
+admin.site.register(models.Submission, SubmissionAdmin)
+
+admin.site.register(models.Announcement, AnnouncementAdmin)
+
+# endregion

@@ -1,7 +1,9 @@
-from os.path import join, dirname, abspath
+import os
+import glob
+from os.path import join, dirname, abspath, isfile
 
 from django.core import management
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from ctflex.management.commands import helpers
@@ -51,9 +53,16 @@ class Command(BaseCommand):
                 for fixture in POST_PROBLEMS_FIXTURES:
                     self.load_fixture(fixture)
 
+                announcements_dir = join(BASE_DIR, 'announcements')
+                for basename in glob.glob(os.path.join(announcements_dir, '*.yaml')):
+                    print(basename)
+                    path = join(announcements_dir, basename)
+                    if isfile(path):
+                        management.call_command('announce', path)
+
         except Exception as err:
             self.stderr.write("Exception encountered; rolling back")
-            raise err
+            raise CommandError(err)
 
         else:
             self.stdout.write("Successfully (re)loaded all fixtures and problems")

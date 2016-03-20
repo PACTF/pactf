@@ -1,4 +1,5 @@
 {% load ctflex %}
+{% load static from staticfiles %}
 
 <nav class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
@@ -11,14 +12,16 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'ctflex:index' %}">PACTF</a>
+      <a class="navbar-brand logo logo-inverted" href="{% url 'ctflex:index' %}">
+        {% include 'ctflex/logo.svg' %}
+        <span class="sr-only">PACTF</span>
+      </a>
     </div>
 
     <div class="collapse navbar-collapse" id="navbar-collapse">
 
       <ul class="nav navbar-nav">
 
-        {# TODO: Active classes #}
         <li><a href="{% url 'ctflex:game' %}">Game</a></li>
         <li><a href="{% url 'ctflex:scoreboard' %}">Scoreboard</a></li>
         <li>

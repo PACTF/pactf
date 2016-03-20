@@ -4,6 +4,7 @@ This file uses django-configurations.
 """
 
 import os
+import re
 from os.path import join
 
 from configurations import Configuration, values
@@ -13,9 +14,9 @@ import ctflex.constants
 from pactf.constants import BASE_DIR
 
 
-# TODO(Yatharth): Prefix attributes and set django-configurations prefix appropriately
+class _Django:
+    """Configure basic Django things"""
 
-class Django:
     INSTALLED_APPS = [
         # Django Defaults
         'django.contrib.admin',
@@ -56,8 +57,14 @@ class Django:
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
 
+        # Django Extensions
+        'django.middleware.common.BrokenLinkEmailsMiddleware',
+
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
+
+        # Local
+        'ctflex.middleware.IncubatingMiddleware',
     )
 
     STATICFILES_FINDERS = (
@@ -65,7 +72,7 @@ class Django:
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
 
-    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
     TEMPLATES = [
         {
@@ -116,27 +123,34 @@ class Django:
     # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
     STATIC_ROOT = join(BASE_DIR, 'static')
 
-    # Where all to collect static files from
-    STATICFILES_DIRS = values.ListValue([])
-
-    # Email
-    EMAIL_HOST = values.Value('smtp.gmail.com')
-    EMAIL_PORT = values.IntegerValue(587)
-    DEFAULT_FROM_EMAIL = values.Value('ctflex2@gmail.com')
-    SERVER_EMAIL = values.Value('ctflex2@gmail.com')
-    EMAIL_HOST_USER = values.Value('ctflex2@gmail.com')
-    EMAIL_HOST_PASSWORD = values.SecretValue()
-    EMAIL_USE_TLS = values.BooleanValue(True)
-
-    RATELIMIT_VIEW = values.Value('ctflex.views.rate_limited')
+    RATELIMIT_VIEW = values.Value('ctflex.views.ratelimited')
 
     # For Boostrap Alerts
     MESSAGE_TAGS = {
         messages.ERROR: 'danger'
     }
+    STATICFILES_DIRS = values.ListValue([])
+
+    ''' Email '''
+
+    email_prefix = 'EMAIL'
+
+    EMAIL_HOST = values.Value('smtp.zoho.com', environ_prefix=None)
+    EMAIL_PORT = values.IntegerValue(587, environ_prefix=None)
+    EMAIL_USE_TLS = values.BooleanValue(True, environ_prefix=None)
+
+    EMAIL_HOST_USER = values.Value('noreply@pactf.com', environ_prefix=None)
+    EMAIL_HOST_PASSWORD = values.SecretValue(environ_prefix=None)
+
+    DEFAULT_FROM_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=email_prefix)
+    SERVER_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=None)
+
+    EMAIL_BACKEND = values.Value('email_log.backends.EmailBackend', environ_prefix=None)
 
 
-class Security:
+class _Security:
+    """Configure security"""
+
     SECRET_KEY = values.SecretValue()
 
     # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
@@ -171,35 +185,46 @@ class Security:
         },
     ]
 
+    ''' Logging '''
 
-class Gunicorn:
-    """Settings for running PACTF with Gunicorn"""
+    ADMINS = values.ListValue([
+        ('Yatharth', 'yatharth999+pactf@gmail.com')
+    ])
+    MANAGERS = ADMINS.value
+
+    IGNORABLE_404_URLS = values.ListValue([
+        re.compile(r'^/apple-touch-icon.*\.png$'),
+        re.compile(r'^/favicon\.ico$'),
+        re.compile(r'^/robots\.txt$'),
+    ])
+
+
+class _Gunicorn:
+    """Configure Gunicorn"""
 
     # As whom Gunicorn should run the server
-    USER = values.Value()
-    GROUP = values.Value()
+    GUNICORN_USER = values.Value(environ_prefix=None)
+    GUNICORN_GROUP = values.Value(environ_prefix=None)
 
     # Path to Gunicorn
-    GUNICORN = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn')
+    GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None)
 
     # Whether to use a socket or serve directly to an address
-    USE_SOCKFILE = values.BooleanValue(False)
+    GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
 
     # Socket to communicate with
-    SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'), check_exists=False)
+    GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
+                                         check_exists=False, environ_prefix=None)
 
     # Url to directly serve to
-    IP = values.IPValue('127.0.0.1')
-    PORT = values.IntegerValue(8001)
+    GUNICORN_IP = values.IPValue('127.0.0.1', environ_prefix=None)
+    GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
 
     # Number of worker processes Gunicorn should spawn
-    NUM_WORKERS = values.IntegerValue(3)
+    GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
 
 
-ctflex_prefix = ctflex.constants.APP_NAME.capitalize()
-
-
-class CTFlex(Django, Configuration):
+class _CTFlex(_Django, Configuration):
     """Configure CTFlex"""
 
     ''' General '''
@@ -209,11 +234,13 @@ class CTFlex(Django, Configuration):
 
     CTFLEX_SITENAME = 'PACTF'
 
-    CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
+    # CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
+
+    CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
 
     ''' Problems and Staticfiles '''
 
-    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'))
+    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
     CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
     CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
 
@@ -232,22 +259,24 @@ class CTFlex(Django, Configuration):
 
 
 # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
-class Base(Security, CTFlex, Gunicorn, Django, Configuration):
+class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
+    """Extract common sub-classes of any full user-facing settings class"""
     pass
 
 
-class Dev(Base):
+class Dev(_Base):
     """Insecure and noisy settings for development"""
 
     ''' Security '''
 
     DEBUG = True
     ALLOWED_HOSTS = values.ListValue(['*'])
+    RATELIMIT_ENABLE = values.Value(False)
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
             'OPTIONS': {
-                'min_length': 5,
+                'min_length': 2,
             }
         },
         {
@@ -257,7 +286,6 @@ class Dev(Base):
 
     ''' Logging '''
 
-    EMAIL_BACKEND = 'email_log.backends.EmailBackend'
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -265,7 +293,7 @@ class Dev(Base):
             # 'file': {
             #     'level': 'DEBUG',
             #     'class': 'logging.FileHandler',
-            #     'f®ilename': join(BASE_DIR, 'logs', 'django.log'),
+            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
             # },
             'console': {
                 'class': 'logging.StreamHandler',
@@ -286,16 +314,17 @@ class Dev(Base):
     }
 
 
-class Prod(Base):
+class Prod(_Base):
     """Secure and quite settings for production"""
 
-    # Security
+    ''' Security '''
+
     DEBUG = False
     ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
-    https = True  # For settings that should only be true when using HTTPS
-    SESSION_COOKIE_SECURE = https
-    CSRF_COOKIE_SECURE = https
+    https = values.Value(True)  # For settings that should only be true when using HTTPS
+    SESSION_COOKIE_SECURE = https.value
+    CSRF_COOKIE_SECURE = https.value
 
-    # (Only enable this if nginx is properly configured with HTTPS.)
-    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    https_headers = values.Value(False)  # Only enable this if nginx is properly configured with HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None

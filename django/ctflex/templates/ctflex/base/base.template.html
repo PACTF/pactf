@@ -1,4 +1,4 @@
-{% comment %} Define base template for all CTFlex templates
+{% comment %}{# Define base template for all CTFlex templates
 
   Purpose:
   Most pages SHOULD derive from `base/windowed.template.html` instead, which
@@ -16,11 +16,9 @@
 
   - Name templates as so:
 
-  <basename>[.snippet][.template].
-  <extension>
+      `<basename>[.snippet][.template].<extension>`
 
-  `
-  <basename>` is a descriptive name like `windowed` or `game`. `extension`
+  `<basename>` is a descriptive name like `windowed` or `game`. `extension`
   is the file type, e.g., `txt` or `html`.
 
   The `.snippet` part is to be included when the template does not stand on
@@ -31,7 +29,7 @@
   The `.template` part is to be included when the template is not intended to
   ever be used directly but only be derived from in some other template. This
   is similar to the notion of Abstract Base Classes in Python.
-{% endcomment %}
+#}{% endcomment %}
 
 {% load static from staticfiles %}
 {% load ctflex %}
@@ -56,10 +54,12 @@
     {% endblock %}
   </title>
 
-  {# XXX(Yatharth): Figure out what resources we actually need #}
-  {# XXX(Yatharth): Download resources locally #}
+  <!-- Favicon -->
+
+  {% include 'ctflex/base/favicons.snippet.html' %}
 
   <!-- CSS -->
+  {# TODO(Yatharth): Figure out what resources we actually need #}
 
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css"
         integrity="sha384-SMQY6km0HNF/4ZQFLn+ksQGfOZcdUItGFzYtcFEtdC5LdIgQ74RSJNYwBRzNsHWK" crossorigin="anonymous">
@@ -69,6 +69,7 @@
         integrity="sha384-fpdlABSRXJUeEO2RMarntvPfwn7UlIhDODwZ6w/1g9YFAIYgVL0jAarUL2f/DfBy" crossorigin="anonymous">
 
   <link href="{% static "ctflex/css/base.css" %}" rel="stylesheet">
+  <link href="{% static "ctflex/css/logo.css" %}" rel="stylesheet">
 
   {% block extra_css %}{% endblock %}
 
@@ -80,12 +81,8 @@
   <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"
           integrity="sha384-vIp38BeRN82wlvPB8/vo/5e0J1/gn7WfUf1Qq9bdh79iMPxjry99thNkscQG1b8C"
           crossorigin="anonymous"></script>
-  <script src="{% static 'ctflex/js/lib/bootstrap.min.js' %}"
-          integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"></script>
-  {# Commented because it took too long to load #}
-  {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"#}
-  {#          integrity="sha384-tSi+YsgNwyohDGfW/VhY51IK3RKAPYDcj1sNXJ16oRAyDP++K0NCzSCUW78EMFmf"#}
-  {#          crossorigin="anonymous"></script>#}
+  <script src="{% static 'ctflex/js/lib/bootstrap.min.js' %}"></script>
+  <script src="{% static 'ctflex/js/lib/jquery.cookie.min.js' %}"></script>
   <script src="{% static "ctflex/js/lib/notify.min.js" %}"></script>
 
   {% if team %}
@@ -127,43 +124,39 @@
 </footer>
 
 <!-- JS Context -->
-{% comment %}
+{% comment %}{#
 
   Purpose:
-  The following snippet allows views to pass context to JavaScript.
+    The following snippet allows views to pass context to JavaScript.
 
   Usage:
-  In your view, where you pass the context to your template, set `js_context`
-  to some Javascript literal. A JSON-serialized dictionary is recommended.
+    In your view, where you pass the context to your template, set `js_context`
+    to some Javascript literal. A JSON-serialized dictionary is recommended.
 
-  In your Javascript, include the following code
+    In your Javascript, include the following code
 
-  if (document.addEventListener) {
-  document.addEventListener('js_context',
-  <your_callback>, false);
-  } else {
-  document.attachEvent('js_context',
-  <your_callback>);
-  }
+      if (document.addEventListener) {
+        document.addEventListener('js_context', <your_callback>, false);
+      } else {
+        document.attachEvent('js_context', <your_callback>);
+      }
 
-  Here,the function `
-  <your_callback>` will be called when the `js_context` is
-  ready to be used by Javascript code.
+    Here,the function `<your_callback>` will be called when the `js_context` is
+    ready to be used by Javascript code.
 
-  Once it is ready, you can access `js_context` as `window.js_context`.
-
+    Once it is ready, you can access `js_context` as `window.js_context`.
+w
   Implementation Notes:
-  - The template must (ultimately) derive from this template.
-  - The value of the `js_context` you set in your view will be parsed as a
-  Javascript literal. It is your responsibility to make sure the value is
-  safe to evaluate.
+    - The template must (ultimately) derive from this template.
+    - The value of the `js_context` you set in your view will be parsed as a
+      Javascript literal. It is your responsibility to make sure the value is
+      safe to evaluate.
 
-{% endcomment %}
+#}{% endcomment %}
 {% if js_context %}
   <script type="text/javascript">
     (function () {
       window.js_context = {{ js_context|safe }};
-      // TODO(Yatharth): Figure out PyCharm’s “Interface cannot be instantiated warning”
       document.dispatchEvent(new Event('js_context'));
     })();
   </script>

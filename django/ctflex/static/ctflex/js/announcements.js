@@ -1,17 +1,18 @@
 jQuery(document).ready(function () {
     var parser = document.createElement('a');
     parser.href = window.location.href;
-    var url = "/api/unread_announcements/" + parser.pathname.split('/').slice(-2)[0];
+    var url = "/api/unread_announcements/"; // + parser.pathname.split('/').slice(-2)[0];
 
     updateCount(url);
 
     setInterval(function () {
         updateCount(url)
-    }, 1000 * 2);
+    }, 1000 * 20);
 });
 
 function updateCount(url) {
 
+    // TODO(Cam): Make it a POST request instead of GET
     $.ajax({
         url: url,
         type: "GET",

@@ -9,7 +9,7 @@ from ctflex import models
 
 # region Helpers
 
-def _model_generated(model):
+def model_generated(model):
     """Generate form fields from model fields
 
     Purpose:
@@ -76,7 +76,7 @@ class CompetitorCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Competitor
-        fields = ('email', 'first_name', 'last_name', 'country', 'state', 'background')
+        fields = ('email', 'first_name', 'last_name')
 
 
 class UserCreationForm(auth_forms.UserCreationForm):
@@ -108,10 +108,16 @@ class TeamCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Team
-        fields = ('name', 'passphrase', 'affiliation')
+        fields = ('name', 'passphrase', 'affiliation', 'country', 'background')
 
+    # ELIGIBLE_HELP_TEXT = ("All of your team's competitors must be middle-schoolers "
+    #                       "or high-schoolers living in the United States to be "
+    #                       "displayed on the scoreboard and be eligible for prizes.")
+    # eligible = forms.BooleanField(initial=True,
+    #                               label="My team is eligible to win prizes.",
+    #                               help_text=ELIGIBLE_HELP_TEXT)
 
-@_model_generated(models.Team)
+@model_generated(models.Team)
 class TeamJoiningForm(forms.Form):
     prefix = 'existing_team'
 

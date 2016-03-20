@@ -6,6 +6,7 @@ from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -18,7 +19,9 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
+
 from ratelimit.utils import is_ratelimited
+from ratelimit.decorators import ratelimit
 
 from ctflex import commands
 from ctflex import forms
@@ -27,7 +30,7 @@ from ctflex import queries
 from ctflex import settings
 
 
-# region Helper Methods
+# region Context Processors
 
 
 def default_context(request):
@@ -39,6 +42,7 @@ def default_context(request):
     return {
         'team': request.user.competitor.team if queries.is_competitor(request.user) else None,
         'contact_email': settings.CONTACT_EMAIL,
+        'js_context': '{}',
     }
 
 
@@ -48,6 +52,25 @@ def windowed_context(window):
         'window': window,
         'windows': queries.all_windows(),
     }
+
+
+# endregion
+
+# region Indirectly-called Views
+
+def ratelimited(request, err=None):
+    """Render template for when the user has been rate limited
+
+    Usage:
+        This view is automatically called by the `ratelimit` module on
+        encountering a Ratelimited exception, so you SHOULD raise that
+        exception instead of calling this method directly.
+    """
+    return render(request, 'ctflex/misc/ratelimited.html')
+
+
+def incubating(request):
+    return render(request, 'ctflex/misc/incubating.html')
 
 
 # endregion
@@ -109,7 +132,6 @@ def limited_http_methods(*methods):
     assert set(methods).issubset({'GET', 'POST', 'PUT', 'DELETE'}), ValueError(
         "Not all methods recognized: {}".format(methods))
 
-    # TODO(Yatharth): Show custom page per http://stackoverflow.com/questions/4614294
     error = HttpResponseNotAllowed('Only the following HTTP methods are allowed here: {}'.format(methods))
 
     def decorator(view):
@@ -184,17 +206,6 @@ def index(request):
 
 
 @limited_http_methods('GET')
-def rate_limited(request, err):
-    """Render template for when the user has been rate limited
-
-    Usage:
-        This view is automatically called by the `ratelimit` module,
-        so nothing more needs to be done.
-    """
-    return render(request, 'ctflex/misc/ratelimited.html')
-
-
-@limited_http_methods('GET')
 @defaulted_window()
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
@@ -207,8 +218,6 @@ def announcements(request, *, window_codename):
 
     return render(request, 'ctflex/misc/announcements.html', context)
 
-
-# TODO(Yatharth): For viewing other teams, needs to use a slightly different template at least and be linked from scoreboard
 
 @limited_http_methods('GET')
 @competitors_only()
@@ -303,8 +312,12 @@ def submit_flag(request, *, prob_id):
 
 @never_cache
 @limited_http_methods('GET')
+@defaulted_window()
 def unread_announcements(request, *, window_codename):
-    window = queries.get_window(window_codename)
+    try:
+        window = queries.get_window(window_codename)
+    except models.Window.DoesNotExist:
+        window = queries.get_window()
     count = queries.unread_announcements(window=window, user=request.user).count()
     return JsonResponse({
         'count': count,
@@ -416,6 +429,15 @@ def board(request, *, window_codename):
 
 # region Auth
 
+password_change = limited_http_methods('GET', 'POST')(
+    ratelimit(key='user', method='POST', rate='4/m', block=True)(
+        auth_views.password_change))
+
+password_reset = limited_http_methods('GET', 'POST')(
+    ratelimit(method='POST', key='ip', rate='4/m', block=True)(
+        auth_views.password_reset))
+
+
 @limited_http_methods('GET')
 def logout_done(request, *,
                 message="You have been logged out.",
@@ -440,19 +462,42 @@ def password_reset_complete(request, *,
     return redirect(redirect_url)
 
 
+# def password_reset(request,
+#                    template_name='ctflex/auth/password_reset.html',
+#                    email_template_name='ctflex/auth/password_reset_email.txt',
+#                    subject_template_name='ctflex/auth/password_reset_email_subject.txt',
+#                    post_reset_redirect='ctflex:password_reset_done',
+#                    extra_email_context=None):
+#     """Wrap password_reset, setting parameters and rate-limiting POSTs"""
+#
+#     # Set extra_email_context
+#     real_extra_email_context = {
+#         'support_email': settings.SUPPORT_EMAIL,
+#         'site_name': settings.SITENAME,
+#     }
+#     if extra_email_context is not None:
+#         real_extra_email_context.update(extra_email_context)
+#
+#     return auth_views.password_reset(request,
+#                                      template_name=template_name,
+#                                      email_template_name=email_template_name,
+#                                      subject_template_name=subject_template_name,
+#                                      post_reset_redirect=post_reset_redirect,
+#                                      extra_email_context=real_extra_email_context,
+#                                      )
+
 # endregion
 
 # region Registration
 
-# TODO(Yatharth): Shorten view by extracting a command
 @never_cache
-@sensitive_post_parameters()
+@sensitive_post_parameters('user-password2', 'new_team-passphrase', 'existing_team-passphrase')
 @csrf_protect
 @limited_http_methods('GET', 'POST')
 @anonyomous_users_only()
 def register(request,
              template_name='ctflex/auth/register.html',
-             post_change_redirect='ctflex:game',
+             post_change_redirect='ctflex:register_done',
              extra_context=None):
     """Display registration form"""
 
@@ -484,6 +529,7 @@ def register(request,
             existing_team_form = forms.TeamJoiningForm()
             active_team_form = new_team_form
 
+        # FIXME(Yatharth): Shorten view by extracting a command
         # If valid, begin a transaction
         if user_form.is_valid() and active_team_form.is_valid() and competitor_form.is_valid():
             try:
@@ -518,13 +564,17 @@ def register(request,
 
             # If no errors were raised, log the user in and redirect!
             else:
-                auth_user = authenticate(
-                    username=user_form.cleaned_data['username'],
-                    password=user_form.cleaned_data['password1'],
-                )
-                auth_login(request, auth_user)
 
-                messages.success(request, "You were successfully registered!")
+                # Only log the user in if not incubating
+                if not settings.INCUBATING:
+                    auth_user = authenticate(
+                        username=user_form.cleaned_data['username'],
+                        password=user_form.cleaned_data['password1'],
+                    )
+                    auth_login(request, auth_user)
+
+                # FIXME(Yatharth): Send email
+
                 return HttpResponseRedirect(reverse(post_change_redirect))
 
     # Otherwise, create blank forms
@@ -538,6 +588,8 @@ def register(request,
     # Initialize context
     context = {
         'team_status': team_status,
+        'max_team_size': settings.MAX_TEAM_SIZE,
+
         'user_form': user_form,
         'competitor_form': competitor_form,
         'new_team_form': new_team_form,
@@ -547,5 +599,10 @@ def register(request,
         context.update(extra_context)
 
     return render(request, template_name, context)
+
+
+@limited_http_methods('GET')
+def register_done(request):
+    return render(request, 'ctflex/auth/register_done.html')
 
 # endregion

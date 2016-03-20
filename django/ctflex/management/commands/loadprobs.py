@@ -106,7 +106,7 @@ class Command(BaseCommand):
 
             with transaction.atomic():
 
-                # Rotate over window folders
+                # Rotate over problem folders
                 for window_basename, window_path in self.walk(PROBLEMS_DIR):
                     for prob_basename, prob_path in self.walk(window_path):
 
@@ -169,9 +169,14 @@ class Command(BaseCommand):
                             self.handle_error(err)
                             continue
 
+                        # Add defaults for fields
                         data.setdefault('generator', None)
                         data.setdefault('description', '')
                         data.setdefault('hint', '')
+
+                        # Remove extra fields
+                        for attr in set(data.keys()) - set(CtfProblem._meta.get_all_field_names()):
+                            del data[attr]
 
                         # If problem exists, update it
                         query = CtfProblem.objects.filter(**{PK_FIELD: uuid})
@@ -266,4 +271,4 @@ class Command(BaseCommand):
             pass
         except Exception as err:
             self.stderr.write("An unforeseen exception was encountered; rolled back transaction")
-            self.handle_error(err)
+            raise CommandError(err)

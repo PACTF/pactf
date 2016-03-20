@@ -10,7 +10,7 @@
     padding-left: 10px;
     padding-right: 10px;
 
-    margin-bottom: 0em;
+    margin-bottom: 0;
 }
 
 .problem-header h3.container-fluid {
@@ -43,6 +43,7 @@
     /* Yatharth: If you are setting a margin on problem-header, you need this
                  to fix a visual glitch in (un)collapsing; no idea why */
     /*border: 1px solid transparent;*/
+    padding-top: 0.5em;
 }
 
 .problem-solved .problem-body {
