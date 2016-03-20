@@ -6,9 +6,6 @@
     email: example11@mailinator.com
     first_name: DefaultFirst
     last_name: DefaultLast
-    country: US
-    state: MA
-    background: H
 
 - model: ctflex.Competitor
   pk: 12
@@ -18,9 +15,6 @@
     email: example12@mailinator.com
     first_name: DefaultFirst
     last_name: DefaultLast
-    country: US
-    state: NY
-    background: H
 
 - model: ctflex.Competitor
   pk: 21
@@ -30,6 +24,3 @@
     email: example21@example.com
     first_name: DefaultFirst
     last_name: DefaultLast
-    country: US
-    state: TX
-    background: H
