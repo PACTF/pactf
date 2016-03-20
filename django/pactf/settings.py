@@ -326,5 +326,5 @@ class Prod(_Base):
     SESSION_COOKIE_SECURE = https.value
     CSRF_COOKIE_SECURE = https.value
 
-    https_headers = values.Value(False)  # Only enable this if nginx is properly configured with HTTPS
+    https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
