@@ -207,7 +207,7 @@ class _Gunicorn:
     GUNICORN_GROUP = values.Value(environ_prefix=None)
 
     # Path to Gunicorn
-    GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None)
+    GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None, check_exists=False)
 
     # Whether to use a socket or serve directly to an address
     GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)

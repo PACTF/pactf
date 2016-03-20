@@ -226,6 +226,11 @@ def view_team(request, *, team_id):
     team = models.Team.objects.get(id=team_id)
     context['team'] = team
     context['total_score'] = queries.score(team=team, window=None)
+    context['windows_data'] = [
+        (win, queries.score(team=team, window=win), queries.solves(team=team, window=win))
+        # We reverse so the more recent rounds are on top.
+        for win in reversed(queries.all_windows())
+    ]
     return render(request, 'ctflex/misc/team.html', context)
 
 

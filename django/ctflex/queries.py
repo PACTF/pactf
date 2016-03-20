@@ -44,7 +44,7 @@ def competitor_key(group, request):
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
-
+# XXX(Cam): Alter this to use solves()
 def score(*, team, window):
     score = 0
     for competitor in team.competitor_set.all():
@@ -54,6 +54,17 @@ def score(*, team, window):
         for solve in solves:
             score += solve.problem.points
     return score
+
+
+def solves(*, team, window):
+    result = []
+    for competitor in team.competitor_set.all():
+        solves = competitor.solve_set.filter()
+        if window is not None:
+            solves = solves.filter(problem__window=window)
+        for solve in solves:
+            result.append(solve)
+    return result
 
 
 def announcements(window):
