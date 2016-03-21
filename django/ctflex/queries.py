@@ -1,4 +1,3 @@
-import datetime
 import importlib
 import importlib.machinery
 import logging
@@ -6,9 +5,9 @@ from copy import copy
 from functools import partial
 from os.path import join
 
-from django.db.models import Sum, Q
+from django.db.models import Sum
 
-from ctflex import constants, models
+from ctflex import constants
 from ctflex import hashers
 from ctflex import models
 from ctflex import settings
@@ -24,10 +23,7 @@ def is_competitor(user):
 
 def get_window(codename=None):
     if codename:
-        try:
-            return models.Window.objects.get(codename=codename)
-        except models.Window.DoesNotExist:
-            return models.Window.objects.current()
+        return models.Window.objects.get(codename=codename)
     else:
         return models.Window.objects.current()
 
@@ -45,25 +41,18 @@ def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
-# XXX(Cam): Alter this to use solves()
-def score(*, team, window):
-    solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
-    return solves.aggregate(score=Sum('problem__points'))['score'] or 0
-
-
 def solves(*, team, window):
-    result = []
-    for competitor in team.competitor_set.all():
-        solves = competitor.solve_set.filter()
-        if window is not None:
-            solves = solves.filter(problem__window=window)
-        for solve in solves:
-            result.append(solve)
-    return result
+    return models.Solve.objects.filter(competitor__team=team, problem__window=window)
+
+
+def score(*, team, window):
+    return (solves(team=team, window=window)
+            .aggregate(score=Sum('problem__points'))['score'] or 0)
 
 
 def announcements(window):
     return window.announcement_set.order_by('-date')
+
 
 def unread_announcements_count(*, window, user):
     if not is_competitor(user):
