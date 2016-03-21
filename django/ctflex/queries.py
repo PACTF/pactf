@@ -63,11 +63,7 @@ def solves(*, team, window):
 
 
 def announcements(window):
-    """Return announcements of that window or of no window"""
-    return (models.Announcement.objects
-            .filter(Q(window=window) | Q(window__isnull=True))
-            .order_by('-date'))
-
+    return window.announcement_set.order_by('-date')
 
 def unread_announcements_count(*, window, user):
     if not is_competitor(user):

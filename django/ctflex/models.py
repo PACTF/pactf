@@ -718,15 +718,12 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 
 @cleaned
 class Announcement(models.Model):
-    """Represent an announcement for a window (and maybe some problems)
-
-    If an announcement is not associated with a window, it is understood to be applicable to all windows.
-    """
+    """Represent an announcement for a window (and maybe some problems)"""
 
     ''' Structural Fields '''
 
     id = models.AutoField(primary_key=True)
-    window = models.ForeignKey(Window, on_delete=models.CASCADE, null=True)
+    window = models.ForeignKey(Window, on_delete=models.CASCADE)
     competitors = models.ManyToManyField(Competitor, related_name='unread_announcements',
                                          blank=True)
     problems = models.ManyToManyField(CtfProblem, blank=True)
