@@ -211,7 +211,7 @@ class _Gunicorn:
     GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None)
 
     # Whether to use a socket or serve directly to an address
-    GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
+    GUNICORN_USE_SOCKFILE = values.BooleanValue(True, environ_prefix=None)
 
     # Socket to communicate with
     GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
