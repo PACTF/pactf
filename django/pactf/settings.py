@@ -189,7 +189,7 @@ class _Security:
 
     ADMINS = values.ListValue([
         ('Yatharth', 'yatharth999+pactf@gmail.com'),
-        ('Tony', 'tony@tonytan.io')
+        ('Tony', 'tony@tonytan.io'),
     ])
     MANAGERS = ADMINS.value
 
