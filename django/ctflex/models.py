@@ -718,7 +718,10 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 
 @cleaned
 class Announcement(models.Model):
-    """Represent an announcement for a window (and maybe some problems)"""
+    """Represent an announcement for a window (and maybe some problems)
+
+    If an announcement is not associated with a window, it is understood to be applicable to all windows.
+    """
 
     ''' Structural Fields '''
 

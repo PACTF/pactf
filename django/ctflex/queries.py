@@ -6,7 +6,7 @@ from copy import copy
 from functools import partial
 from os.path import join
 
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 from ctflex import constants, models
 from ctflex import hashers
@@ -44,6 +44,7 @@ def competitor_key(group, request):
 def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
+
 # XXX(Cam): Alter this to use solves()
 def score(*, team, window):
     solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
@@ -62,7 +63,10 @@ def solves(*, team, window):
 
 
 def announcements(window):
-    return window.announcement_set.order_by('-date')
+    """Return announcements of that window or of no window"""
+    return (models.Announcement.objects
+            .filter(Q(window=window) | Q(window__isnull=True))
+            .order_by('-date'))
 
 
 def unread_announcements_count(*, window, user):
