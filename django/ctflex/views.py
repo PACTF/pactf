@@ -318,7 +318,7 @@ def unread_announcements(request, *, window_codename):
         window = queries.get_window(window_codename)
     except models.Window.DoesNotExist:
         window = queries.get_window()
-    count = queries.unread_announcements(window=window, user=request.user).count()
+    count = queries.unread_announcements_count(window=window, user=request.user)
     return JsonResponse({
         'count': count,
     })
