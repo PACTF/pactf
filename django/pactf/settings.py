@@ -36,6 +36,7 @@ class _Django:
         'debug_toolbar',
         'email_log',
         'widget_tweaks',
+        'django_print_settings',
 
         # Python 3rd-party
         'yaml',
@@ -188,7 +189,9 @@ class _Security:
     ''' Logging '''
 
     ADMINS = values.ListValue([
-        ('Yatharth', 'yatharth999+pactf@gmail.com')
+        ('Yatharth', 'yatharth999+pactf@gmail.com'),
+        ('Tony', 'tony@tonytan.io'),
+        # ('PACTF Errors', _Django.SERVER_EMAIL.value)
     ])
     MANAGERS = ADMINS.value
 
@@ -327,5 +330,5 @@ class Prod(_Base):
     SESSION_COOKIE_SECURE = https.value
     CSRF_COOKIE_SECURE = https.value
 
-    https_headers = values.Value(False)  # Only enable this if nginx is properly configured with HTTPS
+    https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None

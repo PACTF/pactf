@@ -14,8 +14,7 @@ WINDOW_CODE_TOKEN = r'(?:(?P<window_codename>\w+)/)'
 
 api_urls = [
     url(r'^submit_flag/(?P<prob_id>{})/$'.format(UUID_REGEX), views.submit_flag, name='submit_flag'),
-    url(r'^unread_announcements/{}?$'.format(WINDOW_CODE_TOKEN), views.unread_announcements,
-        name='unread_announcements'),
+    url(r'^unread_announcements/$', views.unread_announcements, name='unread_announcements'),
 ]
 
 windowed_urls = [

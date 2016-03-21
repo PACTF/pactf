@@ -4,9 +4,22 @@
     name: "Team 1"
     passphrase: password
     affiliation: PA
+    country: U
+    background: S
 
 - model: "ctflex.Team"
   pk: 2
   fields:
     name: "Team 2"
     passphrase: password
+    country: U
+    background: S
+
+
+- model: "ctflex.Team"
+  pk: 3
+  fields:
+    name: "Team 3 (should be ineligible)"
+    passphrase: password
+    country: O
+    background: S

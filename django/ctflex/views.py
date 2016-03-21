@@ -16,7 +16,7 @@ from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import DetailView
 
@@ -320,14 +320,10 @@ def submit_flag(request, *, prob_id):
 
 
 @never_cache
-@limited_http_methods('GET')
-@defaulted_window()
-def unread_announcements(request, *, window_codename):
-    try:
-        window = queries.get_window(window_codename)
-    except models.Window.DoesNotExist:
-        window = queries.get_window()
-    count = queries.unread_announcements(window=window, user=request.user).count()
+@limited_http_methods('POST')
+def unread_announcements(request):
+    window = queries.get_window()
+    count = queries.unread_announcements_count(window=window, user=request.user)
     return JsonResponse({
         'count': count,
     })
