@@ -1,3 +1,6 @@
+// FIXME: Poll for not just unread announcements
+// but count of problems solved (in case some other member solved) and count of problems displayed
+
 jQuery(document).ready(function () {
     var parser = document.createElement('a');
     parser.href = window.location.href;
@@ -15,7 +18,7 @@ function updateCount(url) {
     // TODO(Cam): Make it a POST request instead of GET
     $.ajax({
         url: url,
-        type: "GET",
+        type: "POST",
         data: {},
 
         success: function (response) {
