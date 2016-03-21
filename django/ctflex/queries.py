@@ -43,24 +43,18 @@ def solved(problem, team):
 
 
 def score(*, team, window):
-    score = 0
-    for competitor in team.competitor_set.all():
-        solves = competitor.solve_set.filter()
-        if window is not None:
-            solves = solves.filter(problem__window=window)
-        for solve in solves:
-            score += solve.problem.points
-    return score
+    solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
+    return solves.aggregate(score=Sum('problem__points'))['score'] or 0
 
 
 def announcements(window):
     return window.announcement_set.order_by('-date')
 
 
-def unread_announcements(*, window, user):
+def unread_announcements_count(*, window, user):
     if not is_competitor(user):
         return 0
-    return user.competitor.unread_announcements.filter(window=window)
+    return user.competitor.unread_announcements.filter(window=window).count()
 
 
 # endregion
@@ -144,31 +138,69 @@ _eligible = lambda team: (not team.banned
                           and team.background == team.SCHOOL_BACKGROUND)
 
 
-def _last_solve_date(*, team, window):
-    """Return date of most recent Solve (or the minimum date if it doesn’t exist)"""
-    solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
+def _solves_in_timer(*, team, window):
+    """Return 1+ solves within the team’s timer (or None if N/A)"""
+
+    if not team.has_timer(window):
+        return None
+    timer = team.timer(window)
+
+    solves = models.Solve.objects.filter(
+        competitor__team=team,
+        problem__window=window,
+        date__gte=timer.start,
+        date__lte=timer.end,
+    )
+
     if not solves.exists():
-        return datetime.datetime.min
-    return solves.order_by('-date').first().date
+        return None
+
+    return solves
+
+
+def _score_in_timer(*, team, window):
+    solves = _solves_in_timer(team=team, window=window)
+    if solves is None:
+        return 0
+    return solves.aggregate(score=Sum('problem__points'))['score'] or 0
+
+
+def _last_solve_in_timer_time(*, team, window):
+    """Return the longest time taken to solve a problem during the team’s timer
+
+    If N/A, the length of the window’s personal timer is returned.
+    """
+
+    solves = _solves_in_timer(team=team, window=window)
+
+    if solves is None:
+        return window.personal_timer_duration
+
+    last_solve_date = solves.order_by('-date').first().date
+    timer = team.timer(window)
+    return last_solve_date - timer.start
 
 
 def _team_ranking_key(window, team_with_score):
     """Return key for team based on rank
 
-    The basis for ranking is, in order, is a high scores, an old most recent solve,
-    and a case-insensitively and lexicographically earlier sorted team name.
+    The basis for ranking is, in order:
+    - a high score
+    - a short time taken since the beginning of a team’s timer to solve the
+      last problem that they solved within their timer
+    - a case-insensitively and lexicographically earlier sorted team name
     """
     team, score_ = team_with_score
     return (
         -score_,
-        _last_solve_date(team=team, window=window),
+        _last_solve_in_timer_time(team=team, window=window),
         team.name.lower(),
     )
 
 
 def board(window=None):
     """Return sorted list of eligible teams with their scores"""
-    eligible_teams_with_score = ((team, score(team=team, window=window))
+    eligible_teams_with_score = ((team, _score_in_timer(team=team, window=window))
                                  for team in models.Team.objects.iterator()
                                  if _eligible(team))
     ranked = sorted(eligible_teams_with_score, key=partial(_team_ranking_key, window))
