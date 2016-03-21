@@ -188,7 +188,8 @@ class _Security:
     ''' Logging '''
 
     ADMINS = values.ListValue([
-        ('Yatharth', 'yatharth999+pactf@gmail.com')
+        ('Yatharth', 'yatharth999+pactf@gmail.com'),
+        ('Tony', 'tony@tonytan.io')
     ])
     MANAGERS = ADMINS.value
 
@@ -210,7 +211,7 @@ class _Gunicorn:
     GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn', environ_prefix=None)
 
     # Whether to use a socket or serve directly to an address
-    GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
+    GUNICORN_USE_SOCKFILE = values.BooleanValue(True, environ_prefix=None)
 
     # Socket to communicate with
     GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
@@ -326,5 +327,5 @@ class Prod(_Base):
     SESSION_COOKIE_SECURE = https.value
     CSRF_COOKIE_SECURE = https.value
 
-    https_headers = values.Value(False)  # Only enable this if nginx is properly configured with HTTPS
+    https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
