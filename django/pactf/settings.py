@@ -36,6 +36,7 @@ class _Django:
         'debug_toolbar',
         'email_log',
         'widget_tweaks',
+        'django_print_settings',
 
         # Python 3rd-party
         'yaml',
@@ -190,6 +191,7 @@ class _Security:
     ADMINS = values.ListValue([
         ('Yatharth', 'yatharth999+pactf@gmail.com'),
         ('Tony', 'tony@tonytan.io'),
+        # ('PACTF Errors', _Django.SERVER_EMAIL.value)
     ])
     MANAGERS = ADMINS.value
 
