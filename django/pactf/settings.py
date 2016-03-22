@@ -251,14 +251,14 @@ class _CTFlex(_Django, Configuration):
 
     @classmethod
     def add_staticfiles_dir(cls):
-        cls.STATICFILES_DIRS.value.append(
+        cls.STATICFILES_DIRS.append(
             (cls.CTFLEX_PROBLEMS_STATIC_URL, cls.CTFLEX_PROBLEMS_STATIC_DIR)
         )
 
     ''' General '''
 
     @classmethod
-    def setup(cls):
+    def pre_setup(cls):
         super().setup()
         cls.add_staticfiles_dir()
 
