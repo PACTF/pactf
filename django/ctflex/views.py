@@ -200,6 +200,7 @@ def defaulted_window():
 def index(request):
     return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
+        'incubating': settings.INCUBATING,
     })
 
 
