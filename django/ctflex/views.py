@@ -11,17 +11,15 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import JsonResponse, HttpResponseRedirect
-from django.http.response import HttpResponseNotAllowed, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseRedirect, Http404
+from django.http.response import HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import DetailView
-
-from ratelimit.utils import is_ratelimited
 from ratelimit.decorators import ratelimit
+from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
 from ctflex import forms
@@ -220,17 +218,31 @@ def announcements(request, *, window_codename):
 
 
 @limited_http_methods('GET')
+def team_public_detail(request, *, team_id):
+    """View the given team's data."""
+
+    try:
+        other_team = models.Team.objects.get(id=team_id)
+    except models.Team.DoesNotExist:
+        raise Http404()
+
+    context = {
+        'windows': queries.all_windows().reverse(),
+        'other_team': other_team,
+        'total_score': queries.score(team=other_team, window=None)
+    }
+    return render(request, 'ctflex/misc/team.html', context)
+
+
+@limited_http_methods('GET')
 @competitors_only()
-class Team(DetailView):
-    model = models.Team
-    template_name = 'ctflex/misc/team.html'
-
-    def get_object(self, **kwargs):
-        return self.request.user.competitor.team
-
-    def get_context_data(self, **kwargs):
-        context = super(Team, self).get_context_data(**kwargs)
-        return context
+def account(request):
+    """View the account/team details page."""
+    context = {
+        'members_left': settings.MAX_TEAM_SIZE - request.user.competitor.team.size(),
+        'windows': queries.all_windows().reverse(),
+    }
+    return render(request, 'ctflex/misc/account.html', context)
 
 
 # endregion
@@ -285,7 +297,7 @@ def submit_flag(request, *, prob_id):
         correct, message = commands.submit_flag(
             prob_id=prob_id, competitor=competitor, flag=flag)
     except models.CtfProblem.DoesNotExist:
-        return HttpResponseNotFound()
+        raise Http404()
     except commands.ProblemAlreadySolvedException:
         status = ALREADY_SOLVED_STATUS
         message = "Your team has already solved this problem!"
@@ -340,7 +352,7 @@ def game(request, *, window_codename):
     try:
         window = queries.get_window(window_codename)
     except models.Window.DoesNotExist:
-        return HttpResponseNotFound()
+        raise Http404()
 
     # Initialize context
     context = windowed_context(window)
@@ -401,7 +413,7 @@ def board(request, *, window_codename):
         try:
             window = queries.get_window(window_codename)
         except models.Window.DoesNotExist:
-            return HttpResponseNotFound()
+            raise Http404()
 
     # Initialize context
     context = windowed_context(window)
@@ -569,7 +581,8 @@ def register(request,
                     )
                     auth_login(request, auth_user)
 
-                # FIXME(Yatharth): Send email
+                    # FIXME(Cam): Email user to confirm
+                    # mail.confirm(user, team, competitor)
 
                 return HttpResponseRedirect(reverse(post_change_redirect))
 

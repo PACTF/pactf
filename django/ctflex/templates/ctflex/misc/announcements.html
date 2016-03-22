@@ -34,7 +34,7 @@
 
         {% if annonce.problems.exists %}
           <div class="affected-problems panel-body">
-            The following problems are affected:
+            This announcement affects the following problems:
           <span>
             {% for prob in annonce.problems.all %}
               <a href="{% url 'ctflex:game' window_codename=window.codename %}#{{ prob.id }}"

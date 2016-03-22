@@ -2,27 +2,100 @@
 {% load ctflex %}
 
 {% block title %}
-  Team — {{ block.super }}
+  Team Profile — {{ block.super }}
 {% endblock %}
 
 {% block header %}
-  Team
+  Team: {{ other_team.name }}
 {% endblock %}
 
 {% block content %}
-  <p>
-    You are {{ user.username }} and part of team {{ object.name }}. You have
-    {% score object %} points!
-  </p>
-  <p>
-    The members of your team are:
-  </p>
-  <ul>
-    {% for teammate in object.competitor_set.all %}
-      <li>{{ teammate.user.username }}</li>
-    {% endfor %}
-  </ul>
-  <p>
-    For new members to join, give them the passphrase <em>{{ team.passphrase }}</em>. You can also <a href="{% url 'ctflex:password_change' %}">change your personal password</a>.
-  </p>
+  {% if team == other_team %}
+    <p>
+      <strong>You are viewing your team’s public profile.</strong>
+      For information about your personal account (or to add competitors to your team), go to your <a
+        href="{% url 'ctflex:account' %}">Account</a> page.
+    </p>
+    <br/>
+  {% endif %}
+
+  <div class="panel-group">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Team Details
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item clearfix">
+          <span class="bold">
+            Team Name
+          </span>
+          <span class="pull-right">
+            {{ other_team.name }}
+          </span>
+        </li>
+        <li class="list-group-item clearfix">
+          <span class="bold">
+            Affiliation
+          </span>
+          <span class="pull-right">
+            {{ other_team.affiliation }}
+          </span>
+        </li>
+        <li class="list-group-item clearfix">
+          <span class="bold">
+            Eligibility
+          </span>
+          for prizes and ranking on scoreboard
+          <span class="pull-right">
+            {% eligible team as is_eligible %}
+            {% if is_eligible %}
+              <span class="glyphicon glyphicon-color glyphicon-ok-sign"></span>
+            {% else %}
+              <span class="glyphicon glyphicon-color glyphicon-remove-sign"></span>
+            {% endif %}
+          </span>
+        </li>
+        <li class="list-group-item clearfix">
+          <span class="bold">
+            Members
+          </span>
+          <span class="pull-right">
+              {% for competitor in other_team.competitor_set.all %}
+                {{ competitor.user.username }}{% include 'ctflex/misc/comma.snippet.html' %}
+              {% endfor %}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel-group">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Scores
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-info">
+            <span class="bold">
+              Overall
+            </span>
+            <span class="pull-right">
+              {{ total_score }}
+            </span>
+        </li>
+        {% for window in windows %}
+          <li class="list-group-item">
+            <span class="bold">
+              {{ window.verbose_name }}
+            </span>
+            {{ window.start|date:"j F" }} – {{ window.end|date:"j F" }}
+            <span class="pull-right">
+              {% score team=other_team %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
 {% endblock %}

@@ -32,8 +32,10 @@ _SETTINGS = (
     # Name used for site in emails sent out
     ('SITENAME', 'CTFlex', None),
 
-    ('SUPPORT_EMAIL', 'example@example.com', None),
-    ('CONTACT_EMAIL', 'example@example.com', None),
+    # Emails displayed to users
+    # ('REGISTER_EMAIL', 'registrar@example.com', None),
+    ('SUPPORT_EMAIL', 'support@example.com', None),
+    ('CONTACT_EMAIL', 'contact@example.com', None),
 
     ### URLs and Views
 

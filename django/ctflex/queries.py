@@ -1,4 +1,3 @@
-import datetime
 import importlib
 import importlib.machinery
 import logging
@@ -8,7 +7,7 @@ from os.path import join
 
 from django.db.models import Sum
 
-from ctflex import constants, models
+from ctflex import constants
 from ctflex import hashers
 from ctflex import models
 from ctflex import settings
@@ -42,9 +41,13 @@ def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
+def solves(*, team, window):
+    return models.Solve.objects.filter(competitor__team=team, problem__window=window)
+
+
 def score(*, team, window):
-    solves = models.Solve.objects.filter(competitor__team=team, problem__window=window)
-    return solves.aggregate(score=Sum('problem__points'))['score'] or 0
+    return (solves(team=team, window=window)
+            .aggregate(score=Sum('problem__points'))['score'] or 0)
 
 
 def announcements(window):
@@ -131,11 +134,11 @@ def problem_list(*, team, window):
 #     return getattr(module, function)
 #
 #
-# _eligible = _get_eligible()
+# eligible = _get_eligible()
 
-_eligible = lambda team: (not team.banned
-                          and team.country == team.US_COUNTRY
-                          and team.background == team.SCHOOL_BACKGROUND)
+eligible = lambda team: (not team.banned
+                         and team.country == team.US_COUNTRY
+                         and team.background == team.SCHOOL_BACKGROUND)
 
 
 def _solves_in_timer(*, team, window):
@@ -202,7 +205,7 @@ def board(window=None):
     """Return sorted list of eligible teams with their scores"""
     eligible_teams_with_score = ((team, _score_in_timer(team=team, window=window))
                                  for team in models.Team.objects.iterator()
-                                 if _eligible(team))
+                                 if eligible(team))
     ranked = sorted(eligible_teams_with_score, key=partial(_team_ranking_key, window))
     return ((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
