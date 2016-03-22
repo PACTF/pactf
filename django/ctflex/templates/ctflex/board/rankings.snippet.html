@@ -12,7 +12,7 @@
     <tr>
       <td>{{ rank }}.</td>
       <td><a href="{% url 'ctflex:team' team_id=team.id %}">{{ team.name }}</a></td>
-      <td>{{ team.affiliation }}</td>
+      <td>{{ team.affiliation|default:"None" }}</td>
       <td>{{ score }}</td>
     </tr>
   {% endfor %}
