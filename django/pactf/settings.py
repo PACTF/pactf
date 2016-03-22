@@ -259,7 +259,7 @@ class _CTFlex(_Django, Configuration):
 
     @classmethod
     def setup(cls):
-        super().setup()
+        super(_CTFlex).setup()
         cls.add_staticfiles_dir()
 
 
