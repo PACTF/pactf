@@ -134,11 +134,11 @@ def problem_list(*, team, window):
 #     return getattr(module, function)
 #
 #
-# _eligible = _get_eligible()
+# eligible = _get_eligible()
 
-_eligible = lambda team: (not team.banned
-                          and team.country == team.US_COUNTRY
-                          and team.background == team.SCHOOL_BACKGROUND)
+eligible = lambda team: (not team.banned
+                         and team.country == team.US_COUNTRY
+                         and team.background == team.SCHOOL_BACKGROUND)
 
 
 def _solves_in_timer(*, team, window):
@@ -205,7 +205,7 @@ def board(window=None):
     """Return sorted list of eligible teams with their scores"""
     eligible_teams_with_score = ((team, _score_in_timer(team=team, window=window))
                                  for team in models.Team.objects.iterator()
-                                 if _eligible(team))
+                                 if eligible(team))
     ranked = sorted(eligible_teams_with_score, key=partial(_team_ranking_key, window))
     return ((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 

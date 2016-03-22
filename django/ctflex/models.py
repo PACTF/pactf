@@ -9,18 +9,15 @@ Style Guidelines:
 import re
 import uuid
 
+import markdown2
+from django.contrib.postgres import fields as psql
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver as _receiver
 from django.utils import timezone
-from django.core.exceptions import ValidationError
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.contrib.postgres import fields as psql
-from django_countries.fields import CountryField, Country
-
-import markdown2
-from localflavor.us.models import USStateField
 
 from ctflex import settings
 from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD

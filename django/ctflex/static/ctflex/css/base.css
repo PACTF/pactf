@@ -187,6 +187,20 @@ body.modal-open div.modal-backdrop {
     float: right;
 }
 
+/* Colored glyphicons */
+
+.glyphicon-color.glyphicon-ok-sign {
+    color: #5cb85c;
+}
+
+.glyphicon-color.glyphicon-info-sign {
+    color: #428bca;
+}
+
+.glyphicon-color.glyphicon-remove-sign {
+    color: #d9534f;
+}
+
 /* Misc */
 
 .text-muted a {
@@ -196,4 +210,18 @@ body.modal-open div.modal-backdrop {
 
 .text-muted a:hover {
     color: #00526e;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/* Account page */
+
+#team-members .user-container .user-username {
+    margin-left: 0.5em;
+}
+
+.panel .list-group-item span.bold {
+    margin-right: 0.25em;
 }

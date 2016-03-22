@@ -31,14 +31,6 @@
     vertical-align: middle;
 }
 
-#eligible-glyph.glyphicon-ok-sign {
-    color: #5cb85c;
-}
-
-#eligible-glyph.glyphicon-info-sign {
-    color: #428bca;
-}
-
 /* Spinning Glyphicons */
 
 .glyphicon.spinning {

@@ -26,8 +26,8 @@ windowed_urls = [
 misc_urls = [
     url('^$', views.index, name='index'),
     url(r'^start_timer/$', views.start_timer, name='start_timer'),
-    url(r'^account/$', views.acct_info, name='account'),
-    url(r'^team/(?P<team_id>\d+)$', views.view_team, name='team_view'),
+    url(r'^account/$', views.account, name='account'),
+    url(r'^team/(?P<team_id>\d+)$', views.team_public_detail, name='team'),
 ]
 
 auth_urls = [
