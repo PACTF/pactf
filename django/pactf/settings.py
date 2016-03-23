@@ -186,21 +186,6 @@ class _Security:
         },
     ]
 
-    ''' Logging '''
-
-    ADMINS = values.ListValue([
-        ('Yatharth', 'yatharth999+pactf@gmail.com'),
-        ('Tony', 'tony@tonytan.io'),
-        # ('PACTF Errors', _Django.SERVER_EMAIL.value)
-    ])
-    MANAGERS = ADMINS.value
-
-    IGNORABLE_404_URLS = values.ListValue([
-        re.compile(r'^/apple-touch-icon.*\.png$'),
-        re.compile(r'^/favicon\.ico$'),
-        re.compile(r'^/robots\.txt$'),
-    ])
-
 
 class _Gunicorn:
     """Configure Gunicorn"""
@@ -258,7 +243,7 @@ class _CTFlex(_Django, Configuration):
     ''' General '''
 
     @classmethod
-    def setup(cls):
+    def pre_setup(cls):
         super().setup()
         cls.add_staticfiles_dir()
 
@@ -333,3 +318,18 @@ class Prod(_Base):
 
     https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
+
+    ''' Logging '''
+
+    ADMINS = values.ListValue([
+        ('Yatharth', 'yatharth999+pactf@gmail.com'),
+        ('Tony', 'tony@tonytan.io'),
+        # ('PACTF Errors', _Django.SERVER_EMAIL.value)
+    ])
+    MANAGERS = ADMINS.value
+
+    IGNORABLE_404_URLS = values.ListValue([
+        re.compile(r'^/apple-touch-icon.*\.png$'),
+        re.compile(r'^/favicon\.ico$'),
+        re.compile(r'^/robots\.txt$'),
+    ])

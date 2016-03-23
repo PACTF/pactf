@@ -13,6 +13,10 @@
     height: 1em;
 }
 
+.jumbotron h3 + h3 {
+    margin-top: -0.5em;
+}
+
 #date-headings {
     margin-top: 0;
     margin-bottom: 1.5em;
