@@ -22,6 +22,7 @@ from ratelimit.decorators import ratelimit
 from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
+from ctflex import mail
 from ctflex import forms
 from ctflex import models
 from ctflex import queries
@@ -564,6 +565,7 @@ def register(request,
                         # Raise a dummy exception to let the atomic transaction
                         # manager know that shit happened so that it rolls back
                         raise DummyException()
+                    mail.confirm(user, team, competitor)
 
             # Don't do anything more with the dummy exception than
             # what the atomic transaction manager would already have
@@ -581,9 +583,6 @@ def register(request,
                         password=user_form.cleaned_data['password1'],
                     )
                     auth_login(request, auth_user)
-
-                    # FIXME(Cam): Email user to confirm
-                    # mail.confirm(user, team, competitor)
 
                 return HttpResponseRedirect(reverse(post_change_redirect))
 
