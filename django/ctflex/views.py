@@ -42,6 +42,7 @@ def default_context(request):
         'team': request.user.competitor.team if queries.is_competitor(request.user) else None,
         'contact_email': settings.CONTACT_EMAIL,
         'js_context': '{}',
+        'incubating': settings.INCUBATING,
     }
 
 
@@ -201,7 +202,6 @@ def defaulted_window():
 def index(request):
     return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
-        'incubating': settings.INCUBATING,
     })
 
 
@@ -565,7 +565,9 @@ def register(request,
                         # Raise a dummy exception to let the atomic transaction
                         # manager know that shit happened so that it rolls back
                         raise DummyException()
-                    mail.confirm(user, team, competitor)
+
+                    # Email user (rolling back if this fails)
+                    mail.confirm_registration(user)
 
             # Don't do anything more with the dummy exception than
             # what the atomic transaction manager would already have

@@ -1,4 +1,7 @@
-"""Proxy manipulation of models by views"""
+"""Proxy manipulation of models by views
+
+Also see: mail.py
+"""
 
 import importlib.machinery
 from os.path import join
@@ -29,9 +32,11 @@ def start_timer(*, team, window):
 
     return True
 
+
 def mark_announcements_read(user):
     if queries.is_competitor(user):
         user.competitor.unread_announcements.clear()
+
 
 # endregion
 

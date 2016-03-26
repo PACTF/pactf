@@ -33,7 +33,7 @@ _SETTINGS = (
     ('SITENAME', 'CTFlex', None),
 
     # Emails displayed to users
-    # ('REGISTER_EMAIL', 'registrar@example.com', None),
+    ('DEFAULT_FROM_EMAIL', 'registrar@example.com', 'DEFAULT_FROM_EMAIL'),
     ('SUPPORT_EMAIL', 'support@example.com', None),
     ('CONTACT_EMAIL', 'contact@example.com', None),
 

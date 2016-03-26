@@ -1,3 +1,0 @@
-Welcome to GenericCTFlexCompetition, {{ user.first_name }} {{ user.last_name }}!
-
-This is an email confirming that you have successfully registered with username {{ user.username }} on team {{ team.name }}.

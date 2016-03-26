@@ -1,17 +1,30 @@
+"""Commands that send email"""
+
 from django.core import mail
 from django.template.loader import render_to_string
 
 from ctflex import settings
 
-def confirm(user, team, competitor):
-    context = {'user' : user, 'team' : team, 'competitor' : competitor}
-    html_message = render_to_string('ctflex/auth/confirm.html', context)
-    # This is actually an extremely dirty hack but I can't thnk of a better way to do this.
-    plaintext = render_to_string('ctflex/text/confirm.txt', context)
+
+def confirm_registration(user):
+    """Confirm registration with user"""
+
+    context = {
+        'user': user,
+        'support_email': settings.SUPPORT_EMAIL,
+        'sitename': settings.SITENAME,
+    }
+
+    message = render_to_string('ctflex/auth/confirm_email.txt', context)
+    # html_message = render_to_string('ctflex/auth/confirm_email.html', context)
+    subject = render_to_string('ctflex/auth/confirm_email_subject.txt', context)
+
     mail.send_mail(
-        subject='confirmation', message=plaintext,
-        from_email=settings.EMAIL_HOST_USER, recipient_list=[user.email],
-        # TODO: Catch this
+        subject=subject,
+        message=message,
+        # html_message=html_message,
+
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
         fail_silently=False,
-        html_message=html_message
     )
