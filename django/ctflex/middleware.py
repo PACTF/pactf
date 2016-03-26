@@ -63,3 +63,11 @@ class IncubatingMiddleware:
             return response
 
         return views.incubating(request)
+
+
+class CloudflareRemoteAddrMiddleware:
+    """Replace REMOTE_ADDR with Cloudflare-sent info when appropriate"""
+
+    def process_request(self, request):
+        if not request.META.get('REMOTE_ADDR', ''):
+            request.META['REMOTE_ADDR'] = request.META.get('CF-Connecting-IP', '')

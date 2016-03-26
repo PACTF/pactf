@@ -60,6 +60,9 @@ class _Django(Configuration):
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
 
+        # Local
+        'ctflex.middleware.CloudflareRemoteAddrMiddleware',
+
         # Django Extensions
         'django.middleware.common.BrokenLinkEmailsMiddleware',
 
