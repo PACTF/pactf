@@ -141,7 +141,7 @@ class _Django:
     email_prefix = 'EMAIL'
 
     EMAIL_HOST = values.Value('smtp.zoho.com', environ_prefix=None)
-    EMAIL_PORT = values.IntegerValue(587, environ_prefix=None)
+    EMAIL_PORT = values.IntegerValue(61539, environ_prefix=None)
     EMAIL_USE_TLS = values.BooleanValue(True, environ_prefix=None)
 
     EMAIL_HOST_USER = values.Value('noreply@pactf.com', environ_prefix=None)
