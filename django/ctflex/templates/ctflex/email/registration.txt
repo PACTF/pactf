@@ -8,5 +8,6 @@ If you didn't register for PACTF, just ignore this email. Please email {{ suppor
 
 Thanks,
 The {{ sitename }} team
+pactf.com
 
 {% endautoescape %}

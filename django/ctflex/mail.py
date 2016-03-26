@@ -15,9 +15,9 @@ def confirm_registration(user):
         'sitename': settings.SITENAME,
     }
 
-    message = render_to_string('ctflex/auth/confirm_email.txt', context)
+    message = render_to_string('ctflex/email/registration.txt', context)
     # html_message = render_to_string('ctflex/auth/confirm_email.html', context)
-    subject = render_to_string('ctflex/auth/confirm_email_subject.txt', context)
+    subject = render_to_string('ctflex/email/registration.subject.txt', context)
 
     mail.send_mail(
         subject=subject,

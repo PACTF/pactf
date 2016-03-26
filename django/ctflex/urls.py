@@ -50,12 +50,12 @@ auth_urls = [
 
     url(r'^password_reset/$', views.password_reset, name='password_reset', kwargs={
         'template_name': 'ctflex/auth/password_reset.html',
-        'email_template_name': 'ctflex/auth/password_reset_email.txt',
-        'subject_template_name': 'ctflex/auth/password_reset_email_subject.txt',
+        'email_template_name': 'ctflex/email/password_reset.txt',
+        'subject_template_name': 'ctflex/email/password_reset.subject.txt',
         'post_reset_redirect': 'ctflex:password_reset_done',
         'extra_email_context': {
             'support_email': settings.SUPPORT_EMAIL,
-            'site_name': settings.SITENAME,
+            'sitename': settings.SITENAME,
         },
     }),
 
