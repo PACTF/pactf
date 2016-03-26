@@ -5,6 +5,7 @@ This file uses django-configurations.
 
 import os
 import re
+import socket
 from os.path import join
 
 from configurations import Configuration, values
@@ -308,7 +309,7 @@ class Dev(_Base):
 
 
 class Prod(_Base):
-    """Secure and quite settings for production"""
+    """Secure and quiet settings for production"""
 
     ''' Security '''
 
@@ -336,3 +337,23 @@ class Prod(_Base):
         re.compile(r'^/favicon\.ico$'),
         re.compile(r'^/robots\.txt$'),
     ])
+
+    @staticmethod
+    def get_hostname():
+        try:
+            return socket.gethostname()
+        except:
+            return None
+
+    @classmethod
+    def set_email_subject_prefix(cls):
+        hostname = cls.get_hostname()
+        if hostname:
+            cls.EMAIL_SUBJECT_PREFIX = "[Django {}] ".format(hostname)
+
+    ''' General '''
+
+    @classmethod
+    def pre_setup(cls):
+        super().setup()
+        cls.set_email_subject_prefix()
