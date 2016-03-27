@@ -16,9 +16,26 @@ class AllFieldModelAdmin(admin.ModelAdmin):
 
     def __init__(self, model, admin_site):
         self.list_display = ([field.name for field in model._meta.fields
-                             if field.name not in self.EXCLUDE] +
+                              if field.name not in self.EXCLUDE] +
                              list(self.INCLUDE))
         super(AllFieldModelAdmin, self).__init__(model, admin_site)
+
+
+# endregion
+
+
+# region Admin Actions
+
+def ban(modeladmin, request, queryset):
+    for object in queryset:
+        object.banned = True
+        object.save()
+
+
+def unban(modeladmin, request, queryset):
+    for object in queryset:
+        object.banned = False
+        object.save()
 
 
 # endregion
@@ -57,6 +74,7 @@ class TeamAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'passphrase',)
     INCLUDE = ('size',)
     date_hierarchy = 'created_at'
+    actions = [ban, unban]
 
 
 class WindowAdmin(AllFieldModelAdmin):
