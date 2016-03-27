@@ -474,11 +474,11 @@ class CtfProblem(models.Model):
     hint_html = models.TextField(editable=False, default='', blank=True)
 
     grader = models.FilePathField(
-        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
+        max_length=200, match=r'^.*\.py$',
         help_text="Basename of the problem's grading script in PROBLEMS_DIR",
     )
     generator = models.FilePathField(
-        max_length=200, path=settings.PROBLEMS_DIR, recursive=True, match=r'^.*\.py$',
+        max_length=200, match=r'^.*\.py$',
         blank=True, null=True,
         help_text="Basename of the problem's generator script in PROBLEMS_DIR",
     )
