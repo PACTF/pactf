@@ -24,6 +24,25 @@ class AllFieldModelAdmin(admin.ModelAdmin):
 
 # endregion
 
+# region Admin Filters
+
+class EligibileFilter(admin.SimpleListFilter):
+    title = 'eligibility'
+    parameter_name = 'eligible'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('E', 'Eligible'),
+            ('I', 'Ineligible'),
+        )
+
+    def queryset(self, request, queryset):
+        result = [team.id for team in queryset if queries.eligible(team) == (self.value() == 'E')]
+        return queryset.filter(id__in=result)
+
+
+# endregion
+
 
 # region Admin Actions
 
@@ -76,6 +95,7 @@ class TeamAdmin(AllFieldModelAdmin):
     INCLUDE = ('size', 'eligible')
     date_hierarchy = 'created_at'
     actions = [ban, unban]
+    list_filter = (EligibileFilter,)
 
     def eligible(self, team):
         return queries.eligible(team)
