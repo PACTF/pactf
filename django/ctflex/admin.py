@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 from ctflex import models
+from ctflex import queries
 
 
 # region Helpers
@@ -72,9 +73,14 @@ class UserAdmin(BaseUserAdmin):
 
 class TeamAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'passphrase',)
-    INCLUDE = ('size',)
+    INCLUDE = ('size', 'eligible')
     date_hierarchy = 'created_at'
     actions = [ban, unban]
+
+    def eligible(self, team):
+        return queries.eligible(team)
+
+    eligible.boolean = True
 
 
 class WindowAdmin(AllFieldModelAdmin):
