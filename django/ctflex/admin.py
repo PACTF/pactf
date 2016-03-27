@@ -3,6 +3,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from ctflex import models
 
@@ -11,10 +12,12 @@ from ctflex import models
 
 class AllFieldModelAdmin(admin.ModelAdmin):
     EXCLUDE = ('id',)
+    INCLUDE = ()
 
     def __init__(self, model, admin_site):
-        self.list_display = [field.name for field in model._meta.fields
-                             if field.name not in self.EXCLUDE]
+        self.list_display = ([field.name for field in model._meta.fields
+                             if field.name not in self.EXCLUDE] +
+                             list(self.INCLUDE))
         super(AllFieldModelAdmin, self).__init__(model, admin_site)
 
 
@@ -32,6 +35,13 @@ class CompetitorInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (CompetitorInline,)
     date_hierarchy = 'date_joined'
+    list_display = ('username', 'team', 'email', 'first_name', 'last_name', 'is_staff')
+
+    def team(self, user):
+        try:
+            return user.competitor.team.name
+        except ObjectDoesNotExist:
+            return None
 
     def remove_email_field(self):
         # (`personal_info` is mutable, so we can modify it after getting a reference.)
@@ -45,6 +55,7 @@ class UserAdmin(BaseUserAdmin):
 
 class TeamAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'passphrase',)
+    INCLUDE = ('size',)
     date_hierarchy = 'created_at'
 
 
