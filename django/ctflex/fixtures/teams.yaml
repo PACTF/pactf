@@ -3,7 +3,7 @@
   fields:
     name: "Team 1"
     passphrase: password
-    affiliation: PA
+    school: Phillips Academy
     country: U
     background: S
 
@@ -12,6 +12,7 @@
   fields:
     name: "Team 2"
     passphrase: password
+    school: Abbot Academy
     country: U
     background: S
 
