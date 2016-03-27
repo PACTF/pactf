@@ -3,7 +3,7 @@
 /static/
 /pactf_nginx.conf
 /pactf_supervisor.conf
-/django/*/migrations/
+#/django/*/migrations/
 /ctfproblems/_static
 /django/ctflex/fixtures/dump.yaml
 
