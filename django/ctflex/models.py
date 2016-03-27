@@ -178,7 +178,7 @@ class Team(models.Model):
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
     affiliation = models.CharField(max_length=60, blank=True,
-                                   verbose_name="Affiliation")
+                                   verbose_name="School")
 
     # FIXME: Change fixtures
 
