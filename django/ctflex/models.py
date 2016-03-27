@@ -174,6 +174,7 @@ class Team(models.Model):
 
     ''' Data Fields '''
 
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     banned = models.BooleanField(default=False)
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
@@ -238,6 +239,7 @@ class Competitor(models.Model):
 
     ''' Extra Data '''
 
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)

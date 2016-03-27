@@ -31,6 +31,7 @@ class CompetitorInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (CompetitorInline,)
+    date_hierarchy = 'date_joined'
 
     def remove_email_field(self):
         # (`personal_info` is mutable, so we can modify it after getting a reference.)
@@ -44,6 +45,7 @@ class UserAdmin(BaseUserAdmin):
 
 class TeamAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'passphrase',)
+    date_hierarchy = 'created_at'
 
 
 class WindowAdmin(AllFieldModelAdmin):
