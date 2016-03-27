@@ -108,7 +108,7 @@ class TeamCreationForm(forms.ModelForm):
 
     class Meta:
         model = models.Team
-        fields = ('name', 'passphrase', 'affiliation', 'country', 'background')
+        fields = ('name', 'passphrase', 'school', 'country', 'background')
 
     # ELIGIBLE_HELP_TEXT = ("All of your team's competitors must be middle-schoolers "
     #                       "or high-schoolers living in the United States to be "

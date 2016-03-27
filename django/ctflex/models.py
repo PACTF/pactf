@@ -177,8 +177,8 @@ class Team(models.Model):
     banned = models.BooleanField(default=False)
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
-    affiliation = models.CharField(max_length=60, blank=True,
-                                   verbose_name="School")
+    school = models.CharField(max_length=60, blank=True,
+                              verbose_name="School")
 
     # FIXME: Change fixtures
 
