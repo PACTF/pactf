@@ -6,6 +6,7 @@ from functools import partial
 from os.path import join
 
 from django.db.models import Sum
+from django.utils import timezone
 
 from ctflex import constants
 from ctflex import hashers
@@ -142,7 +143,23 @@ eligible = lambda team: (not team.banned
 
 
 def _solves_in_timer(*, team, window):
-    """Return 1+ solves within the team’s timer (or None if N/A)"""
+    """Return 1+ solves within the team’s timer
+
+    Implementation Notes:
+      - If there was no timer, None will be returned.
+      - If `window` is None, all solves within the timer of any window of the
+        team’s will be returned.
+    """
+
+    if window is None:
+        solves = None
+        for window in all_windows():
+            window_solves = _solves_in_timer(team=team, window=window)
+            if solves is None:
+                solves = window_solves
+            if window_solves is not None:
+                solves |= window_solves
+        return solves
 
     if not team.has_timer(window):
         return None
@@ -171,13 +188,18 @@ def _score_in_timer(*, team, window):
 def _last_solve_in_timer_time(*, team, window):
     """Return the longest time taken to solve a problem during the team’s timer
 
-    If N/A, the length of the window’s personal timer is returned.
+    Implementation Notes:
+    - If N/A, the maximum possible duration is returned.
+    - If `window` is None, the ‘current’ window is used.
     """
+
+    if window is None:
+        window = get_window()
 
     solves = _solves_in_timer(team=team, window=window)
 
     if solves is None:
-        return window.personal_timer_duration
+        return timezone.timedelta.max
 
     last_solve_date = solves.order_by('-date').first().date
     timer = team.timer(window)
