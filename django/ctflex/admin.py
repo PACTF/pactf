@@ -99,6 +99,7 @@ class TeamAdmin(AllFieldModelAdmin):
     date_hierarchy = 'created_at'
     actions = [ban, unban]
     list_filter = (EligibileFilter, 'banned',)
+    inlines=(CompetitorInline,)
 
     def eligible(self, team):
         return queries.eligible(team)
