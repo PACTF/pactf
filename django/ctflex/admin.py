@@ -32,13 +32,16 @@ class EligibileFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('E', 'Eligible'),
-            ('I', 'Ineligible'),
+            ('1', 'Eligible'),
+            ('0', 'Ineligible'),
         )
 
     def queryset(self, request, queryset):
-        result = [team.id for team in queryset if queries.eligible(team) == (self.value() == 'E')]
-        return queryset.filter(id__in=result)
+        if self.value() in ('0', '1'):
+            result = [team.id for team in queryset
+                      if queries.eligible(team)
+                      == (self.value() == '1')]
+            return queryset.filter(id__in=result)
 
 
 # endregion
@@ -95,7 +98,7 @@ class TeamAdmin(AllFieldModelAdmin):
     INCLUDE = ('size', 'eligible')
     date_hierarchy = 'created_at'
     actions = [ban, unban]
-    list_filter = (EligibileFilter,)
+    list_filter = (EligibileFilter, 'banned',)
 
     def eligible(self, team):
         return queries.eligible(team)
