@@ -38,7 +38,7 @@
             School
           </span>
           <span class="pull-right">
-            {{ other_team.school }}
+            {{ other_team.school|default:"None" }}
           </span>
         </li>
         <li class="list-group-item clearfix">
@@ -47,7 +47,7 @@
           </span>
           for prizes and ranking on scoreboard
           <span class="pull-right">
-            {% eligible team as is_eligible %}
+            {% eligible other_team as is_eligible %}
             {% if is_eligible %}
               <span class="glyphicon glyphicon-color glyphicon-ok-sign"></span>
             {% else %}
