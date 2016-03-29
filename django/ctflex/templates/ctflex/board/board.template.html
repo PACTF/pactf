@@ -13,3 +13,7 @@
   {% endblock %}
 {% endblock %}
 
+{% block extra_js %}
+  {{ content.super }}
+  <script type="text/javascript" src="{% static 'ctflex/js/board.js' %}"></script>
+{% endblock %}

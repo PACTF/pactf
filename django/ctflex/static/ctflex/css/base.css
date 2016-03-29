@@ -136,7 +136,6 @@ select.form-control {
     appearance: none;
 }
 
-
 /* Messages */
 
 .jumbotron #messages {
@@ -214,6 +213,10 @@ body.modal-open div.modal-backdrop {
 
 .bold {
     font-weight: bold;
+}
+
+.clickable-row {
+    cursor: pointer;
 }
 
 /* Account page */
