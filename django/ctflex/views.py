@@ -566,9 +566,6 @@ def register(request,
                         # manager know that shit happened so that it rolls back
                         raise DummyException()
 
-                    # Email user (rolling back if this fails)
-                    mail.confirm_registration(user)
-
             # Don't do anything more with the dummy exception than
             # what the atomic transaction manager would already have
             # done for us by rolling back
@@ -577,6 +574,9 @@ def register(request,
 
             # If no errors were raised, log the user in and redirect!
             else:
+
+                # Email user
+                mail.confirm_registration(user)
 
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:
