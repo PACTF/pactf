@@ -10,7 +10,7 @@ def confirm(user, team, competitor):
     plaintext = render_to_string('ctflex/text/confirm.txt', context)
     mail.send_mail(
         subject='confirmation', message=plaintext,
-        from_email=settings.EMAIL_HOST_USER, recipient_list=[user.email],
+        from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[user.email],
         # TODO: Catch this
         fail_silently=False,
         html_message=html_message
