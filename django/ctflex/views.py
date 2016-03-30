@@ -247,6 +247,12 @@ def account(request):
     return render(request, 'ctflex/misc/account.html', context)
 
 
+@limited_http_methods('GET')
+def display_help(request):
+    """Display the help page."""
+    context = default_context(request)
+    return render(request, 'ctflex/misc/help.html', context)
+
 # endregion
 
 # region POSTs

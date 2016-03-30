@@ -32,7 +32,7 @@
       <div id="date-headings" class="row">
         {% for window in windows %}
           <h3>
-            <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}:</strong></span>
+            <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}</strong></span>
             <br class="visible-xs-block"/>
             <span
                 class="col-sm-6 text-left">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>

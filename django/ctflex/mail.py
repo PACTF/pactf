@@ -26,7 +26,6 @@ def confirm_registration(user):
     mail.send_mail(
         subject=subject,
         message=message,
-        # html_message=html_message,
 
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
