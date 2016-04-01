@@ -30,7 +30,6 @@
             <span class="badge alert-danger" id="unread-announcements-badge">0</span>
           </a>
         </li>
-        <li><a href="{% url 'ctflex:help' %}">Learn</a></li>
 
       </ul>
 
@@ -40,17 +39,34 @@
 
           {% if team %}
             <li><p class="navbar-text">Score: <span id="navbar-score">{% score team %}</span></p></li>
-            <li><a href="{% url 'ctflex:account' %}">Account</a></li>
-
           {% else %}
-            <li>
-              <p class="navbar-text">
-                <em>Not a competitor</em>
-              </p>
-            </li>
+            <p class="navbar-text">
+              <em>Not a competitor</em>
+            </p>
           {% endif %}
 
-          <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+               aria-expanded="false">Learn<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'ctflex:help' %}">Help</a></li>
+              {# eventually chat page goes here #}
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+               aria-expanded="false">Account<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+
+              {% if team %}
+                <li><a href="{% url 'ctflex:account' %}">Personal Account</a></li>
+                <li><a href="{% url 'ctflex:team' team_id=team.id %}">Team Page</a></li>
+              {% endif %}
+
+              <li><a href="{% url 'ctflex:logout' %}">Logout</a></li>
+            </ul>
+          </li>
 
         {% else %}
 

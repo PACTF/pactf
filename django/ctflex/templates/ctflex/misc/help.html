@@ -7,60 +7,65 @@
 {% endblock %}
 
 {% block header %}
-  Help Me!
+  Help!
 {% endblock %}
 
 
 {% block content %}
-  <h2>Where do I start?</h2>
   <p>
-    What kind of difficulty are you having? Click to expand the tab!
+    <strong>What kind of difficulty are you having?</strong> Click to expand the tab!
   </p>
 
   <div id="help-accordion" class="panel-group">
     <div class="panel panel-default">
       <div class="panel-heading clearfix" data-toggle="collapse"
-       data-target="#help-1" data-parent="#help-accordion">
+           data-target="#help-1" data-parent="#help-accordion">
         I don't know where to start!
       </div>
-      <div id="help-1" class="panel-collapse collapse"><div class="panel-body">
-        <p>
-          That's okay, nobody really does! Step back and look at the problem.
-          Maybe check the hint, too, that's what they're there for. Next, think
-          about what you really need to do. Do you need to do some complicated
-          math for decryption? Do you need to get a site to tell you something
-          secret? Figure it out, and get googling! We're not that creative;
-          you'd be surprised at what you can turn up.
-        </p>
-      </div></div>
+      <div id="help-1" class="panel-collapse collapse">
+        <div class="panel-body">
+          <p>
+            That’s okay! Step back and look at the problem.
+            Read the hint too—that’s what they’re there for! Next, think
+            about what you really need to do. Do you need to do some complicated
+            math for decryption? Do you need to get a site to tell you something
+            secret? Figure it out, and get googling! We’re not that creative;
+            you’d be surprised at what you can turn up.
+          </p>
+        </div>
+      </div>
     </div>
     <div class="panel panel-default">
       <div class="panel-heading clearfix" data-toggle="collapse"
-       data-target="#help-2" data-parent="#help-accordion">
-       Google isn't helpful! What do I search for?
+           data-target="#help-2" data-parent="#help-accordion">
+        Google isn’t helpful! What do I search for?
       </div>
-      <div id="help-2" class="panel-collapse collapse"><div class="panel-body">
-        <p>
-          Look <i>really</i> closely. Read the hint again, or start googling
-          the title blindly. Even if you don't get anything useful, you'll
-          be getting closer and closer to the solution by figuring out what
-          <i>doesn't</i> work. In a worst-case, take a break and try again in
-          a few hours, maybe you'll have had some insight!
-        </p>
-      </div></div>
+      <div id="help-2" class="panel-collapse collapse">
+        <div class="panel-body">
+          <p>
+            Look <i>really</i> closely. Read the hint again, or start googling
+            the title blindly. Even if you don’t get anything useful, you’ll
+            be getting closer and closer to the solution by figuring out what
+            <i>doesn’t</i> work. In the worst-case, take a break and try again in
+            a few hours; maybe you’ll have had some insight!
+          </p>
+        </div>
+      </div>
     </div>
     <div class="panel panel-default">
       <div class="panel-heading clearfix" data-toggle="collapse"
-       data-target="#help-3" data-parent="#help-accordion">
-       ...Nope! Still stuck.
+           data-target="#help-3" data-parent="#help-accordion">
+        … Nope! Still stuck.
       </div>
-      <div id="help-3" class="panel-collapse collapse"><div class="panel-body">
-        <p>
-          Well, we're (almost) always on our
-          <a href=https://webchat.freenode.net/>freenode channel</a> at
-          #pactf2. Drop on by, and maybe we'll give you a hint!
-        </p>
-      </div></div>
+      <div id="help-3" class="panel-collapse collapse">
+        <div class="panel-body">
+          <p>
+            Well, we’re (almost) always on our
+            <a href=https://webchat.freenode.net/>freenode channel</a> at
+            #pactf2. Drop on by, and maybe we’ll give you a hint!
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
