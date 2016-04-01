@@ -494,10 +494,12 @@ class CtfProblem(models.Model):
     ''' Helpers '''
 
     def process_html(self, text):
-        return link_static(
-            markdown_to_html(text),
-            static_prefix=settings.PROBLEMS_STATIC_URL,
-            text_prefix=self.id,
+        return markdown_to_html(
+            link_static(
+                text,
+                static_prefix=settings.PROBLEMS_STATIC_URL,
+                text_prefix=self.id,
+            )
         )
 
     ''' Cleaning '''
