@@ -3,11 +3,15 @@
 import sys
 
 from IPython.core import ultratb
-
+from django.core.management import CommandError
 
 DEBUG_OPTION_NAME = 'debug'
 
+
 # region Misc
+
+class ForeseenCommandError(CommandError):
+    pass
 
 
 def filter_dict(kwargs):

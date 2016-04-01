@@ -20,6 +20,9 @@ class Command(BaseCommand):
         helpers.add_debug_argument(parser)
         helpers.add_no_input_argument(parser)
         helpers.add_clear_argument(parser)
+        parser.add_argument('--skiplater',
+                            action='store_true', dest='skiplater', default=False,
+                            help="Don’t load the solves fixture or announcements")
 
     @staticmethod
     def load_fixture(fixture):
@@ -50,6 +53,9 @@ class Command(BaseCommand):
                 }))
                 self.stdout.write('')
 
+                if options['skiplater']:
+                    return
+
                 for fixture in POST_PROBLEMS_FIXTURES:
                     self.load_fixture(fixture)
 
@@ -60,9 +66,10 @@ class Command(BaseCommand):
                     if isfile(path):
                         management.call_command('announce', path)
 
+        except helpers.ForeseenCommandError as err:
+            raise err
         except Exception as err:
-            self.stderr.write("Exception encountered; rolling back")
+            self.stderr.write("Unforeseen exception encountered; rolling back")
             raise CommandError(err)
-
         else:
             self.stdout.write("Successfully (re)loaded all fixtures and problems")
