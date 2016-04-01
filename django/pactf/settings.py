@@ -38,6 +38,7 @@ class _Django:
         'email_log',
         'widget_tweaks',
         'django_print_settings',
+        'post_office',
 
         # Python 3rd-party
         'yaml',
@@ -150,7 +151,13 @@ class _Django:
     DEFAULT_FROM_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=email_prefix)
     SERVER_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=None)
 
-    EMAIL_BACKEND = values.Value('email_log.backends.EmailBackend', environ_prefix=None)
+    EMAIL_BACKEND = values.Value('post_office.EmailBackend', environ_prefix=None)
+    POST_OFFICE = {
+        'DEFAULT_PRIORITY': 'medium',
+        'BACKENDS': {
+            'default': 'email_log.backends.EmailBackend',
+        }
+    }
 
 
 class _Security:
