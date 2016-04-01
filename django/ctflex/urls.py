@@ -29,6 +29,7 @@ misc_urls = [
     url(r'^account/$', views.account, name='account'),
     url(r'^team/(?P<team_id>\d+)$', views.team_public_detail, name='team'),
     url(r'^help/$', views.display_help, name='help'),
+    url(r'^admin_game/$', views.admin_game, name='admin_game'),
 ]
 
 auth_urls = [

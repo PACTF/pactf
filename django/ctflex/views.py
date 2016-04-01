@@ -350,6 +350,9 @@ def unread_announcements(request):
 def game(request, *, window_codename):
     """Display problems"""
 
+    if request.user.is_superuser:
+        return redirect(reverse('ctflex:admin_game'))
+
     # Define countdown
     COUNTDOWN_ENDTIME_KEY = 'countdown_endtime'
     COUNTDOWN_MAX_MICROSECONDS_KEY = 'countdown_max_microseconds'
@@ -405,6 +408,24 @@ def game(request, *, window_codename):
 
     context['js_context'] = json.dumps(js_context)
     return render(request, template_name, context)
+
+
+@never_cache
+@limited_http_methods('GET')
+@competitors_only()
+def admin_game(request):
+    """Displays the admin game."""
+    if not request.user.is_superuser:
+        raise Http404()
+    context = default_context(request)
+    context['prob_list'] = []
+    for window in queries.all_windows():
+        context['prob_list'] += queries.problem_list(
+            team=request.user.competitor.team, window=window
+        )
+    context['can_compete_in_current_window'] = True
+    context['js_context'] = '{}'
+    return render(request, 'ctflex/game/active.html', context)
 
 
 @never_cache
