@@ -10,7 +10,7 @@
 - model: ctflex.window
   pk: 2
   fields:
-    codename: binaries
+    codename: binary
     verbose_name: Bamboozling Binaries
     start: '2015-01-19T14:42:21+00:00'
     end: '2015-01-30T14:42:24+00:00'
