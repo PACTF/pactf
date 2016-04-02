@@ -152,12 +152,16 @@ class _Django:
     SERVER_EMAIL = values.Value(EMAIL_HOST_USER.value, environ_prefix=None)
 
     EMAIL_BACKEND = values.Value('post_office.EmailBackend', environ_prefix=None)
-    POST_OFFICE = {
-        'DEFAULT_PRIORITY': 'medium',
-        'BACKENDS': {
-            'default': 'email_log.backends.EmailBackend',
+    EMAIL_CRON = values.BooleanValue(False, environ_prefix=None)
+
+    @property
+    def POST_OFFICE(self):
+        return {
+            'DEFAULT_PRIORITY': 'medium' if self.EMAIL_CRON else 'now',
+            'BACKENDS': {
+                'default': 'email_log.backends.EmailBackend',
+            },
         }
-    }
 
 
 class _Security:
