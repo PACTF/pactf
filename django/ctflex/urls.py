@@ -32,7 +32,7 @@ misc_urls = [
 ]
 
 auth_urls = [
-    url(r'^login/$', anonyomous_users_only()(auth_views.login), name='login', kwargs={
+    url(r'^login/$', auth_views.login, name='login', kwargs={
         'template_name': 'ctflex/auth/login.html'
     }),
 

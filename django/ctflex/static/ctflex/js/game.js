@@ -34,7 +34,7 @@ function submit_flag(problem_id) {
             // XXX(Yatharth): Review
             success: function (response) {
                 var style = "error";
-                if (response.status == 0 || response.status == 2) {
+                if (response.status <= 0) {
                     jQuery("#" + problem_id + "-body").toggle('show');
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
