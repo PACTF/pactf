@@ -9,15 +9,16 @@ django-email-log==0.2.0
 django-extensions==1.6.1
 django-jinja==2.1.1
 django-localflavor==1.2
+django-post-office==2.0.7
 django-print-settings==0.1.2
 django-ratelimit==0.6.0
 django-widget-tweaks==1.4.1
 envdir==0.7
-gnureadline==6.3.3
 gunicorn==19.4.1
 ipython==4.0.1
 ipython-genutils==0.1.0
 Jinja2==2.8
+jsonfield==1.0.3
 markdown2==2.3.1
 MarkupSafe==0.23
 path.py==8.1.2
