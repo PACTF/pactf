@@ -2173,9 +2173,9 @@ body.modal-open div.modal-backdrop { z-index: 0; }
 .outline { stroke: rgb(0, 124, 170); }
 .fill { fill: rgb(0, 140, 186); }
 .inline { stroke: none; }
-.logo-inverted .outline { stroke: white; }
-.logo-inverted .fill { fill: white; }
-.logo-inverted .inline { stroke: rgb(136, 136, 136); stroke-width: 5px; }
+.logo-inline .outline { stroke: white; }
+.logo-inline .fill { fill: white; }
+.logo-inline .inline { stroke: rgb(136, 136, 136); stroke-width: 5px; }
 .jumbotron h3 { margin-bottom: 0.5em; }
 #date-headings { margin-top: 0px; margin-bottom: 1.5em; }
 #date-headings h3 { margin: 0px 0px 0.25em; }

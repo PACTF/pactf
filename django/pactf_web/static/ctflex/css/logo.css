@@ -19,7 +19,7 @@
     height: 100%;
 }
 
-#container {
+.logo #container {
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-width: 10px;
@@ -28,37 +28,47 @@
     stroke: none;
 }
 
-/* Normal */
+/* Normal and inverted */
 
-.outline {
+.logo .outline {
     stroke: #007caa;
 }
 
-.fill {
+.logo .fill {
     fill: #008cba;
 }
 
-.inline {
+
+.logo .inline {
     stroke: none;
 }
 
-/* Inverted */
-
 .logo-inverted .outline {
-    stroke: white;
+    stroke: #008cba;
 }
 
 .logo-inverted .fill {
+    fill: #007caa;
+}
+
+
+/* Inline */
+
+.logo-inline .outline {
+    stroke: white;
+}
+
+.logo-inline .fill {
     fill: white;
 }
 
-.logo-inverted .inline {
+.logo-inline .inline {
     stroke: #aaa;
     stroke-width: 4px;
 }
 
 
 @media screen and (max-width: 30px) {
-    .logo-inverted .inline {
+    .logo-inline .inline {
     }
 }
