@@ -23,7 +23,7 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
+    is_superuser: false
     username: "user11"
     is_staff: true
     is_active: true
@@ -38,7 +38,7 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
+    is_superuser: false
     username: "user12"
     is_staff: true
     is_active: true
@@ -53,7 +53,7 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: true
+    is_superuser: false
     username: "user21"
     is_staff: true
     is_active: true
