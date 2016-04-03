@@ -11,7 +11,7 @@ from ctflex.management.commands import helpers
 
 
 class Command(BaseCommand):
-    help = "Make an announcement from YAML "
+    help = "Reset sequence IDs"
 
     def add_arguments(self, parser):
         helpers.add_debug_argument(parser)

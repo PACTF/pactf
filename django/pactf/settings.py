@@ -15,7 +15,7 @@ import ctflex.constants
 from pactf.constants import BASE_DIR
 
 
-class _Django:
+class _Django(Configuration):
     """Configure basic Django things"""
 
     INSTALLED_APPS = [
@@ -137,8 +137,25 @@ class _Django:
     # Admin URL
     ADMIN_URL_PATH = values.Value('admin')
 
-    ''' Email '''
+    # Warnings
+    WARNINGS_TO_SUPPRESS = values.ListValue([
+        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.'
+    ])
 
+    @classmethod
+    def suppress_warnings_to_suppress(cls):
+        import logging
+        warn_logger = logging.getLogger('py.warnings')
+        warn_logger.addFilter(lambda record: not any(
+            warning in record.getMessage() for warning in cls.WARNINGS_TO_SUPPRESS))
+
+    # Setup
+    @classmethod
+    def post_setup(cls):
+        cls.suppress_warnings_to_suppress()
+
+
+class _Email:
     email_prefix = 'EMAIL'
 
     EMAIL_HOST = values.Value('smtp.zoho.com', environ_prefix=None)
@@ -264,7 +281,7 @@ class _CTFlex(_Django, Configuration):
 
 
 # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
-class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
+class _Base(_Security, _CTFlex, _Gunicorn, _Email, _Django, Configuration):
     """Extract common sub-classes of any full user-facing settings class"""
     pass
 
