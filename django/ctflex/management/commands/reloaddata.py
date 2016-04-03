@@ -55,18 +55,17 @@ class Command(BaseCommand):
                 }))
                 self.stdout.write('')
 
-                if options['skiplater']:
-                    return
+                if not options['skiplater']:
 
-                for fixture in POST_PROBLEMS_FIXTURES:
-                    self.load_fixture(fixture)
+                    for fixture in POST_PROBLEMS_FIXTURES:
+                        self.load_fixture(fixture)
 
-                announcements_dir = join(BASE_DIR, 'announcements')
-                for basename in glob.glob(os.path.join(announcements_dir, '*.yaml')):
-                    print(basename)
-                    path = join(announcements_dir, basename)
-                    if isfile(path):
-                        management.call_command('announce', path)
+                    announcements_dir = join(BASE_DIR, 'announcements')
+                    for basename in glob.glob(os.path.join(announcements_dir, '*.yaml')):
+                        print(basename)
+                        path = join(announcements_dir, basename)
+                        if isfile(path):
+                            management.call_command('announce', path)
 
         except Exception as err:
             self.stderr.write("Unforeseen exception encountered; rolled back transaction")
