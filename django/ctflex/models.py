@@ -564,10 +564,14 @@ class CtfProblem(models.Model):
 
     def invalidate_html(self):
         """Force cached property to be computed again on save"""
-        if hasattr(self, 'description'):
+        try:
             del self.description
-        if hasattr(self, 'hint'):
+        except AttributeError:
+            pass
+        try:
             del self.hint
+        except AttributeError:
+            pass
 
     FIELD_CLEANERS = {
         # (The order matters here.)
