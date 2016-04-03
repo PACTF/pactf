@@ -75,7 +75,8 @@ def submit_flag(*, prob_id, competitor, flag):
 
     # Confirm that the team can submit flags
     window = problem.window
-    if not window.ended() and not competitor.team.has_active_timer(window):
+    if (not competitor.user.is_superuser and not window.ended()
+        and not competitor.team.has_active_timer(window)):
         raise FlagSubmissionNotAllowedException()
 
     # Check if the problem has already been solved

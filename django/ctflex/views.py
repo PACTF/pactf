@@ -153,6 +153,12 @@ def competitors_only():
 
 
 @universal_decorator(methodname='dispatch')
+def competitors_or_superusers_only():
+    """Decorates views to redirect non-competitor non-superusers to the login page"""
+    return user_passes_test(queries.is_competitor_or_superuser)
+
+
+@universal_decorator(methodname='dispatch')
 def anonyomous_users_only(redirect_url=settings.INVALID_STATE_REDIRECT_URL):
     """Decorates views to redirect already authenticated users away"""
 
@@ -252,6 +258,7 @@ def display_help(request):
     """Display the help page."""
     return render(request, 'ctflex/misc/help.html')
 
+
 # endregion
 
 # region POSTs
@@ -346,7 +353,7 @@ def unread_announcements(request):
 @never_cache
 @limited_http_methods('GET')
 @defaulted_window()
-@competitors_only()
+@competitors_or_superusers_only()
 def game(request, *, window_codename):
     """Display problems"""
 
@@ -355,6 +362,7 @@ def game(request, *, window_codename):
     COUNTDOWN_MAX_MICROSECONDS_KEY = 'countdown_max_microseconds'
 
     # Process request
+    superuser = request.user.is_superuser
     team = request.user.competitor.team
     try:
         window = queries.get_window(window_codename)
@@ -366,7 +374,7 @@ def game(request, *, window_codename):
     context['prob_list'] = queries.problem_list(team=team, window=window)
     js_context = {}
 
-    if not window.started():
+    if not window.started() and not superuser:
         template_name = 'ctflex/game/waiting.html'
 
         js_context[COUNTDOWN_ENDTIME_KEY] = window.start.isoformat()
@@ -387,7 +395,7 @@ def game(request, *, window_codename):
             )
         )
 
-    elif not team.has_timer(window):
+    elif not team.has_timer(window) and not superuser:
         template_name = 'ctflex/game/inactive.html'
 
         js_context[COUNTDOWN_ENDTIME_KEY] = window.end.isoformat()
@@ -395,13 +403,16 @@ def game(request, *, window_codename):
             window.personal_timer_duration.total_seconds() * 1000
         )
 
-    elif not team.has_active_timer(window):
+    elif not team.has_active_timer(window) and not superuser:
         template_name = 'ctflex/game/expired.html'
 
     else:
         template_name = 'ctflex/game/active.html'
 
-        js_context[COUNTDOWN_ENDTIME_KEY] = team.timer(window).end.isoformat()
+        if superuser:
+            messages.warning(request, "You are viewing this window as a superuser.")
+        else:
+            js_context[COUNTDOWN_ENDTIME_KEY] = team.timer(window).end.isoformat()
 
     context['js_context'] = json.dumps(js_context)
     return render(request, template_name, context)
