@@ -5,6 +5,8 @@ Having this file enables:
 - Sharing constants between, for example, `apps.py` and `models.py` (`apps.py` can't import `models.py`);
 """
 
+import uuid
+
 ''' App Metadata '''
 
 APP_NAME = 'ctflex'
@@ -21,5 +23,6 @@ API_NAMESPACE = 'api'
 
 ''' Problems '''
 
+UUID_GENERATOR = uuid.uuid4
 DEPS_PROBS_FIELD = 'probs'
 DEPS_THRESHOLD_FIELD = 'threshold'

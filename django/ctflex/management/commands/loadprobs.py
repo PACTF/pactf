@@ -118,8 +118,13 @@ class Command(BaseCommand):
                 self.stderr.write("Backing up and deleting existing UUID file")
                 backip_uuid_path = join(prob_path, UUID_BACKUP_BASENAME)
                 shutil.move(uuid_path, backip_uuid_path)
+
+        # Else, generate a UUID
         else:
-            uuid = None
+            uuid = str(constants.UUID_GENERATOR())
+            self.stdout.write("Creating a UUID file for '{}'".format(prob_identifier))
+            with open(uuid_path, 'w') as uuid_file:
+                uuid_file.write(uuid)
 
         # Add window and add defaults
         try:
@@ -129,10 +134,11 @@ class Command(BaseCommand):
             self.handle_error(err)
             return
 
-        # Add defaults for fields
+        # Configure fields
+        data['id'] = uuid
         data.setdefault('generator', None)
-        data.setdefault('description', '')
-        data.setdefault('hint', '')
+        data['description_raw'] = data.pop('description', '')
+        data['hint_raw'] = data.pop('hint', '')
 
         # Remove extra fields
         for attr in set(data.keys()) - set(field.name for field in CtfProblem._meta.get_fields()):
@@ -150,12 +156,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write("Trying to create problem for '{}'".format(prob_identifier))
             problem = CtfProblem(**data)
-
-            # Save the UUID to a file
-            uuid = str(problem.id)
-            self.stdout.write("Creating a UUID file for '{}'".format(prob_identifier))
-            with open(uuid_path, 'w') as uuid_file:
-                uuid_file.write(uuid)
 
         # Validate and save to list
         try:
@@ -274,15 +274,20 @@ class Command(BaseCommand):
             '--clear': options['clear'],
         }))
 
-        # Actually load problems
+
         self.stdout.write("Beginning transaction to actually save problems\n")
         try:
+
+            # Actually load problems
             with transaction.atomic():
+                print(self.processed_problems)
                 for problem in self.processed_problems:
+                    print("Saving {} to window {}".format(problem, problem.window))
                     problem.save()
+
+            # Delete unprocessed problems
+            self.delete_unprocessed(options)
+
         except Exception as err:
             self.stderr.write("Unforeseen exception encountered while saving problems; rolled back transaction")
             raise CommandError(err)
-
-        # Delete unprocessed problems
-        self.delete_unprocessed(options)

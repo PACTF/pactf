@@ -34,13 +34,13 @@
 
         <!-- Description -->
         <div class="problem-description">
-          {{ prob.description_html|safe }}
+          {{ prob.description|safe }}
         </div>
 
         <!-- Hint -->
         <input type="button" class="btn btn-primary hint-button" value="Toggle Hint"/>
         <div class="hint-content">
-          {{ prob.hint_html|safe }}
+          {{ prob.hint|safe }}
         </div>
 
         <!-- Flag Submission -->
@@ -73,4 +73,7 @@
     </div>
 
   {% endfor %}
+  {% if not prob_list %}
+    <p>There are no problems in this round.</p>
+{% endif %}
 </div>

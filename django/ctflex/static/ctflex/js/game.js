@@ -35,11 +35,10 @@ function submit_flag(problem_id) {
             success: function (response) {
                 var style = "error";
                 if (response.status <= 0) {
-                    jQuery("#" + problem_id + "-body").toggle('show');
+                    jQuery("#" + problem_id + " .problem-body").toggle('show');
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
-                    jQuery("#" + problem_id + " .problem-body").hide();
                     jQuery("#navbar-score").text(function (i, value) {
                         return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
                     });

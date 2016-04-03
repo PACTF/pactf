@@ -18,9 +18,10 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver as _receiver
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from ctflex import settings
-from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD
+from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD, UUID_GENERATOR
 
 
 # region Helpers
@@ -464,16 +465,14 @@ class CtfProblem(models.Model):
     class Meta:
         verbose_name = "Problem"
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=UUID_GENERATOR, editable=False)
     name = models.CharField(max_length=100)
     window = models.ForeignKey(Window)
 
     points = models.IntegerField()
 
-    description = models.TextField(default='', blank=True)
-    description_html = models.TextField(editable=False, default='', blank=True)
-    hint = models.TextField(default='', blank=True)
-    hint_html = models.TextField(editable=False, default='', blank=True)
+    description_raw = models.TextField(default='', blank=True)
+    hint_raw = models.TextField(default='', blank=True)
 
     grader = models.FilePathField(
         max_length=200, match=r'^.*\.py$',
@@ -501,6 +500,16 @@ class CtfProblem(models.Model):
                 text_prefix=self.id,
             )
         )
+
+    ''' Properties '''
+
+    @cached_property
+    def description(self):
+        return self.process_html(self.description_raw)
+
+    @cached_property
+    def hint(self):
+        return self.process_html(self.hint_raw)
 
     ''' Cleaning '''
 
@@ -542,21 +551,23 @@ class CtfProblem(models.Model):
                 self.deps[DEPS_PROBS_FIELD] = ()
 
     def validate_desc_and_hint_exist_or_not(self):
-        if self.generator and (self.description or self.hint):
+        if self.generator and (self.description_raw or self.hint_raw):
             raise ValidationError(
                 "Description and hints should not be statically provided for dynamic problems",
                 code='desc_and_hint_exist_or_not'
             )
-        elif not self.generator and not self.description:
+        elif not self.generator and not self.description_raw:
             raise ValidationError(
                 "Description must be provided statically for simple problems",
                 code='desc_and_hint_exist_or_not'
             )
 
-    def sync_html(self):
-        if not self.generator:
-            self.description_html = self.process_html(self.description)
-            self.hint_html = self.process_html(self.hint)
+    def invalidate_html(self):
+        """Force cached property to be computed again on save"""
+        if hasattr(self, 'description'):
+            del self.description
+        if hasattr(self, 'hint'):
+            del self.hint
 
     FIELD_CLEANERS = {
         # (The order matters here.)
@@ -566,10 +577,10 @@ class CtfProblem(models.Model):
         ),
     }
 
-    # (The order matters here.)
+    # (The order does not matter.)
     MODEL_CLEANERS = (
+        invalidate_html,
         validate_desc_and_hint_exist_or_not,
-        sync_html,
     )
 
 

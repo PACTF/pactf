@@ -118,7 +118,7 @@ class TimerAdmin(AllFieldModelAdmin):
 
 
 class CtfProblemAdmin(AllFieldModelAdmin):
-    EXCLUDE = ('id', 'description', 'description_html', 'hint', 'hint_html', 'grader')
+    EXCLUDE = ('id', 'description_raw', 'hint_raw', 'grader')
 
 
 class SolveAdmin(AllFieldModelAdmin):
