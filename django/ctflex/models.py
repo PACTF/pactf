@@ -468,7 +468,7 @@ class CtfProblem(models.Model):
     name = models.CharField(max_length=100)
     window = models.ForeignKey(Window)
 
-    points = models.IntegerField(validators=[validators.MinValueValidator(1), ])
+    points = models.IntegerField()
 
     description = models.TextField(default='', blank=True)
     description_html = models.TextField(editable=False, default='', blank=True)
