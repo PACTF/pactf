@@ -235,7 +235,7 @@ class Competitor(models.Model):
 
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.PROTECT)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
     ''' Extra Data '''
 
@@ -772,7 +772,7 @@ class Announcement(models.Model):
         if self.problems:
             problem_windows = set(obj['window'] for obj in self.problems.values('window'))
             if not problem_windows.issubset({self.window.id}):
-                raise ValidationError("Associated problems’ windows must match the announcement’s window",
+                raise ValidationError("All problems’ windows must match the announcement’s window",
                                       code='window')
 
     FIELD_CLEANERS = {
@@ -781,7 +781,6 @@ class Announcement(models.Model):
         ),
     }
 
-    # (Order doesn’t matter.)
     MODEL_CLEANERS = (
         sync_html,
     )
