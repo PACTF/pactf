@@ -61,6 +61,10 @@
     margin: 0 auto;
 }
 
+body {
+    background: white;
+}
+
 /* Overlayed Image (old) *//*
 
 #jumbotron-img {
