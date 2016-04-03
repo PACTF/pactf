@@ -10,10 +10,6 @@ DEBUG_OPTION_NAME = 'debug'
 
 # region Misc
 
-class ForeseenCommandError(CommandError):
-    pass
-
-
 def filter_dict(kwargs):
     """Return only the keys of a dictionary whose values are truthy"""
     return (key for key, value in kwargs.items() if value)

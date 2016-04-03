@@ -118,9 +118,6 @@ class Command(BaseCommand):
                 self.stderr.write("Backing up and deleting existing UUID file")
                 backip_uuid_path = join(prob_path, UUID_BACKUP_BASENAME)
                 shutil.move(uuid_path, backip_uuid_path)
-
-            # Don't delete an existing problem later just because there ended up being an error
-            self.processed_problems.append(uuid)
         else:
             uuid = None
 
@@ -160,15 +157,17 @@ class Command(BaseCommand):
             with open(uuid_path, 'w') as uuid_file:
                 uuid_file.write(uuid)
 
-        # Catch validation errors
+        # Validate and save to list
         try:
-            problem.save()
+            problem.clean()
         except ValidationError as err:
             self.stderr.write("Validation failed for '{}'".format(prob_identifier))
             self.handle_error(err)
             return
 
-        # Either way, copy over any static files
+        self.processed_problems.append(problem)
+
+        # Copy over any static files
         try:
             static_from = join(prob_path, STATICFOLDER_BASENAME)
             static_to = join(PROBLEMS_STATIC_DIR, str(uuid))
@@ -182,11 +181,8 @@ class Command(BaseCommand):
             self.handle_error(err)
             return
 
-        # Also, mark as processed
-        self.processed_problems.append(problem.id)
-
         # We made it!
-        self.stdout.write("Successfully imported problem for '{}'".format(prob_identifier))
+        self.stdout.write("Validated problem for '{}'".format(prob_identifier))
 
     def delete_unprocessed(self, options):
         """Delete existing problems that were not updated if clear option was given
@@ -195,7 +191,8 @@ class Command(BaseCommand):
         does not automatically approve it.)
         """
 
-        unprocessed_problems = CtfProblem.objects.exclude(pk__in=self.processed_problems).all()
+        unprocessed_problems = CtfProblem.objects.exclude(
+            pk__in=[problem.id for problem in self.processed_problems]).all()
 
         if options['clear'] and unprocessed_problems:
 
@@ -229,8 +226,6 @@ class Command(BaseCommand):
     def handle(self, **options):
 
         write = self.stdout.write
-
-        # Initialize list for problems we came across from the files
         self.processed_problems = []
 
         # Initialize error handling
@@ -257,38 +252,37 @@ class Command(BaseCommand):
             shutil.rmtree(PROBLEMS_STATIC_DIR)
         os.makedirs(PROBLEMS_STATIC_DIR, exist_ok=True)
 
+        # Load problems
+        for window_basename, window_path in self.walk(PROBLEMS_DIR):
+            for prob_basename, prob_path in self.walk(window_path):
+                self.process_problem_folder(
+                    window_basename=window_basename,
+                    prob_basename=prob_basename,
+                    prob_path=prob_path
+                )
+
+        # Stop if errors were encountered
+        if self.errored:
+            write("")
+            raise CommandError("Exception(s) were encountered; database was not modified")
+
+        # Collect all static files to final location
+        write("")
+        write("Collecting static files to final location")
+        management.call_command('collectstatic', *helpers.filter_dict({
+            '--no-input': not options['interactive'],
+            '--clear': options['clear'],
+        }))
+
+        # Actually load problems
+        self.stdout.write("Beginning transaction to actually save problems\n")
         try:
-
             with transaction.atomic():
-
-                # Load problems
-                for window_basename, window_path in self.walk(PROBLEMS_DIR):
-                    for prob_basename, prob_path in self.walk(window_path):
-                        self.process_problem_folder(
-                            window_basename=window_basename,
-                            prob_basename=prob_basename,
-                            prob_path=prob_path
-                        )
-
-                # Stop if errors were encountered
-                if self.errored:
-                    write("")
-                    raise helpers.ForeseenCommandError("Foreseen exceptions were encountered; rolled back transaction")
-
-                # Delete unprocessed problems
-                self.delete_unprocessed(options)
-
-                # Collect all static files to final location
-                write("")
-                write("Collecting static files to final location")
-                management.call_command('collectstatic', *helpers.filter_dict({
-                    '--no-input': not options['interactive'],
-                    '--clear': options['clear'],
-                }))
-
-        except helpers.ForeseenCommandError as err:
-            raise err
-
+                for problem in self.processed_problems:
+                    problem.save()
         except Exception as err:
-            self.stderr.write("An unforeseen exception was encountered; rolled back transaction")
+            self.stderr.write("Unforeseen exception encountered while saving problems; rolled back transaction")
             raise CommandError(err)
+
+        # Delete unprocessed problems
+        self.delete_unprocessed(options)

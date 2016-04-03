@@ -33,6 +33,8 @@ class Command(BaseCommand):
 
         helpers.debug_with_pdb(**options)
 
+        self.stdout.write("Beginning transaction\n")
+
         try:
             with transaction.atomic():
 
@@ -66,10 +68,8 @@ class Command(BaseCommand):
                     if isfile(path):
                         management.call_command('announce', path)
 
-        except helpers.ForeseenCommandError as err:
-            raise err
         except Exception as err:
-            self.stderr.write("Unforeseen exception encountered; rolling back")
+            self.stderr.write("Unforeseen exception encountered; rolled back transaction")
             raise CommandError(err)
         else:
             self.stdout.write("Successfully (re)loaded all fixtures and problems")
