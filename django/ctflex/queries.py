@@ -22,6 +22,10 @@ def is_competitor(user):
     return user.is_authenticated() and hasattr(user, models.Competitor.user.field.rel.name)
 
 
+def is_competitor_or_superuser(user):
+    return user.is_superuser or is_competitor(user)
+
+
 def get_window(codename=None):
     if codename:
         return models.Window.objects.get(codename=codename)
