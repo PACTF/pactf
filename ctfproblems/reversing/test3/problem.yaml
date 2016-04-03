@@ -1,0 +1,14 @@
+name: Problem3
+points: 10
+description: |
+  #### this is desc3
+
+  do we have **markdown** _working_?
+
+  ```python
+  def foo():
+    pass
+  ```
+
+hint: |
+  hint3

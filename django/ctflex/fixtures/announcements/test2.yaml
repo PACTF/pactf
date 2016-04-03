@@ -1,9 +1,9 @@
 id: 102
 title: Test 5 is broken
 
-window: web
+window: crypto
 problems:
-  - e336045a-b9cc-4e6b-ade4-d893e102f3fc
+  - a653ed48-a5a1-487e-a5ea-615f9dee6bb3
 
 body: >
   Static files should be fixed now.
