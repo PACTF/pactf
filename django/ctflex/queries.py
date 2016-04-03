@@ -238,35 +238,38 @@ def board(window=None):
 # region Problem Formatting
 
 
-# XXX(Yatharth): Handle exceptions
-# TODO(Yatharth): Use recommended way to import from path for Python 3.5
-def _get_desc_and_hint(problem, team):
-    """Return static description and hint or generate them"""
+def _generate_desc_and_hint(problem, team):
+    """Generate description and hint for dynnamic problems"""
 
-    if not problem.generator:
-        return problem.description_html, problem.hint_html
+    assert problem.generator
 
     generator_path = join(settings.PROBLEMS_DIR, problem.window.codename, problem.generator)
+    # TODO(Yatharth): Use recommended way to import from path for Python 3.5
     generator = importlib.machinery.SourceFileLoader('gen', generator_path).load_module()
-    desc, hint = generator.generate(hashers.dyanamic_problem_key(team))
+    desc_raw, hint_raw = generator.generate(hashers.dyanamic_problem_key(team))
+    desc, hint = problem.process_html(desc_raw), problem.process_html(hint_raw)
 
-    return problem.process_html(desc), problem.process_html(hint)
+    return desc, hint
 
 
+# XXX(Yatharth): Handle errors
 # TODO(Yatharth): Redesign to avoid needing this function
 def format_problem(problem, team):
     """Return a problem-like object, with the description and hint generated if necessary
 
-    This function is proxied via a template tag.
+    Usage:
+        This function is proxied via a template tag.
     """
 
     if not problem.generator:
         return problem
 
+    # except Exception as err:
+    #     MESSAGE = "There is something wrong with this problem. Please report this to {}".format(settings.SUPPORT_EMAIL)
+    #     data['description'], data['hint'] = MESSAGE, MESSAGE
+
     data = copy(problem.__dict__)
-
-    data['description_html'], data['hint_html'] = _get_desc_and_hint(problem, team)
-
+    data['description'], data['hint'] = _generate_desc_and_hint(problem, team)
     return data
 
 # endregion
