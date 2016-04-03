@@ -9,46 +9,51 @@
 {# (content_wrapper is used instead of content to be able to use the full page.) #}
 {% block content_wrapper %}
 
-  <div class="jumbotron text-center">
+  <div id="jumbotron-background">
+    <div class="jumbotron text-center gradient">
 
-    {% include 'ctflex/base/messages.snippet.html' %}
+      {% include 'ctflex/base/messages.snippet.html' %}
 
-    <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
+      <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
 
-    <div id="jumbotron-img">
-      {#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
-      <div class="logo">
-        {% include 'ctflex/logo.svg' %}
+      <div id="jumbotron-img">
+        {#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
+        <div class="logo">
+          {% include 'ctflex/logo.svg' %}
+        </div>
       </div>
-    </div>
-    <h3>
-      <strong>{% include 'ctflex/text/title.txt' %}</strong> is an online <b>computer security</b> competition for
-      <strong>high school students.</strong>
-    </h3>
+      <h3>
+        <strong>{% include 'ctflex/text/title.txt' %}</strong> is a multi-round online
+        <b>computer security</b> competition for
+        <strong>high school students.</strong>
+      </h3>
 
-    {% if incubating %}
-      <h3>{% include 'ctflex/text/index_subtitle.html' %}</h3>
-    {% else %}
-      <div id="date-headings" class="row">
-        {% for window in windows %}
-          <h3>
-            <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}</strong></span>
-            <br class="visible-xs-block"/>
+      {% if incubating %}
+        <h3>{% include 'ctflex/text/index_subtitle.html' %}</h3>
+      {% else %}
+        <div id="date-headings" class="row">
+          {% for window in windows %}
+            <h3>
+              <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}</strong></span>
+              <br class="visible-xs-block"/>
             <span
                 class="col-sm-6 text-left">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
-          </h3>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <p class="text-center">
-      {% if team %}
-        <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go the to Game!</a>
-      {% else %}
-        <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+            </h3>
+          {% endfor %}
+        </div>
       {% endif %}
-    </p>
+
+      <p class="text-center">
+        {% if team %}
+          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go the to Game!</a>
+        {% else %}
+          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+        {% endif %}
+      </p>
+
+    </div>
   </div>
+
   <div class="container">
     <div class="row">
 
