@@ -1,23 +1,23 @@
 - model: ctflex.solve
-  pk: 211
+  pk: 111
   fields:
     problem: a653ed48-a5a1-487e-a5ea-615f9dee6bb3
     competitor: 11
-    date: '2016-03-10T01:42:01+00:00'
+    date: '2016-04-03T01:42:01+00:00'
     flag: flag2
 
 - model: ctflex.solve
-  pk: 412
+  pk: 121
   fields:
-    problem: 43375f09-3494-4114-8d5f-36584293e746
-    competitor: 12
-    date: '2016-03-10T01:42:01+00:00'
-    flag: flag4
+    problem: a653ed48-a5a1-487e-a5ea-615f9dee6bb3
+    competitor: 21
+    date: '2016-04-04T01:42:01+00:00'
+    flag: flag2
 
 - model: ctflex.solve
-  pk: 521
+  pk: 212
   fields:
-    problem: 85e50328-2b74-45a7-bd60-d932d7890ff0
-    competitor: 21
-    date: '2016-03-10T01:42:01+00:00'
-    flag: 5
+    problem: 09ae9730-a70d-41cc-9cf0-6405e31d151f
+    competitor: 12
+    date: '2016-04-07T01:42:01+00:00'
+    flag: flag3
