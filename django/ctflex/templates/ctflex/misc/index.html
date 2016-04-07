@@ -33,12 +33,13 @@
         <div id="window-container" class="row">
           {% for window in windows %}
             <h3>
-              <span class="window-name col-md-5"><strong>{{ window.codename|title }}</strong></span>
-              <br class="visible-sm-block visible-xs-block"/>
-              <span class="window-number col-md-2"><strong>Round #{{ window.number }}</strong></span>
+              <span class="window-name col-md-6"><strong>
+                {{ window.codename|title }}:&nbsp;
+                Round #{{ window.number }}
+              </strong></span>
               <br class="visible-sm-block visible-xs-block"/>
               <span
-                  class="window-date col-md-5">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
+                  class="window-date col-md-6">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
             </h3>
             <br>
           {% endfor %}

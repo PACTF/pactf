@@ -86,10 +86,6 @@ body {
     text-align: center;
 }
 
-#window-container .window-number {
-    text-align: center;
-}
-
 #window-container .window-date {
     text-align: center;
 }
@@ -98,10 +94,6 @@ body {
 
     #window-container .window-name {
         text-align: right;
-    }
-
-    #window-container .window-number {
-        text-align: center;
     }
 
     #window-container .window-date {
