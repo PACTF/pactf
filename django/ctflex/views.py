@@ -383,8 +383,6 @@ def unread_announcements(request):
 def game(request, *, window_codename):
     """Display problems"""
 
-    1 / 0
-
     # Process request
     superuser = request.user.is_superuser
     team = request.user.competitor.team
