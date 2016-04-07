@@ -250,3 +250,14 @@ body.modal-open div.modal-backdrop {
     /*color: #333;*/
 }
 
+/* About Page */
+
+a.link-undercover {
+    color: black;
+    text-decoration: none;
+}
+
+a.link-undercover:visited {
+    color: black;
+    text-decoration: none;
+}
