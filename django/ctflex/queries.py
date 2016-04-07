@@ -229,10 +229,11 @@ def _team_ranking_key(window, team_with_score):
 
 def board(window=None):
     """Return sorted list of eligible teams with their scores"""
-    eligible_teams_with_score = ((team, _score_in_timer(team=team, window=window))
+    teams_with_score = ((team, _score_in_timer(team=team, window=window))
                                  for team in models.Team.objects.iterator()
-                                 if eligible(team))
-    ranked = sorted(eligible_teams_with_score, key=partial(_team_ranking_key, window))
+                                 # if eligible(team)
+                                 )
+    ranked = sorted(teams_with_score, key=partial(_team_ranking_key, window))
     return ((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
 

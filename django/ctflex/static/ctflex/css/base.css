@@ -42,7 +42,7 @@ body {
 
 body {
     /* Margin bottom by footer height */
-    margin-bottom: 45px;
+    margin-bottom: 130px;
 }
 
 html {
@@ -58,7 +58,7 @@ footer {
     text-align: center;
 
     /* Set the fixed height of the footer here */
-    height: 45px;
+    height: 130px;
     background-color: #f5f5f5;
 }
 
@@ -70,6 +70,20 @@ footer > .container {
 
 footer > .container > p {
     margin-bottom: 0;
+}
+
+#footer-sponsors {
+    padding-top: 15px;
+}
+
+#footer-sponsors a {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#footer-sponsors img {
+    width: auto;
+    height: 75px;
 }
 
 /* Navbar */
@@ -215,10 +229,6 @@ body.modal-open div.modal-backdrop {
     font-weight: bold;
 }
 
-.clickable-row {
-    cursor: pointer;
-}
-
 /* Account page */
 
 #team-members .user-container .user-username {
@@ -228,3 +238,15 @@ body.modal-open div.modal-backdrop {
 .panel .list-group-item span.bold {
     margin-right: 0.25em;
 }
+
+/* Scoreboard */
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.team-ineligible {
+    /*background-color: #ccc;*/
+    /*color: #333;*/
+}
+

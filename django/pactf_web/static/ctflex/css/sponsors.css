@@ -1,0 +1,36 @@
+
+h2 {
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+}
+
+.sponsor-img img {
+    height: auto;
+    width: auto;
+    max-width: 80%;
+    max-height: 10em;
+    /*padding-left: 5em;*/
+    /*padding-right: 5em;*/
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+@media (max-width: 767px) {
+    h3 {
+        text-align: center;
+        widht: 100%;
+    }
+}
+
+.sponsor {
+    margin-bottom: 2em;
+}
+
+
+
+

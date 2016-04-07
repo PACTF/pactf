@@ -1,0 +1,58 @@
+@font-face {
+    font-family: montserrat;
+    src: url('../fonts/montserrat.otf');
+}
+
+@font-face {
+    font-family: panton;
+    src: url('../fonts/panton.otf');
+}
+
+h2 {
+    text-align: center;
+    width: 100%;
+    height: auto;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.about-secion {
+    margin-bottom: 2em;
+}
+
+.person {
+    margin-bottom: 1.25em;
+}
+
+.person-img {
+    display: block;
+    margin: auto;
+
+    min-width: 60%;
+    width: 60%;
+    max-width: 15em;
+}
+
+.person-img img {
+    height: 100%;
+    width: 100%;
+    border-radius: 100%;
+}
+
+.person-name {
+    margin-top: 1em;
+    font-family: montserrat, sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.person-pos {
+    font-family: panton, sans-serif;
+}
+
+.person-desc {
+    margin-top: 0.5em;
+    font-family: sans-serif;
+    text-align: justify;
+    text-justify: inter-word;
+}

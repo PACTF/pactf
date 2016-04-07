@@ -243,7 +243,7 @@ The `dynamic` field is a boolean that defaults to False. If true, a Python scrip
 
 #### Problem Dependencies
 
-The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `problems` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `problems` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `score` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `score` is not provided, it defaults to 1. 
+The `deps` dictionary field is used to enable a problem conditionally for competitors. It can optionally contain the `probs` field. This shall be a list of problem UUIDs relevant to determining whether the problem being loaded should be enabled for a competitor. If the `probs` field is not provided, all problems shall be considered relevant. The `deps` dictionary can optionally contain the `threshold` integer field. Its value is the threshold that the sum of the scores of problems considered relevant should exceed. If `threshold` is not provided, it defaults to 1. 
 
 
   [usaco]: https://usaco.org/

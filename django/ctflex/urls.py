@@ -28,7 +28,10 @@ misc_urls = [
     url(r'^start_timer/$', views.start_timer, name='start_timer'),
     url(r'^account/$', views.account, name='account'),
     url(r'^team/(?P<team_id>\d+)$', views.team_public_detail, name='team'),
-    url(r'^help/$', views.display_help, name='help'),
+    url(r'^learn/$', views.display_learn, name='learn'),
+    url(r'^sponsors/$', views.sponsors, name='sponsors'),
+    url(r'^about/$', views.about, name='about'),
+    url(r'^prizes/$', views.prizes, name='prizes'),
 ]
 
 auth_urls = [

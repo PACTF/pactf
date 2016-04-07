@@ -362,6 +362,9 @@ class Window(models.Model):
 
     ''' Properties '''
 
+    def number(self):
+        return Window.objects.filter(start__lt=self.start).count() + 1
+
     def started(self):
         return self.start <= timezone.now()
 

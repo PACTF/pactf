@@ -1,5 +1,5 @@
 {% extends 'ctflex/base/headered.template.html' %}
-{% load ctflex %}
+{% load ctflex_ctf %}
 
 {% block title %}
   Team Profile — {{ block.super }}
@@ -45,7 +45,7 @@
           <span class="bold">
             Eligibility
           </span>
-          for prizes and ranking on scoreboard
+          for prizes
           <span class="pull-right">
             {% eligible other_team as is_eligible %}
             {% if is_eligible %}

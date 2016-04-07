@@ -1,4 +1,25 @@
-© PACTF 2016
-| <a href="https://pactf.statuspage.io/" target="_blank">System Status</a>
-| <a href="mailto:{{ contact_email }}" target="_blank">Contact Us</a>
-| Made with <span class="glyphicon glyphicon-heart"></span> at <a href="https://www.andover.edu/" target="_blank">Phillips Academy</a>
+{% load static from staticfiles %}
+
+<p id="footer-text" class="text-muted">
+  © PACTF 2016
+  | <a target="_blank" href="https://pactf.statuspage.io/">System Status</a>
+  | <a target="_blank" href="mailto:{{ contact_email }}">Contact Us</a>
+  | Made with
+  <span class="glyphicon glyphicon-heart"></span> at
+  <a target="_blank" href="https://www.andover.edu/">Phillips Academy</a>
+</p>
+
+<div id="footer-sponsors" class="row">
+  <a target="_blank" href="https://www.andover.edu/ABOUT/ABBOTACADEMYASSOCIATION/Pages/default.aspx">
+    <img src="{% static 'pactf_web/img/sponsors/abbot.png' %}"/>
+  </a>
+  <a target="_blank" href="https://www.cylab.cmu.edu/">
+    <img src="{% static 'pactf_web/img/sponsors/cylab.png' %}"/>
+  </a>
+  <a target="_blank" href="https://www.bu.edu/hic/research/massachusetts-open-cloud/">
+    <img src="{% static 'pactf_web/img/sponsors/moc.png' %}"/>
+  </a>
+  <a target="_blank" href="https://www.bu.edu/hic/research/macs/">
+    <img src="{% static 'pactf_web/img/sponsors/bu.png' %}"/>
+  </a>
+</div>

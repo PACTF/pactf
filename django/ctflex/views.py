@@ -22,11 +22,12 @@ from ratelimit.decorators import ratelimit
 from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
-from ctflex import mail
 from ctflex import forms
+from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
+from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY
 
 
 # region Context Processors
@@ -212,6 +213,26 @@ def index(request):
 
 
 @limited_http_methods('GET')
+def display_learn(request):
+    return render(request, 'ctflex/misc/learn.html')
+
+
+@limited_http_methods('GET')
+def about(request):
+    return render(request, 'ctflex/misc/about.html')
+
+
+@limited_http_methods('GET')
+def prizes(request):
+    return render(request, 'ctflex/misc/prizes.html')
+
+
+@limited_http_methods('GET')
+def sponsors(request):
+    return render(request, 'ctflex/misc/sponsors.html')
+
+
+@limited_http_methods('GET')
 @defaulted_window()
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
@@ -251,12 +272,6 @@ def account(request):
         'windows': queries.all_windows().reverse(),
     }
     return render(request, 'ctflex/misc/account.html', context)
-
-
-@limited_http_methods('GET')
-def display_help(request):
-    """Display the help page."""
-    return render(request, 'ctflex/misc/help.html')
 
 
 # endregion
@@ -356,10 +371,6 @@ def unread_announcements(request):
 @competitors_or_superusers_only()
 def game(request, *, window_codename):
     """Display problems"""
-
-    # Define countdown
-    COUNTDOWN_ENDTIME_KEY = 'countdown_endtime'
-    COUNTDOWN_MAX_MICROSECONDS_KEY = 'countdown_max_microseconds'
 
     # Process request
     superuser = request.user.is_superuser

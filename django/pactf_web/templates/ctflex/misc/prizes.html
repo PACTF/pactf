@@ -1,0 +1,100 @@
+{% extends 'ctflex/base/headered.template.html' %}
+
+{% block title %}
+  Prizes - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Prizes
+{% endblock %}
+
+
+{% block content %}
+
+  <div class="panel-group">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Overall Contest Prizes
+      </div>
+      <div class="panel-body">
+        For overall performance in all three rounds, the contest’s top eligible<sup>†</sup> teams will be awarded prizes:
+      </div>
+      <div class="list-group">
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            1st
+          </span>
+          <span class="pull-right">
+            $750
+          </span>
+        </div>
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            2nd
+          </span>
+          <span class="pull-right">
+            $500
+          </span>
+        </div>
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            3rd–5th
+          </span>
+          <span class="pull-right">
+            $100 (gift card)
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-group">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Per-Round Prizes
+      </div>
+      <div class="panel-body">
+        For each of the three rounds, the round’s top eligible<sup>†</sup> teams will be awarded prizes:
+      </div>
+      <div class="list-group">
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            1st
+          </span>
+          <span class="pull-right">
+            $200
+          </span>
+        </div>
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            2nd
+          </span>
+          <span class="pull-right">
+            $150
+          </span>
+        </div>
+
+        <div class="list-group-item clearfix">
+          <span class="bold">
+            3rd–5th
+          </span>
+          <span class="pull-right">
+            $50 (gift card)
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <p>
+    <sup>†</sup> Teams are eligible (to win prizes) if all of its competitors are middle-schoolers or high-schoolers living in the United States of America. Ineligible teams will be factored out when awarding prizes.
+  </p>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'ctflex/base/headered.template.html' %}
+{% load static from staticfiles %}
+{% load sponsor from ctflex_sponsors %}
+
+{% block title %}
+  Sponsors - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Our Sponsors
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static "ctflex/css/sponsors.css" %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+
+  <p class="text-center">
+    PACTF is proud to be sponsored by the following entities:
+  </p>
+
+  <h2>Diamond Sponsors</h2>
+
+  {% with title='Abbot Academy Association' link='https://www.andover.edu/ABOUT/ABBOTACADEMYASSOCIATION/Pages/default.aspx' image='pactf_web/img/sponsors/abbot.png' %}
+    {% sponsor %}
+      PACTF is made possible in part by a grant from the Abbot Academy Association, continuing Abbot's tradition of boldness, innovation, and caring.
+    {% endsponsor %}
+  {% endwith %}
+
+  <h2>Gold Sponsors</h2>
+
+
+  {% with title='CyLab Institute' link='https://www.cylab.cmu.edu/' image='pactf_web/img/sponsors/cylab.png' %}
+    {% sponsor %}
+      <a href="{{ link }}"
+         target="_blank">Carnegie Mellon CyLab</a>
+      is a bold and visionary effort, which establishes public-private partnerships to develop new technologies for measurable, secure, available, trustworthy, and sustainable computing and communications systems.
+    {% endsponsor %}
+  {% endwith %}
+
+  {% with title='Massachusetts Open Cloud' link='https://www.bu.edu/hic/research/massachusetts-open-cloud/' image='pactf_web/img/sponsors/moc.png' %}
+    {% sponsor %}
+      <a href="{{ link }}"
+         target="_blank">The Massachusetts Open Cloud (MOC)</a>
+      is a new public cloud, designed and implemented in Massachusetts as the first “Open Cloud eXchange” (OCX): a novel, transformative marketplace model for public cloud offerings. Led by Boston University, the MOC is a collaborative effort among BU, Harvard, UMass Amherst, MIT, and Northeastern University, as well as the Massachusetts Green High-Performance Computing Center (MGHPCC) and Oak Ridge National Laboratory (ORNL).
+    {% endsponsor %}
+  {% endwith %}
+
+  {% with title='Modular Approach to Cloud Security' link='https://www.bu.edu/hic/research/macs/' image='pactf_web/img/sponsors/bu.png' %}
+    {% sponsor %}
+      <a target="_blank" href="{{ link }}">The Modular Approach to Cloud Security (MACS)</a>
+      project, funded by the Secure and Trustworthy Cyberspace (SaTC) program of the National Science Foundation’s (NSF), is charged to address the grand challenges in building secure cloud services. This is a 5-year, Frontier project that involves BU, MIT, NEU and UConn. The goal of the MACS project is to develop methods for building information systems with meaningful multi-layered security guarantees.
+    {% endsponsor %}
+  {% endwith %}
+
+  {% with title='Rafik B. Hariri Institute' link='https://www.bu.edu/hic/' image='pactf_web/img/sponsors/bu.png' %}
+    {% sponsor %}
+      <a href="{{ link }}"
+         target="_blank">The Rafik B. Hariri Institute</a> for Computing and Computational Science & Engineering initiates, catalyzes, and propels collaborative, interdisciplinary research and training initiatives for a better society by promoting discovery and innovations through the use of computational and data-driven approaches, and advances in the science of computing inspired by challenges in arts and sciences, engineering, and management disciplines.
+
+    {% endsponsor %}
+  {% endwith %}
+
+  <h2>Silver Sponsors</h2>
+
+  {% with title='The Nest' link='http://www.noblenet.org/owhl/make/' image='pactf_web/img/sponsors/nest.png' %}
+    {% sponsor %}
+      <a href="{{ link }}"
+         target="_blank">The Nest</a>,
+      the makerspace at Phillips Academy, is where innovation and community intersect. Located in the basement of the OWHL, this space is designed for the entire PA community to create, explore, and innovate with one another. It doesn’t matter if your interest is making a new dress or developing new technology. You are invited.
+    {% endsponsor %}
+  {% endwith %}
+
+{% endblock %}
