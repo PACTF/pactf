@@ -13,7 +13,8 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.http.response import HttpResponseNotAllowed
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
+from django.template import RequestContext
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -74,8 +75,18 @@ def incubating(request):
     return render(request, 'ctflex/misc/incubating.html')
 
 
-# endregion
+def handler_factory(status_code):
+    def generic_handler(request, *args, **kwargs):
+        context = RequestContext(request)
+        context['status_code'] = status_code
+        response = render_to_response('ctflex/misc/error.html', context_instance=context)
+        response.status_code = status_code
+        return response
 
+    return generic_handler
+
+
+# endregion
 
 # region Decorators
 
@@ -371,6 +382,8 @@ def unread_announcements(request):
 @competitors_or_superusers_only()
 def game(request, *, window_codename):
     """Display problems"""
+
+    1 / 0
 
     # Process request
     superuser = request.user.is_superuser

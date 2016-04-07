@@ -1,0 +1,24 @@
+{% extends 'ctflex/base/headered.template.html' %}
+
+{% block title %}
+  Error - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Error {{ status_code }}
+{% endblock %}
+
+
+{% block content %}
+  <p>
+    <strong>We are very sorry about this. Our team is currently working to fix this issue as soon as possible.</strong>
+  </p>
+  <p>
+    For more information, please go to our
+    <a target="_blank" href="https://pactf.statuspage.io/">System Status</a> page.
+  </p>
+  <p>
+    We thank you in advance for your patience.
+  </p>
+
+{% endblock %}
