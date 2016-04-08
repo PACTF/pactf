@@ -181,6 +181,69 @@ class _Django(Configuration):
             },
         }
 
+    ''' Logging '''
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        # 'filters': {
+        #     'special': {
+        #         '()': 'project.logging.SpecialFilter',
+        #         'foo': 'bar',
+        #     },
+        #     'require_debug_true': {
+        #         '()': 'django.utils.log.RequireDebugTrue',
+        #     },
+        # },
+        # 'handlers': {
+        #     'console': {
+        #         'level': 'INFO',
+        #         'filters': ['require_debug_true'],
+        #         'class': 'logging.StreamHandler',
+        #         'formatter': 'simple'
+        #     },
+        #     'mail_admins': {
+        #         'level': 'ERROR',
+        #         'class': 'django.utils.log.AdminEmailHandler',
+        #         'filters': ['special']
+        # 'null': {
+        #     'class': 'logging.NullHandler',
+        # },
+        # 'mail_admins': {
+        #     'level': 'ERROR',
+        #     'class': 'django.utils.log.AdminEmailHandler',
+        #     'include_html': True,
+        # }
+        #     }
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': join(BASE_DIR, 'logs', 'django.log'),
+            },
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            },
+            # django.template warning goes to email
+
+            ctflex.constants.BASE_LOGGER_NAME: {
+                'handlers': [
+                    'console'
+                ],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+            # other logger that ctflex has (have a base logger constant)
+        },
+    }
+
 
 class _Security:
     """Configure security"""
@@ -306,35 +369,6 @@ class Dev(_Base):
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
-
-    ''' Logging '''
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            # 'file': {
-            #     'level': 'DEBUG',
-            #     'class': 'logging.FileHandler',
-            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
-            # },
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-                'propagate': True,
-            },
-            ctflex.constants.LOGGER_NAME: {
-                'handlers': ['console'],
-                'level': 'DEBUG',
-                'propagate': False,
-            },
-        },
-    }
 
 
 class Prod(_Base):
