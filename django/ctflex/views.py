@@ -498,7 +498,7 @@ def logout_done(request, *,
 @limited_http_methods('GET')
 def password_change_done(request, *,
                          message="Your password was successfully changed.",
-                         redirect_url=settings.TEAM_CHANGE_REDIRECT_URL):
+                         redirect_url='ctflex:account'):
     messages.success(request, message)
     return redirect(redirect_url)
 
@@ -506,7 +506,7 @@ def password_change_done(request, *,
 @limited_http_methods('GET')
 def password_reset_complete(request, *,
                             message="Your password was successfully set. You can log in now.",
-                            redirect_url='ctflex:index'):
+                            redirect_url='ctflex:login'):
     messages.success(request, message)
     return redirect(redirect_url)
 

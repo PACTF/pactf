@@ -109,7 +109,7 @@ class _Django(Configuration):
     # Auth URLs
     LOGIN_URL = 'ctflex:login'
     LOGOUT_URL = 'ctflex:logout'
-    LOGIN_REDIRECT_URL = 'ctflex:index'
+    LOGIN_REDIRECT_URL = 'ctflex:game'
 
     # Internationalization
     LANGUAGE_CODE = 'en-us'
