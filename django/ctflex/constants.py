@@ -15,8 +15,6 @@ VERBOSE_NAME = 'CTFlex'
 ''' Logging '''
 
 BASE_LOGGER_NAME = APP_NAME
-CODE_LOGGER_NAME = BASE_LOGGER_NAME + ".code"
-IP_LOGGER_NAME = BASE_LOGGER_NAME + ".ip"
 
 ''' URLs '''
 

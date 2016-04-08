@@ -193,53 +193,44 @@ class _Django(Configuration):
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
-        # 'filters': {
-        #     'special': {
-        #         '()': 'project.logging.SpecialFilter',
-        #         'foo': 'bar',
-        #     },
-        #     'require_debug_true': {
-        #         '()': 'django.utils.log.RequireDebugTrue',
-        #     },
-        # },
-        # 'handlers': {
-        #     'console': {
-        #         'level': 'INFO',
-        #         'filters': ['require_debug_true'],
-        #         'class': 'logging.StreamHandler',
-        #         'formatter': 'simple'
-        #     },
-        #     'mail_admins': {
-        #         'level': 'ERROR',
-        #         'class': 'django.utils.log.AdminEmailHandler',
-        #         'filters': ['special']
-        # 'null': {
-        #     'class': 'logging.NullHandler',
-        # },
-        # 'mail_admins': {
-        #     'level': 'ERROR',
-        #     'class': 'django.utils.log.AdminEmailHandler',
-        #     'include_html': True,
-        # }
-        #     }
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+        
+        'filters': {
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
             },
+        },
+
+        'handlers': {
+            # 'ctflex_file': {
+            #     'level': 'DEBUG',
+            #     'class': 'logging.FileHandler',
+            #     'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+            # },
+            # 'console': {
+            #     'level': 'INFO',
+            #     'filters': ['require_debug_true'],
+            #     'class': 'logging.StreamHandler',
+            #     'formatter': 'simple'
+            # },
+            # 'mail_admins': {
+            #     'level': 'ERROR',
+            #     'class': 'django.utils.log.AdminEmailHandler',
+            #     'filters': ['special']
+            # 'null': {
+            #     'class': 'logging.NullHandler',
+            # },
             'console': {
                 'class': 'logging.StreamHandler',
             },
         },
+
+        # TODO(Yatharth): django.template warning goes to email
         'loggers': {
             'django': {
                 'handlers': ['console'],
                 'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
                 'propagate': True,
             },
-            # django.template warning goes to email
-
             ctflex.constants.BASE_LOGGER_NAME: {
                 'handlers': [
                     'console'
@@ -247,183 +238,176 @@ class _Django(Configuration):
                 'level': 'DEBUG',
                 'propagate': False,
             },
-            # other logger that ctflex has (have a base logger constant)
         },
     }
 
+    class _Security:
+        """Configure security"""
 
-class _Security:
-    """Configure security"""
+        SECRET_KEY = values.SecretValue()
 
-    SECRET_KEY = values.SecretValue()
+        # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
+        PASSWORD_HASHERS = ['ctflex.hashers.PBKDF2PasswordHasher4',
+                            'django.contrib.auth.hashers.PBKDF2PasswordHasher']
 
-    # Use PBKDF2PasswordHasher that uses 4 times the default number of iterations
-    PASSWORD_HASHERS = ['ctflex.hashers.PBKDF2PasswordHasher4',
-                        'django.contrib.auth.hashers.PBKDF2PasswordHasher']
+        # Number of days that a password reset link is valid for
+        PASSWORD_RESET_TIMEOUT_DAYS = 1
 
-    # Number of days that a password reset link is valid for
-    PASSWORD_RESET_TIMEOUT_DAYS = 1
+        # Request modern browsers to block suspected XSS attacks. Not to be relied upon.
+        SECURE_BROWSER_XSS_FILTER = True
 
-    # Request modern browsers to block suspected XSS attacks. Not to be relied upon.
-    SECURE_BROWSER_XSS_FILTER = True
+        # Prevent browsers from guessing content types (reducing security risk).
+        SECURE_CONTENT_TYPE_NOSNIFF = True
 
-    # Prevent browsers from guessing content types (reducing security risk).
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+        # Minimum password strength validation
+        AUTH_PASSWORD_VALIDATORS = [
+            {
+                'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+            },
+            {
+                'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+                'OPTIONS': {
+                    'min_length': 10,
+                }
+            },
+            {
+                'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+            },
+            {
+                'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+            },
+        ]
 
-    # Minimum password strength validation
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-            'OPTIONS': {
-                'min_length': 10,
-            }
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
+    class _Gunicorn:
+        """Configure Gunicorn"""
 
+        # As whom Gunicorn should run the server
+        GUNICORN_USER = values.Value(environ_prefix=None)
+        GUNICORN_GROUP = values.Value(environ_prefix=None)
 
-class _Gunicorn:
-    """Configure Gunicorn"""
-
-    # As whom Gunicorn should run the server
-    GUNICORN_USER = values.Value(environ_prefix=None)
-    GUNICORN_GROUP = values.Value(environ_prefix=None)
-
-    # Path to Gunicorn
-    GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn',
-                                     environ_prefix=None, check_exists=False)
-
-    # Whether to use a socket or serve directly to an address
-    GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
-
-    # Socket to communicate with
-    GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
+        # Path to Gunicorn
+        GUNICORN_PATH = values.PathValue('~/.virtualenvs/pactf/bin/gunicorn',
                                          environ_prefix=None, check_exists=False)
 
-    # Url to directly serve to
-    GUNICORN_IP = values.IPValue('127.0.0.1', environ_prefix=None)
-    GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
+        # Whether to use a socket or serve directly to an address
+        GUNICORN_USE_SOCKFILE = values.BooleanValue(False, environ_prefix=None)
 
-    # Number of worker processes Gunicorn should spawn
-    GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
+        # Socket to communicate with
+        GUNICORN_SOCKFILE = values.PathValue(join(BASE_DIR, 'run', 'gunicorn.sock'),
+                                             environ_prefix=None, check_exists=False)
 
+        # Url to directly serve to
+        GUNICORN_IP = values.IPValue('127.0.0.1', environ_prefix=None)
+        GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
 
-class _CTFlex(_Django, Configuration):
-    """Configure CTFlex"""
+        # Number of worker processes Gunicorn should spawn
+        GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
 
-    ''' General '''
+    class _CTFlex(_Django, Configuration):
+        """Configure CTFlex"""
 
-    # CTFLEX_REGISTER_EMAIL = 'registrar@pactf.com'
-    CTFLEX_SUPPORT_EMAIL = 'contact@pactf.com'
-    CTFLEX_CONTACT_EMAIL = 'contact@pactf.com'
+        ''' General '''
 
-    CTFLEX_SITENAME = 'PACTF'
+        # CTFLEX_REGISTER_EMAIL = 'registrar@pactf.com'
+        CTFLEX_SUPPORT_EMAIL = 'contact@pactf.com'
+        CTFLEX_CONTACT_EMAIL = 'contact@pactf.com'
 
-    # CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
+        CTFLEX_SITENAME = 'PACTF'
 
-    CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
+        # CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
 
-    ''' Problems and Staticfiles '''
+        CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
 
-    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
-    CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
-    CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
+        ''' Problems and Staticfiles '''
 
-    @classmethod
-    def add_staticfiles_dir(cls):
-        cls.STATICFILES_DIRS.append(
-            (cls.CTFLEX_PROBLEMS_STATIC_URL, cls.CTFLEX_PROBLEMS_STATIC_DIR)
-        )
+        CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
+        CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
+        CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
 
-    ''' General '''
+        @classmethod
+        def add_staticfiles_dir(cls):
+            cls.STATICFILES_DIRS.append(
+                (cls.CTFLEX_PROBLEMS_STATIC_URL, cls.CTFLEX_PROBLEMS_STATIC_DIR)
+            )
 
-    @classmethod
-    def pre_setup(cls):
-        super().setup()
-        cls.add_staticfiles_dir()
+        ''' General '''
 
+        @classmethod
+        def pre_setup(cls):
+            super().setup()
+            cls.add_staticfiles_dir()
 
-# TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
-class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
-    """Extract common sub-classes of any full user-facing settings class"""
-    pass
+    # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
+    class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
+        """Extract common sub-classes of any full user-facing settings class"""
+        pass
 
+    class Dev(_Base):
+        """Insecure and noisy settings for development"""
 
-class Dev(_Base):
-    """Insecure and noisy settings for development"""
+        ''' Security '''
 
-    ''' Security '''
+        DEBUG = True
+        ALLOWED_HOSTS = values.ListValue(['*'])
+        RATELIMIT_ENABLE = values.Value(False)
+        AUTH_PASSWORD_VALIDATORS = [
+            {
+                'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+                'OPTIONS': {
+                    'min_length': 2,
+                }
+            },
+            {
+                'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+            },
+        ]
 
-    DEBUG = True
-    ALLOWED_HOSTS = values.ListValue(['*'])
-    RATELIMIT_ENABLE = values.Value(False)
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-            'OPTIONS': {
-                'min_length': 2,
-            }
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
+    class Prod(_Base):
+        """Secure and quiet settings for production"""
 
+        ''' Security '''
 
-class Prod(_Base):
-    """Secure and quiet settings for production"""
+        DEBUG = False
+        ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
 
-    ''' Security '''
+        https = values.Value(True)  # For settings that should only be true when using HTTPS
+        SESSION_COOKIE_SECURE = https.value
+        CSRF_COOKIE_SECURE = https.value
 
-    DEBUG = False
-    ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
+        https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
 
-    https = values.Value(True)  # For settings that should only be true when using HTTPS
-    SESSION_COOKIE_SECURE = https.value
-    CSRF_COOKIE_SECURE = https.value
+        ''' Logging '''
 
-    https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
+        ADMINS = values.ListValue([
+            ('Yatharth', 'yatharth999+pactf@gmail.com'),
+            ('Tony', 'tony@tonytan.io'),
+            # ('PACTF Errors', _Django.SERVER_EMAIL.value)
+        ])
+        MANAGERS = ADMINS.value
 
-    ''' Logging '''
+        IGNORABLE_404_URLS = values.ListValue([
+            re.compile(r'^/apple-touch-icon.*\.png$'),
+            re.compile(r'^/favicon\.ico$'),
+            re.compile(r'^/robots\.txt$'),
+        ])
 
-    ADMINS = values.ListValue([
-        ('Yatharth', 'yatharth999+pactf@gmail.com'),
-        ('Tony', 'tony@tonytan.io'),
-        # ('PACTF Errors', _Django.SERVER_EMAIL.value)
-    ])
-    MANAGERS = ADMINS.value
+        @staticmethod
+        def get_hostname():
+            try:
+                return socket.gethostname()
+            except:
+                return None
 
-    IGNORABLE_404_URLS = values.ListValue([
-        re.compile(r'^/apple-touch-icon.*\.png$'),
-        re.compile(r'^/favicon\.ico$'),
-        re.compile(r'^/robots\.txt$'),
-    ])
+        @classmethod
+        def set_email_subject_prefix(cls):
+            hostname = cls.get_hostname()
+            if hostname:
+                cls.EMAIL_SUBJECT_PREFIX = "[Django {}] ".format(hostname)
 
-    @staticmethod
-    def get_hostname():
-        try:
-            return socket.gethostname()
-        except:
-            return None
+        ''' General '''
 
-    @classmethod
-    def set_email_subject_prefix(cls):
-        hostname = cls.get_hostname()
-        if hostname:
-            cls.EMAIL_SUBJECT_PREFIX = "[Django {}] ".format(hostname)
-
-    ''' General '''
-
-    @classmethod
-    def pre_setup(cls):
-        super().setup()
-        cls.set_email_subject_prefix()
+        @classmethod
+        def pre_setup(cls):
+            super().setup()
+            cls.set_email_subject_prefix()
