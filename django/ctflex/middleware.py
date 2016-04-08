@@ -74,6 +74,7 @@ class CloudflareRemoteAddrMiddleware:
         EMPTY_IPS = ('', "b''")
 
         if request.META.get(REMOTE_ADDR, '') in EMPTY_IPS:
-            logger.debug("changing IP from {} to {}"
-                         .format(request.META.get(REMOTE_ADDR, ''), request.META.get(HTTP_CF_CONNECTING_IP, '')))
+            # logger.debug("changing IP from {} to {}".format(
+            #     request.META.get(REMOTE_ADDR, ''),
+            #     request.META.get(HTTP_CF_CONNECTING_IP, '')))
             request.META[REMOTE_ADDR] = request.META.get(HTTP_CF_CONNECTING_IP, '')

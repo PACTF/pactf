@@ -221,7 +221,6 @@ def defaulted_window():
 
 @limited_http_methods('GET')
 def index(request):
-    logger.debug("index ip is {}".format(request.META.get('REMOTE_ADDR', '')))
     return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
     })
