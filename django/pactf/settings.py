@@ -222,7 +222,7 @@ class _Django(Configuration):
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
-                'filename': join(BASE_DIR, 'logs', 'django.log'),
+                'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
             },
             'console': {
                 'class': 'logging.StreamHandler',
