@@ -39,6 +39,8 @@ class _Django(Configuration):
         'widget_tweaks',
         'django_print_settings',
         'post_office',
+
+        # Django 3rd-party (local)
         'request',
 
         # Python 3rd-party
@@ -241,6 +243,7 @@ class _Django(Configuration):
         },
     }
 
+
 class _Security:
     """Configure security"""
 
@@ -278,6 +281,7 @@ class _Security:
         },
     ]
 
+
 class _Gunicorn:
     """Configure Gunicorn"""
 
@@ -302,6 +306,7 @@ class _Gunicorn:
 
     # Number of worker processes Gunicorn should spawn
     GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
+
 
 class _CTFlex(_Django, Configuration):
     """Configure CTFlex"""
@@ -337,10 +342,12 @@ class _CTFlex(_Django, Configuration):
         super().setup()
         cls.add_staticfiles_dir()
 
+
 # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
 class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
     """Extract common sub-classes of any full user-facing settings class"""
     pass
+
 
 class Dev(_Base):
     """Insecure and noisy settings for development"""
@@ -361,6 +368,7 @@ class Dev(_Base):
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
+
 
 class Prod(_Base):
     """Secure and quiet settings for production"""
