@@ -71,9 +71,10 @@ class CloudflareRemoteAddrMiddleware:
     def process_request(self, request):
         REMOTE_ADDR = 'REMOTE_ADDR'
         HTTP_CF_CONNECTING_IP = 'HTTP_CF_CONNECTING_IP'
+        EMPTY_IPS = ('', "b''")
 
         logger.debug("ip is {}".format(request.META.get(REMOTE_ADDR, '')))
-        if not request.META.get(REMOTE_ADDR, ''):
+        if request.META.get(REMOTE_ADDR, '') in EMPTY_IPS:
             logger.debug("changing IP from {} to {}"
                          .format(request.META.get(REMOTE_ADDR, ''), request.META.get(HTTP_CF_CONNECTING_IP, '')))
             request.META[REMOTE_ADDR] = request.META.get(HTTP_CF_CONNECTING_IP, '')
