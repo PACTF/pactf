@@ -69,6 +69,8 @@ class CloudflareRemoteAddrMiddleware:
     """Replace REMOTE_ADDR with Cloudflare-sent info when appropriate"""
 
     def process_request(self, request):
+        # TODO(Yatharth): Use HTTP_X_FORWARDED_FOR if CF doesn’t work
+
         REMOTE_ADDR = 'REMOTE_ADDR'
         HTTP_CF_CONNECTING_IP = 'HTTP_CF_CONNECTING_IP'
         EMPTY_IPS = ('', "b''")
