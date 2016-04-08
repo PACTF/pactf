@@ -443,7 +443,7 @@ def game(request, *, window_codename):
 
 @limited_http_methods('GET')
 @defaulted_window()
-@cache_page(30)
+@cache_page(45)
 def board(request, *, window_codename):
     """Displays rankings"""
 
