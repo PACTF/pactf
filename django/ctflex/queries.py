@@ -13,7 +13,7 @@ from ctflex import hashers
 from ctflex import models
 from ctflex import settings
 
-logger = logging.getLogger(constants.CODE_LOGGER_NAME + '.' + __name__)
+logger = logging.getLogger(constants.BASE_LOGGER_NAME + '.' + __name__)
 
 
 # region General

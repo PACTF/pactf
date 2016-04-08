@@ -29,9 +29,9 @@ from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, CODE_LOGGER_NAME
+from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME
 
-logger = logging.getLogger(CODE_LOGGER_NAME + '.' + __name__)
+logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 
 
 # region Context Processors
