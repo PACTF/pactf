@@ -27,6 +27,9 @@ _SETTINGS = (
     # Whether the incubating middleware is enabled
     ('INCUBATING', False, None),
 
+    # View to use for ratelimiting
+    ('RATELIMIT_VIEW', None, 'RATELIMIT_VIEW'),
+
     ### Metadata
 
     # Name used for site in emails sent out

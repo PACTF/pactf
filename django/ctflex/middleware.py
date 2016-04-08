@@ -1,14 +1,14 @@
 """Define middleware"""
-
+import logging
 from importlib import import_module
-
-from django.conf import settings
 
 from ratelimit.exceptions import Ratelimited
 
 from ctflex import constants
 from ctflex import views
-import ctflex.settings
+from ctflex import settings
+
+logger = logging.getLogger(constants.BASE_LOGGER_NAME + '.' + __name__)
 
 
 class RatelimitMiddleware:
@@ -45,7 +45,7 @@ class IncubatingMiddleware:
 
     def process_response(self, request, response):
 
-        if not ctflex.settings.INCUBATING:
+        if not settings.INCUBATING:
             return response
 
         if not request.resolver_match:
@@ -63,3 +63,20 @@ class IncubatingMiddleware:
             return response
 
         return views.incubating(request)
+
+
+class CloudflareRemoteAddrMiddleware:
+    """Replace REMOTE_ADDR with Cloudflare-sent info when appropriate"""
+
+    def process_request(self, request):
+        # TODO(Yatharth): Use HTTP_X_FORWARDED_FOR if CF doesn’t work
+
+        REMOTE_ADDR = 'REMOTE_ADDR'
+        HTTP_CF_CONNECTING_IP = 'HTTP_CF_CONNECTING_IP'
+        EMPTY_IPS = ('', "b''")
+
+        if request.META.get(REMOTE_ADDR, '') in EMPTY_IPS:
+            # logger.debug("changing IP from {} to {}".format(
+            #     request.META.get(REMOTE_ADDR, ''),
+            #     request.META.get(HTTP_CF_CONNECTING_IP, '')))
+            request.META[REMOTE_ADDR] = request.META.get(HTTP_CF_CONNECTING_IP, '')

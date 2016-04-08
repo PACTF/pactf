@@ -39,6 +39,7 @@ class _Django(Configuration):
         'widget_tweaks',
         'django_print_settings',
         'post_office',
+        'request',
 
         # Python 3rd-party
         'yaml',
@@ -49,6 +50,7 @@ class _Django(Configuration):
         'ctflex',
     ]
 
+    # (Order matters a lot here.)
     MIDDLEWARE_CLASSES = (
         # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,11 +62,15 @@ class _Django(Configuration):
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
 
+        # Local
+        'ctflex.middleware.CloudflareRemoteAddrMiddleware',
+
         # Django Extensions
         'django.middleware.common.BrokenLinkEmailsMiddleware',
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
+        'request.middleware.RequestMiddleware',
 
         # Local
         'ctflex.middleware.IncubatingMiddleware',
@@ -140,7 +146,8 @@ class _Django(Configuration):
     ''' Warnings '''
 
     WARNINGS_TO_SUPPRESS = values.ListValue([
-        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.'
+        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
+        'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.'
     ])
 
     @classmethod
@@ -181,6 +188,58 @@ class _Django(Configuration):
             },
         }
 
+    ''' Logging '''
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+
+        'filters': {
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            },
+        },
+
+        'handlers': {
+            # 'ctflex_file': {
+            #     'level': 'DEBUG',
+            #     'class': 'logging.FileHandler',
+            #     'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+            # },
+            # 'console': {
+            #     'level': 'INFO',
+            #     'filters': ['require_debug_true'],
+            #     'class': 'logging.StreamHandler',
+            #     'formatter': 'simple'
+            # },
+            # 'mail_admins': {
+            #     'level': 'ERROR',
+            #     'class': 'django.utils.log.AdminEmailHandler',
+            #     'filters': ['special']
+            # 'null': {
+            #     'class': 'logging.NullHandler',
+            # },
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+
+        # TODO(Yatharth): django.template warning goes to email
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            },
+            ctflex.constants.BASE_LOGGER_NAME: {
+                'handlers': [
+                    'console'
+                ],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+        },
+    }
 
 class _Security:
     """Configure security"""
@@ -219,7 +278,6 @@ class _Security:
         },
     ]
 
-
 class _Gunicorn:
     """Configure Gunicorn"""
 
@@ -244,7 +302,6 @@ class _Gunicorn:
 
     # Number of worker processes Gunicorn should spawn
     GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
-
 
 class _CTFlex(_Django, Configuration):
     """Configure CTFlex"""
@@ -280,12 +337,10 @@ class _CTFlex(_Django, Configuration):
         super().setup()
         cls.add_staticfiles_dir()
 
-
 # TODO(Yatharth): Figure out why putting CTFlex before Security screws up SECRET_KEY
 class _Base(_Security, _CTFlex, _Gunicorn, _Django, Configuration):
     """Extract common sub-classes of any full user-facing settings class"""
     pass
-
 
 class Dev(_Base):
     """Insecure and noisy settings for development"""
@@ -306,36 +361,6 @@ class Dev(_Base):
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
-
-    ''' Logging '''
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            # 'file': {
-            #     'level': 'DEBUG',
-            #     'class': 'logging.FileHandler',
-            #     'filename': join(BASE_DIR, 'logs', 'django.log'),
-            # },
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-                'propagate': True,
-            },
-            ctflex.constants.LOGGER_NAME: {
-                'handlers': ['console'],
-                'level': 'DEBUG',
-                'propagate': False,
-            },
-        },
-    }
-
 
 class Prod(_Base):
     """Secure and quiet settings for production"""
