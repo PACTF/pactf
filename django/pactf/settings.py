@@ -39,6 +39,7 @@ class _Django(Configuration):
         'widget_tweaks',
         'django_print_settings',
         'post_office',
+        'request',
 
         # Python 3rd-party
         'yaml',
@@ -49,6 +50,7 @@ class _Django(Configuration):
         'ctflex',
     ]
 
+    # (Order matters a lot here.)
     MIDDLEWARE_CLASSES = (
         # Django Defaults
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,6 +70,7 @@ class _Django(Configuration):
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
+        'request.middleware.RequestMiddleware',
 
         # Local
         'ctflex.middleware.IncubatingMiddleware',
@@ -143,7 +146,8 @@ class _Django(Configuration):
     ''' Warnings '''
 
     WARNINGS_TO_SUPPRESS = values.ListValue([
-        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.'
+        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
+        'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.'
     ])
 
     @classmethod
