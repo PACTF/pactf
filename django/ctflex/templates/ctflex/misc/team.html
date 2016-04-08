@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+
   {% if team == other_team %}
     <p>
       <strong>You are viewing your team’s public profile.</strong>
@@ -19,33 +20,39 @@
     <br/>
   {% endif %}
 
-  <div class="panel-group">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        Team Details
-      </div>
-      <ul class="list-group">
-        <li class="list-group-item clearfix">
+  {% if other_team.banned %}
+    <p>
+      This team’s information cannot be displayed.
+    </p>
+  {% else %}
+
+    <div class="panel-group">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Team Details
+        </div>
+        <ul class="list-group">
+          <li class="list-group-item clearfix">
           <span class="bold">
             Team Name
           </span>
           <span class="pull-right">
             {{ other_team.name }}
           </span>
-        </li>
-        <li class="list-group-item clearfix">
+          </li>
+          <li class="list-group-item clearfix">
           <span class="bold">
             School
           </span>
           <span class="pull-right">
             {{ other_team.school|default:"None" }}
           </span>
-        </li>
-        <li class="list-group-item clearfix">
+          </li>
+          <li class="list-group-item clearfix">
           <span class="bold">
             Eligibility
           </span>
-          for prizes
+            for prizes
           <span class="pull-right">
             {% eligible other_team as is_eligible %}
             {% if is_eligible %}
@@ -54,8 +61,8 @@
               <span class="glyphicon glyphicon-color glyphicon-remove-sign"></span>
             {% endif %}
           </span>
-        </li>
-        <li class="list-group-item clearfix">
+          </li>
+          <li class="list-group-item clearfix">
           <span class="bold">
             Members
           </span>
@@ -64,38 +71,40 @@
                 {{ competitor.user.username }}{% include 'ctflex/misc/comma.snippet.html' %}
               {% endfor %}
           </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="panel-group">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        Scores
+          </li>
+        </ul>
       </div>
-      <ul class="list-group">
-        <li class="list-group-item list-group-item-info">
+    </div>
+
+    <div class="panel-group">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Scores
+        </div>
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-info">
             <span class="bold">
               Overall
             </span>
             <span class="pull-right">
               {{ total_score }}
             </span>
-        </li>
-        {% for window in windows %}
-          <li class="list-group-item">
+          </li>
+          {% for window in windows %}
+            <li class="list-group-item">
             <span class="bold">
               {{ window.verbose_name }}
             </span>
-            {{ window.start|date:"j F" }} – {{ window.end|date:"j F" }}
+              {{ window.start|date:"j F" }} – {{ window.end|date:"j F" }}
             <span class="pull-right">
               {% score team=other_team %}
             </span>
-          </li>
-        {% endfor %}
-      </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
-  </div>
+
+  {% endif %}
 
 {% endblock %}

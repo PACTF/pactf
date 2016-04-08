@@ -16,7 +16,7 @@ from django.http.response import HttpResponseNotAllowed
 from django.shortcuts import render, redirect, render_to_response
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_page
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from ratelimit.decorators import ratelimit
@@ -440,9 +440,9 @@ def game(request, *, window_codename):
     return render(request, template_name, context)
 
 
-@never_cache
 @limited_http_methods('GET')
 @defaulted_window()
+@cache_page(30)
 def board(request, *, window_codename):
     """Displays rankings"""
 
