@@ -68,7 +68,7 @@ We are bunch of high-schoolers who participated in their first CTF in the Spring
 
 - [Yatharth Agarwal](mailto:yagarwal@andover.edu)
 - [Cameron Wong](mailto:cwong@andover.edu)
-- [Tony Tan](mailto:ztan@andover.edu)
+- [Tony Zhaocheng Tan](https://tonytan.io/about/)
 
 If you are using CTFlex and PACTF, we would love for you to get in touch for providing feedback or asking for support.
 
