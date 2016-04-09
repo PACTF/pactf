@@ -18,9 +18,12 @@
 
 {% block content %}
   <p>
-    <strong>Welcome to {{ window.verbose_name }}!</strong> This round started at on
-    {{ window.start|date:'F j, Y' }} and will run until
-    {{ window.end|date:'F j, Y' }}.
+    <strong>Welcome to {{ window.verbose_name }}!</strong>
+  </p>
+  <p>
+    This round started at
+    <strong>{{ window.start|date:'g:i A e' }} on {{ window.start|date:'F j, Y' }}</strong>
+    and will run until <strong>{{ window.end|date:'g:i A e' }} on {{ window.end|date:'F j, Y' }}</strong>.
   </p>
   <p>
     You can start solving problems once you start your team’s {% include 'ctflex/text/timer_length.adjective.txt' %} timer. Your team will then have {% include 'ctflex/text/timer_length.noun.txt' %} to solve as many problems as you all can!
