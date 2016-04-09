@@ -35,7 +35,7 @@ class _Django(Configuration):
         'django_countries',
         'django_extensions',
         'debug_toolbar',
-        'email_log',
+        # 'email_log',
         'widget_tweaks',
         'django_print_settings',
         'post_office',
