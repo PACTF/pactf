@@ -27,6 +27,9 @@ _SETTINGS = (
     # Whether the incubating middleware is enabled
     ('INCUBATING', False, None),
 
+    # View to use for ratelimiting
+    ('RATELIMIT_VIEW', None, 'RATELIMIT_VIEW'),
+
     ### Metadata
 
     # Name used for site in emails sent out
@@ -45,7 +48,6 @@ _SETTINGS = (
     ('LOGIN_REDIRECT_URL', 'ctflex:index', 'LOGIN_REDIRECT_URL'),
     ('WINDOW_CHANGE_URL', 'ctflex:game', None),
     ('LOGOUT_REDIRECT_URL', 'ctflex:index', None),
-    ('TEAM_CHANGE_REDIRECT_URL', 'ctflex:current_team', None),
     ('INVALID_STATE_REDIRECT_URL', 'ctflex:index', None),
 
     ### Problems

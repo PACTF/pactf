@@ -13,14 +13,17 @@
   <p>
     <strong>You were successfully registered!</strong> You should receive an email confirming the same.
   </p>
+
   {% if incubating %}
     <p>
       We’ll email you when the contest starts.
     </p>
   {% else %}
+
     <p>
       Check out the <a href="{% url 'ctflex:index' %}">contest schedule</a>
       and head on over the <a href="{% url 'ctflex:game' %}">Game</a>!
     </p>
+
   {% endif %}
 {% endblock %}

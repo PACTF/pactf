@@ -32,7 +32,7 @@
 #}{% endcomment %}
 
 {% load static from staticfiles %}
-{% load ctflex %}
+{% load ctflex_ctf %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -131,9 +131,7 @@
 
 <footer>
   <div class="container">
-    <p class="text-muted">
-      {% include 'ctflex/base/footer.snippet.html' %}
-    </p>
+    {% include 'ctflex/base/footer.snippet.html' %}
   </div>
 </footer>
 

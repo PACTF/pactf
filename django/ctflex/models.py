@@ -362,6 +362,9 @@ class Window(models.Model):
 
     ''' Properties '''
 
+    def number(self):
+        return Window.objects.filter(start__lt=self.start).count() + 1
+
     def started(self):
         return self.start <= timezone.now()
 
@@ -640,10 +643,11 @@ class Solve(models.Model):
         )
     }
 
+    # (Order does not matter.)
     MODEL_CLEANERS = (
         validate_teams_are_unique,
-        validate_time_inside_window,
-        validate_time_not_in_future,
+        # validate_time_inside_window,
+        # validate_time_not_in_future,
     )
 
 

@@ -17,28 +17,31 @@
       <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
 
       <div id="jumbotron-img">
-        {#      <img src="https://multiculturalgames.wikispaces.com/file/view/shane.jpg/129596425/shane.jpg">#}
         <div class="logo logo-inverted">
           {% include 'ctflex/logo.svg' %}
         </div>
       </div>
       <h3>
-        <strong>{% include 'ctflex/text/title.txt' %}</strong> is a multi-round online
-        <b>computer security</b> competition for
-        <strong>high school students.</strong>
+        <strong>{% include 'ctflex/text/title.txt' %}</strong> is
+        a <strong>multi-round</strong> online <strong>computer security</strong> competition
+        for <strong>middle</strong> and <strong>high school students.</strong>
       </h3>
 
       {% if incubating %}
         <h3>{% include 'ctflex/text/index_subtitle.html' %}</h3>
       {% else %}
-        <div id="date-headings" class="row">
+        <div id="window-container" class="row">
           {% for window in windows %}
             <h3>
-              <span class="col-sm-6 text-right"><strong>{{ window.verbose_name }}</strong></span>
-              <br class="visible-xs-block"/>
-            <span
-                class="col-sm-6 text-left">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
+              <span class="window-name col-md-6"><strong>
+                {{ window.codename|title }}:&nbsp;
+                Round {{ window.number }}
+              </strong></span>
+              <br class="visible-sm-block visible-xs-block"/>
+              <span
+                  class="window-date col-md-6">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
             </h3>
+            <br>
           {% endfor %}
         </div>
       {% endif %}
@@ -54,10 +57,10 @@
     </div>
   </div>
 
-  <div class="container">
+  <div id="info-container" class="container">
     <div class="row">
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h2>
           New to CTFs?
         </h2>
@@ -79,7 +82,7 @@
           </p>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h2>
           {% include 'ctflex/text/title.txt' %} is different
         </h2>
@@ -99,7 +102,27 @@
           </p>
           <p>
             <strong>There are scoreboards</strong>
-            for each individual round, and there is an overall all-time scoreboard. Prizes will be given to the top-ranking teams of the individual rounds and the overall CTF, so whether you are a specialist or an all-rounder, there's something for you!
+            for each individual round, and there is an overall all-time scoreboard.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        {# TODO(Yatharth): Make CTF-agnostic #}
+        <h2>
+          Are there prizes?
+        </h2>
+        <p>
+          Over $3,000 worth of prizes will be awarded to the top-ranking teams of each round as well as of the overall contest. Whether you are a specialist or an all-rounder, there's something for you!
+        </p>
+        <p>
+          <a class="btn btn-default collapse-data-btn" data-toggle="collapse" href="#prizes-info">Tell me more</a>
+        </p>
+        <div id="prizes-info" class="collapse">
+          <p>
+            Check out our
+            <a href="{% url 'ctflex:prizes' %}" target="_blank">prizes page</a>
+            for details, and learn about
+            <a href="{% url 'ctflex:sponsors' %}" target="_blank">the sponsors</a> who helped make PACTF possible!
           </p>
         </div>
       </div>

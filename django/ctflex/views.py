@@ -2,6 +2,7 @@
 
 import inspect
 import json
+import logging
 from functools import wraps
 
 from django.contrib import messages
@@ -13,20 +14,24 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.http.response import HttpResponseNotAllowed
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
+from django.template import RequestContext
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_page
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from ratelimit.decorators import ratelimit
 from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
-from ctflex import mail
 from ctflex import forms
+from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
+from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME
+
+logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 
 
 # region Context Processors
@@ -73,8 +78,18 @@ def incubating(request):
     return render(request, 'ctflex/misc/incubating.html')
 
 
-# endregion
+def handler_factory(status_code):
+    def generic_handler(request, *args, **kwargs):
+        context = RequestContext(request)
+        context['status_code'] = status_code
+        response = render_to_response('ctflex/misc/error.html', context_instance=context)
+        response.status_code = status_code
+        return response
 
+    return generic_handler
+
+
+# endregion
 
 # region Decorators
 
@@ -212,6 +227,26 @@ def index(request):
 
 
 @limited_http_methods('GET')
+def display_learn(request):
+    return render(request, 'ctflex/misc/learn.html')
+
+
+@limited_http_methods('GET')
+def about(request):
+    return render(request, 'ctflex/misc/about.html')
+
+
+@limited_http_methods('GET')
+def prizes(request):
+    return render(request, 'ctflex/misc/prizes.html')
+
+
+@limited_http_methods('GET')
+def sponsors(request):
+    return render(request, 'ctflex/misc/sponsors.html')
+
+
+@limited_http_methods('GET')
 @defaulted_window()
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
@@ -251,12 +286,6 @@ def account(request):
         'windows': queries.all_windows().reverse(),
     }
     return render(request, 'ctflex/misc/account.html', context)
-
-
-@limited_http_methods('GET')
-def display_help(request):
-    """Display the help page."""
-    return render(request, 'ctflex/misc/help.html')
 
 
 # endregion
@@ -324,7 +353,8 @@ def submit_flag(request, *, prob_id):
     except commands.EmptyFlagException:
         status = ERROR_STATUS
         message = "The flag was empty."
-    except:
+    except Exception as err:
+        logger.error("queries.submit_flag: " + str(err))
         status = ERROR_STATUS
         message = "Something went wrong; please report this to us if it persists."
     else:
@@ -356,10 +386,6 @@ def unread_announcements(request):
 @competitors_or_superusers_only()
 def game(request, *, window_codename):
     """Display problems"""
-
-    # Define countdown
-    COUNTDOWN_ENDTIME_KEY = 'countdown_endtime'
-    COUNTDOWN_MAX_MICROSECONDS_KEY = 'countdown_max_microseconds'
 
     # Process request
     superuser = request.user.is_superuser
@@ -418,9 +444,9 @@ def game(request, *, window_codename):
     return render(request, template_name, context)
 
 
-@never_cache
 @limited_http_methods('GET')
 @defaulted_window()
+@cache_page(45)
 def board(request, *, window_codename):
     """Displays rankings"""
 
@@ -475,7 +501,7 @@ def logout_done(request, *,
 @limited_http_methods('GET')
 def password_change_done(request, *,
                          message="Your password was successfully changed.",
-                         redirect_url=settings.TEAM_CHANGE_REDIRECT_URL):
+                         redirect_url='ctflex:account'):
     messages.success(request, message)
     return redirect(redirect_url)
 
@@ -483,7 +509,7 @@ def password_change_done(request, *,
 @limited_http_methods('GET')
 def password_reset_complete(request, *,
                             message="Your password was successfully set. You can log in now.",
-                            redirect_url='ctflex:index'):
+                            redirect_url='ctflex:login'):
     messages.success(request, message)
     return redirect(redirect_url)
 

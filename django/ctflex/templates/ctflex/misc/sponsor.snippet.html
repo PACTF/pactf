@@ -1,0 +1,29 @@
+{% load static from staticfiles %}
+
+<div class="sponsor">
+  <div class="row">
+    <div class="sponsor-img col-xs-12 col-sm-5 text-center vcenter text-center">
+      {% if image %}
+        {% if link %}
+          <a href="{{ link }}" target="_blank">
+        {% endif %}
+      <img src="{% static image %}" alt="{{ title }}"/>
+
+      {% if link %}
+        </a>
+      {% endif %}
+      {% endif %}
+
+      <!--@formatter:off-->
+    {% spaceless %}
+      </div><div class="col-sm-7 vcenter">
+    {% endspaceless %}
+    <!--@formatter:on-->
+
+      <h3>{{ title }}</h3>
+      <p>
+        {{ description }}
+      </p>
+      </div>
+  </div>
+</div>

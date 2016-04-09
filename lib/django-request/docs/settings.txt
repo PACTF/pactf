@@ -1,0 +1,163 @@
+.. _settings:
+
+========
+Settings
+========
+
+``REQUEST_IGNORE_AJAX``
+=======================
+
+Default: ``False``
+
+If this is set to True, then ajax requests will be ignored and not added to the database. To determine if a request was ajax, we use HttpRequest.is_ajax(), see Django documentation for more information.
+
+``REQUEST_IGNORE_IP``
+=====================
+
+Default: ``None``
+
+Any requests from a IP Address in this list will be ignored.
+
+``REQUEST_LOG_IP``
+=====================
+
+Default: ``True``
+
+If set to False, ip addresses are replaced with REQUEST_IP_DUMMY.
+
+``REQUEST_IP_DUMMY``
+=====================
+
+Default: ``1.1.1.1``
+
+Used dummy address, if REQUEST_LOG_IP is set to False.
+
+``REQUEST_ANONYMOUS_IP``
+=====================
+
+Default: ``False``
+
+If set to True, last octet of the ip is set to 1.
+
+``REQUEST_LOG_USER``
+=====================
+
+Default: ``True``
+
+If set to False, user are not logged (set to None).
+
+``REQUEST_IGNORE_USERNAME``
+===========================
+
+Default: ``None``
+
+Any requests from users in this list will be ignored.
+
+``REQUEST_IGNORE_PATHS``
+===========================
+
+Default: ``None``
+
+Any requests which match these paths will be ignored. This setting should be a tuple filled with regex paths.
+
+Example:
+
+.. code-block:: python
+
+    REQUEST_IGNORE_PATHS = (
+        r'^admin/',
+    )
+
+``REQUEST_IGNORE_USER_AGENTS``
+===========================
+
+Default: ``None``
+
+Any request with a user agent that matches any pattern in this list will be ignored.
+
+Example:
+
+.. code-block:: python
+
+    REQUEST_IGNORE_USER_AGENTS = (
+        r'^$', # ignore requests with no user agent string set
+        r'Googlebot',
+        r'Baiduspider',
+    )
+
+``REQUEST_TRAFFIC_MODULES``
+=================================
+
+Default: 
+
+.. code-block:: python
+
+	(
+    	'request.traffic.UniqueVisitor',
+    	'request.traffic.UniqueVisit',
+    	'request.traffic.Hit',
+	)
+
+These are all the items in the traffic graph and table on the overview page. If you wish to remove or add a item you can override this setting and set what you want to see. There are also many more options you can add from the following list;
+
+- ``'request.traffic.Ajax'``: To show the amount of requests made from javascript.
+- ``'request.traffic.NotAjax'``: To show the amount of requests that are NOT made from javascript.
+- ``'request.traffic.Error'``: To show the amount of error's, this includes error 500 and page not found.
+- ``'request.traffic.Error404'``: To show the amount of page not found.
+- ``'request.traffic.Hit'``: To show the total amount of requests.
+- ``'request.traffic.Search'``: To display requests from search engines.
+- ``'request.traffic.Secure'``: To show the amount of requests over SSL.
+- ``'request.traffic.Unsecure'``: To show the amount of requests NOT over SSL.
+- ``'request.traffic.UniqueVisit'``: To show visits based from outsider referrals.
+- ``'request.traffic.UniqueVisitor'``: To show the amount of requests made from unique visitors based upon IP address.
+- ``'request.traffic.User'``: To show the amount of requests made from a valid user account.
+- ``'request.traffic.UniqueUser'``: To show the amount of users.
+
+``REQUEST_PLUGINS``
+===================
+
+Default: 
+
+.. code-block:: python
+
+	(
+	    'request.plugins.TrafficInformation',
+	    'request.plugins.LatestRequests',
+	    'request.plugins.TopPaths',
+	    'request.plugins.TopErrorPaths',
+	    'request.plugins.TopReferrers',
+	    'request.plugins.TopSearchPhrases',
+	    'request.plugins.TopBrowsers',
+	)
+
+These are all the plugins you can see on the overview page. If you wish to remove or add a plugin you can override this setting and set what you want to see. Here is a list of all the plugins and what they do;
+
+- ``'request.plugins.TrafficInformation'``: This is a plugin to show a table of the traffic modules.
+- ``'request.plugins.LatestRequests'``: The last 5 requests.
+- ``'request.plugins.TopPaths'``: A list of all the paths (not including errors).
+- ``'request.plugins.TopErrorPaths'``: A list of the paths which error, this can be useful for finding bugs.
+- ``'request.plugins.TopReferrers'``: Shows a list of top referrals to your site.
+- ``'request.plugins.TopSearchPhrases'``: Shows a list of all the search phrases used to find your site.
+- ``'request.plugins.TopBrowsers'``: Shows a graph of the top browsers accessing your site.
+- ``'request.plugins.ActiveUsers'``: Show a list of active users in the last 5 minutes. This may not be a good idea to use on a large website with lots of active users as it will generate a long list.
+
+``REQUEST_BASE_URL``
+====================
+
+Default: ``'http://%s' % Site.objects.get_current().domain``
+
+This setting should only be set if you use SSL or do not use django.contrib.sites. This is the base url for detecting referral from within the same site.
+
+``REQUEST_ONLY_ERRORS``
+=====================================
+
+Default: ``False``
+
+If this is set to True, django-request will ONLY store error returning request/responses. This can be useful to use django-request purely as a error detection system.
+
+``REQUEST_VALID_METHOD_NAMES``
+==============================
+
+Default: ('get', 'post', 'put', 'delete', 'head', 'options', 'trace')
+
+Any request which is not in this tuple/list will be ignored.

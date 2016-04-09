@@ -64,11 +64,11 @@ That’s awesome! Check out the [developer documentation](docs/dev.md).
 
 ## Who are we?
 
-We are bunch of high-schoolers who participated in their first CTF in the Spring of 2015 and have since been driven to bring that same rewarding experience to everyone. We are:
+We are bunch of high-schoolers who participated in their first CTF in the Fall of 2014 and have since been driven to bring that same rewarding experience to everyone. We are:
 
 - [Yatharth Agarwal](mailto:yagarwal@andover.edu)
 - [Cameron Wong](mailto:cwong@andover.edu)
-- [Tony Tan](mailto:ztan@andover.edu)
+- [Tony Zhaocheng Tan](https://tonytan.io/about/)
 
 If you are using CTFlex and PACTF, we would love for you to get in touch for providing feedback or asking for support.
 

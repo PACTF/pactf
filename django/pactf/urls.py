@@ -6,6 +6,13 @@ from django.contrib import admin
 
 from ratelimit.decorators import ratelimit
 
+import ctflex.views
+
+handler404 = ctflex.views.handler_factory(404)  # page not found
+handler500 = ctflex.views.handler_factory(500)  # internal server error
+handler403 = ctflex.views.handler_factory(403)  # permission denied
+handler402 = ctflex.views.handler_factory(401)  # bad request
+
 admin.autodiscover()
 admin.site.login = (
     ratelimit(key='ip', rate='1/s', method='POST', block=True)(

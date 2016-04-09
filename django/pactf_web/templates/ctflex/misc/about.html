@@ -1,0 +1,143 @@
+{% extends 'ctflex/base/headered.template.html' %}
+{% load static from staticfiles %}
+
+{% block title %}
+  Team - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  The {% include 'ctflex/text/title.txt' %} Team
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static "ctflex/css/about.css" %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+
+  <p class="text-center">
+    PACTF is run by
+    <a target="_blank" href="https://patechmasters.com">Techmasters</a>,
+    an independent student organization at
+    <a target="_blank" href="https://www.andover.edu">Phillips Academy, Andover</a>.
+  </p>
+
+
+  <h2>Project Team</h2>
+
+  <div class="about-section about row text-center">
+
+    <div class="person col-xs-6 col-md-4">
+      <div class="person-img">
+        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">
+          <img src="{% static 'pactf_web/img/about/yagarwal3.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">
+          Yatharth Agarwal
+        </a>
+      </div>
+      <div class="person-pos">
+        Class of 2017
+      </div>
+    </div>
+
+    <div class="person col-xs-6 col-md-4">
+      <div class="person-img">
+        <a href="https://tonytan.io/about/" target="_blank">
+          <img src="{% static 'pactf_web/img/about/ztan.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a class="link-undercover" href="https://tonytan.io/about/" target="_blank">
+          Tony Zhaocheng Tan
+        </a>
+      </div>
+      <div class="person-pos">
+        Class of 2017
+      </div>
+    </div>
+
+
+    <div class="person col-xs-6 col-md-4">
+      <div class="person-img">
+        <img src="{% static 'pactf_web/img/about/cwong.jpg' %}">
+      </div>
+      <div class="person-name">
+        Cameron Wong
+      </div>
+      <div class="person-pos">
+        Class of 2016
+      </div>
+    </div>
+
+    <div class="person col-xs-6 col-md-4 col-md-push-2">
+      <div class="person-img">
+        <img src="{% static 'pactf_web/img/about/sorgul.jpg' %}">
+      </div>
+      <div class="person-name">
+        Sarp Orgul
+      </div>
+      <div class="person-pos">
+        Class of 2016
+      </div>
+    </div>
+
+    <div class="person col-xs-pull-3 col-xs-6 col-xs-push-0 col-md-4 col-md-push-2">
+      <div class="person-img">
+        <img src="{% static 'pactf_web/img/about/areich.jpg' %}">
+      </div>
+      <div class="person-name">
+        Alex Reichenbach
+      </div>
+      <div class="person-pos">
+        Class of 2018
+      </div>
+    </div>
+
+  </div>
+
+
+  <h2>Faculty Mentors</h2>
+
+  <div class="about-secion row text-center">
+
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <a href="http://skylit.com/maria.html" target="_blank">
+          <img src="{% static 'pactf_web/img/about/mlitvin.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a href="http://skylit.com/maria.html" target="_blank">Ms. Maria Litvin</a>
+      </div>
+      <div class="person-pos">
+        Project Mentor
+      </div>
+      <div class="person-desc">
+        Maria Litvin is the advisor for Phillips Academy's Computer Science Club and a variety of CS-related projects, including PACTF, ACSL, Technovation Challenge, and NACLO. In addition to teaching mathematics and computer science at Phillips Academy, Ms. Litvin teaches coding to elementary school students at the local Boys & Girls Club and conducts Code.org workshops for elementary school teachers. Ms. Litvin is the co-author (with Gary Litvin) of several best-selling computer science textbooks and AP prep books.
+      </div>
+    </div>
+
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <a href="http://jadrian.org/" target="_blank">
+          <img src="{% static 'pactf_web/img/about/jmiles.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a href="http://jadrian.org/" target="_blank">Dr. Jadrian Miles</a>
+      </div>
+      <div class="person-pos">
+        Technical Mentor
+      </div>
+      <div class="person-desc">
+        Dr. Jadrian Miles is passionate about his students’ brilliant creativity; about math, algorithms, numerical optimization, and empathy and intention in software design; and about the transformative democratic power of equitable education in computation.
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -14,18 +14,24 @@
 
 {% block content %}
   <p>
-    <strong>Welcome to {{ window.verbose_name }}! This round has not yet started.</strong> It will run from
-    {{ window.start|date:'F j, Y' }} to {{ window.end|date:'F j, Y' }} and start in:
+    <strong>Welcome to {{ window.verbose_name }}! This round has not yet started.</strong>
+  </p>
+  <p>
+    It will run from
+    <strong>{{ window.start|date:'g:i A e' }} on {{ window.start|date:'F j, Y' }}</strong> to
+    <strong>{{ window.end|date:'g:i A e' }} on {{ window.end|date:'F j, Y' }}</strong>, and it will start in:
   </p>
 
   {% include 'ctflex/game/countdown.snippet.html' %}
 
   <p>
-    When it starts, your team will be able to pick any {% include 'ctflex/text/timer_length.adjective.txt' %} span within the round to solve problems. Until then, you can:
+    When it starts, your team will be able to pick any {% include 'ctflex/text/timer_length.adjective.txt' %} span within the round to solve problems.</p>
+  <p>
+    Until then, you can:
   </p>
   <ul>
     <li>Look at past rounds’ problems using the dropdown above.</li>
-    <li>Find out all of the roundss’ schedules on the <a href="{% url 'ctflex:index' %}">homepage</a>.</li>
+    <li>Find out all of the rounds’ schedules also by using the dropdown above.</li>
     <li><a href="mailto:{{ contact_email }}">Let us know</a> you think of {% include 'ctflex/text/title.txt' %}!
     </li>
   </ul>

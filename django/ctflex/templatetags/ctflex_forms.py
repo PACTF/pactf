@@ -1,9 +1,9 @@
 """Define template tags and filters related to forms for CTFlex in production"""
 
+from django import template
 from django.template import Context
 from django.template.loader import get_template
 from django.forms.fields import CheckboxInput
-from django import template
 
 register = template.Library()
 
