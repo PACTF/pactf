@@ -208,29 +208,29 @@ class _Django(Configuration):
                 'class': 'logging.FileHandler',
                 'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
             },
-            # 'console': {
-            #     'level': 'INFO',
-            #     'filters': ['require_debug_true'],
-            #     'class': 'logging.StreamHandler',
-            #     'formatter': 'simple'
-            # },
-            # 'mail_admins': {
-            #     'level': 'ERROR',
-            #     'class': 'django.utils.log.AdminEmailHandler',
-            #     'filters': ['special']
-            # 'null': {
-            #     'class': 'logging.NullHandler',
-            # },
             'console': {
+                # 'level': 'INFO',
+                # 'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
+                # 'formatter': 'simple'
+            },
+            'mail_admins': {
+                'level': 'WARNING',
+                'class': 'django.utils.log.AdminEmailHandler',
+            },
+            'null': {
+                'class': 'logging.NullHandler',
             },
         },
 
-        # TODO(Yatharth): django.template warning goes to email
         'loggers': {
             'django': {
                 'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'level': 'INFO',
+                'propagate': True,
+            },
+            'django.template': {
+                'handlers': ['mail_admins', 'console'],
                 'propagate': True,
             },
             ctflex.constants.BASE_LOGGER_NAME: {
