@@ -72,7 +72,7 @@ class _Django(Configuration):
 
         # Django 3rd-party
         'ctflex.middleware.RatelimitMiddleware',
-        'request.middleware.RequestMiddleware',
+        # 'request.middleware.RequestMiddleware',
 
         # Local
         'ctflex.middleware.IncubatingMiddleware',
