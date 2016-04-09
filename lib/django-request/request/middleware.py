@@ -33,7 +33,7 @@ class RequestMiddleware(object):
         r = Request()
         print('middleware')
         print(request)
-        print(request.meta)
+        print(request.META)
         print(response)
         r.from_http_request(request, response)
 
