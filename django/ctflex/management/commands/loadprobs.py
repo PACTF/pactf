@@ -280,7 +280,9 @@ class Command(BaseCommand):
 
             # Actually load problems
             with transaction.atomic():
+                print('POINT A')
                 print(self.processed_problems)
+                print('POINT B')
                 for problem in self.processed_problems:
                     print("Saving {} to window {}".format(problem, problem.window))
                     problem.save()
