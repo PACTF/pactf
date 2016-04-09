@@ -185,9 +185,9 @@ class _Django(Configuration):
     def POST_OFFICE(self):
         return {
             'DEFAULT_PRIORITY': 'medium' if self.EMAIL_CRON else 'now',
-            'BACKENDS': {
-                'default': 'email_log.backends.EmailBackend',
-            },
+            # 'BACKENDS': {
+            #     'default': 'email_log.backends.EmailBackend',
+            # },
         }
 
     ''' Logging '''
