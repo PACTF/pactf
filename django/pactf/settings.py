@@ -339,7 +339,7 @@ class _CTFlex(_Django, Configuration):
     ''' General '''
 
     @classmethod
-    def pre_setup(cls):
+    def setup(cls):
         super().setup()
         cls.add_staticfiles_dir()
 
