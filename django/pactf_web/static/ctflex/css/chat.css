@@ -1,0 +1,9 @@
+#content {
+    max-width: 70em;
+}
+
+iframe {
+    height: 550px;
+    width: 100%;
+    border: 0;
+}

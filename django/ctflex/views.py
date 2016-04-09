@@ -247,6 +247,11 @@ def sponsors(request):
 
 
 @limited_http_methods('GET')
+def chat(request):
+    return render(request, 'ctflex/misc/chat.html')
+
+
+@limited_http_methods('GET')
 @defaulted_window()
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
