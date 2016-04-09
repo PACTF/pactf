@@ -420,3 +420,8 @@ class Prod(_Base):
     def pre_setup(cls):
         super().setup()
         cls.set_email_subject_prefix()
+
+
+class FakeProd(Prod):
+    ADMINS = values.ListValue([])
+    MANAGERS = ADMINS.value
