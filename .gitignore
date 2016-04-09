@@ -6,6 +6,7 @@
 #/django/*/migrations/
 /ctfproblems/_static
 /django/ctflex/fixtures/dump.yaml
+/logs/
 
 # Python
 *.pyc
