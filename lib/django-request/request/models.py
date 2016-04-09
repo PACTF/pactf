@@ -58,7 +58,7 @@ class Request(models.Model):
         self.is_ajax = request.is_ajax()
 
         # User infomation
-        cloudflareRemoteAddrMiddleware.process_request(request)
+        # cloudflareRemoteAddrMiddleware.process_request(request)
         self.ip = request.META.get('REMOTE_ADDR', '')
         self.referer = request.META.get('HTTP_REFERER', '')[:255]
         self.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
