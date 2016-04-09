@@ -646,7 +646,7 @@ class Solve(models.Model):
     # (Order does not matter.)
     MODEL_CLEANERS = (
         validate_teams_are_unique,
-        validate_time_inside_window,
+        # validate_time_inside_window,
         # validate_time_not_in_future,
     )
 
