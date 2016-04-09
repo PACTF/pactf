@@ -326,7 +326,7 @@ class _CTFlex(_Django, Configuration):
 
     ''' Problems and Staticfiles '''
 
-    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, '../../pactf-problemset'), environ_prefix=None)
+    CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, '../pactf-problemset'), environ_prefix=None)
     CTFLEX_PROBLEMS_STATIC_DIR = join(CTFLEX_PROBLEMS_DIR.value, '_static')
     CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
 
