@@ -10,8 +10,10 @@ from request.managers import RequestManager
 from request.utils import HTTP_STATUS_CODES, browsers, engines
 from request import settings as request_settings
 
+from ctflex.middleware import CloudflareRemoteAddrMiddleware
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+cloudflareRemoteAddrMiddleware = CloudflareRemoteAddrMiddleware()
 
 
 class Request(models.Model):
@@ -24,7 +26,8 @@ class Request(models.Model):
     time = models.DateTimeField(_('time'), auto_now_add=True)
 
     is_secure = models.BooleanField(_('is secure'), default=False)
-    is_ajax = models.BooleanField(_('is ajax'), default=False, help_text=_('Wheather this request was used via javascript.'))
+    is_ajax = models.BooleanField(_('is ajax'), default=False,
+                                  help_text=_('Wheather this request was used via javascript.'))
 
     # User infomation
     ip = models.GenericIPAddressField(_('ip address'))
@@ -55,6 +58,7 @@ class Request(models.Model):
         self.is_ajax = request.is_ajax()
 
         # User infomation
+        cloudflareRemoteAddrMiddleware.process_request(request)
         self.ip = request.META.get('REMOTE_ADDR', '')
         self.referer = request.META.get('HTTP_REFERER', '')[:255]
         self.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
@@ -105,7 +109,7 @@ class Request(models.Model):
         elif request_settings.REQUEST_ANONYMOUS_IP:
             parts = self.ip.split('.')[0:-1]
             parts.append('1')
-            self.ip='.'.join(parts)
+            self.ip = '.'.join(parts)
         if not request_settings.REQUEST_LOG_USER:
             self.user = None
 
