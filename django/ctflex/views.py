@@ -2,6 +2,7 @@
 
 import inspect
 import json
+import logging
 from functools import wraps
 
 from django.contrib import messages
@@ -28,7 +29,9 @@ from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY
+from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME
+
+logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 
 
 # region Context Processors
@@ -218,7 +221,6 @@ def defaulted_window():
 
 @limited_http_methods('GET')
 def index(request):
-    print("\t\tip: {}, {}".format(request.META.get('REMOTE_ADDR'), request.META.get('CF-Connecting-IP', '')))
     return render(request, 'ctflex/misc/index.html', {
         'windows': queries.all_windows(),
     })
