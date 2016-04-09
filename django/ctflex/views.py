@@ -353,7 +353,8 @@ def submit_flag(request, *, prob_id):
     except commands.EmptyFlagException:
         status = ERROR_STATUS
         message = "The flag was empty."
-    except:
+    except Exception as err:
+        logger.error("queries.submit_flag: " + str(err))
         status = ERROR_STATUS
         message = "Something went wrong; please report this to us if it persists."
     else:

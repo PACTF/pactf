@@ -203,11 +203,11 @@ class _Django(Configuration):
         },
 
         'handlers': {
-            # 'ctflex_file': {
-            #     'level': 'DEBUG',
-            #     'class': 'logging.FileHandler',
-            #     'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
-            # },
+            'ctflex_file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+            },
             # 'console': {
             #     'level': 'INFO',
             #     'filters': ['require_debug_true'],
@@ -235,7 +235,8 @@ class _Django(Configuration):
             },
             ctflex.constants.BASE_LOGGER_NAME: {
                 'handlers': [
-                    'console'
+                    'console',
+                    'ctflex_file'
                 ],
                 'level': 'DEBUG',
                 'propagate': False,
