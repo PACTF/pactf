@@ -193,7 +193,7 @@ class _Django(Configuration):
 
     ''' Logging '''
 
-    CTFLEX_LOG_LEVEL = values.Value('WARNING', environ_prefix=None)
+    CTFLEX_LOG_LEVEL = values.Value('INFO', environ_prefix=None)
     DJANGO_LOG_LEVEL = values.Value('INFO', environ_prefix=None)
 
     @classmethod
