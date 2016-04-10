@@ -1,12 +1,15 @@
 """Define middleware"""
+
 import logging
+from collections import OrderedDict
 from importlib import import_module
 
 from ratelimit.exceptions import Ratelimited
 
+from ctflex.middleware.utils import browsers
 from ctflex import constants
-from ctflex import views
 from ctflex import settings
+from ctflex import views
 
 logger = logging.getLogger(constants.BASE_LOGGER_NAME + '.' + __name__)
 
@@ -75,10 +78,44 @@ class CloudflareRemoteAddrMiddleware:
         HTTP_CF_CONNECTING_IP = 'HTTP_CF_CONNECTING_IP'
         EMPTY_IPS = ('', "b''")
 
-        # logger.debug("middleware.cloudflare: " + "IP is {}".format(
-        #     request.META.get(REMOTE_ADDR, '')))
+        logger.debug("cloudflare: IP is {}".format(
+            request.META.get(REMOTE_ADDR, '')))
         if request.META.get(REMOTE_ADDR, '') in EMPTY_IPS:
-            # logger.debug("middleware.cloudflare: " + "changing IP from {} to {}".format(
-            #     request.META.get(REMOTE_ADDR, ''),
-            #     request.META.get(HTTP_CF_CONNECTING_IP, '')))
+            logger.debug("cloudflare: changing IP from {} to {}".format(
+                request.META.get(REMOTE_ADDR, ''),
+                request.META.get(HTTP_CF_CONNECTING_IP, '')))
             request.META[REMOTE_ADDR] = request.META.get(HTTP_CF_CONNECTING_IP, '')
+
+
+class RequestLoggingMiddleware:
+    logger = logging.getLogger(constants.IP_LOGGER_NAME)
+
+    def process_response(self, request, response):
+
+        info = OrderedDict()
+
+        # Request info
+        info['method'] = request.method
+        info['path'] = request.path[:255]
+        info['is_secure'] = request.is_secure()
+        info['is_ajax'] = request.is_ajax()
+
+        # User info
+        info['ip'] = request.META.get('REMOTE_ADDR', '')
+        info['referer'] = request.META.get('HTTP_REFERER', '')[:255]
+        info['user_agent'] = request.META.get('HTTP_USER_AGENT', '')[:255]
+        info['language'] = request.META.get('HTTP_ACCEPT_LANGUAGE', '')[:255]
+        info['user'] = request.user if getattr(request, 'user', False) and request.user.is_authenticated() else None
+
+        # Redirect info
+        info['status_code'] = None
+        info['redirect'] = None
+        if response:
+            info['status_code'] = response.status_code
+            if response.status_code in (301, 302):
+                info['redirect'] = response['Location']
+
+        message = str(info)[13:-2]
+        self.logger.info(message)
+
+        return response

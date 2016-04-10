@@ -65,6 +65,7 @@ class _Django(Configuration):
         'django.middleware.security.SecurityMiddleware',
 
         # Local
+        'ctflex.middleware.RequestLoggingMiddleware',
         'ctflex.middleware.CloudflareRemoteAddrMiddleware',
 
         # Django Extensions
@@ -192,57 +193,84 @@ class _Django(Configuration):
 
     ''' Logging '''
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
+    CTFLEX_LOG_LEVEL = values.Value('WARNING', environ_prefix=None)
+    DJANGO_LOG_LEVEL = values.Value('INFO', environ_prefix=None)
 
-        'filters': {
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
-            },
-        },
+    @classmethod
+    def set_logging(cls):
+        cls.LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': False,
 
-        'handlers': {
-            'ctflex_file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+            'filters': {
+                'require_debug_true': {
+                    '()': 'django.utils.log.RequireDebugTrue',
+                },
             },
-            'console': {
-                # 'level': 'INFO',
-                # 'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
-                # 'formatter': 'simple'
-            },
-            'mail_admins': {
-                'level': 'WARNING',
-                'class': 'django.utils.log.AdminEmailHandler',
-            },
-            'null': {
-                'class': 'logging.NullHandler',
-            },
-        },
 
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propagate': True,
+            'formatters': {
+                'detailed': {
+                    'format': '%(levelname)-8s @ %(asctime)s in line:%(lineno)-4d of %(module)-17s : %(message)s'
+                },
+                'time': {
+                    'format': '%(asctime)s %(message)s'
+                }
             },
-            'django.template': {
-                'handlers': ['mail_admins', 'console'],
-                'propagate': True,
+
+            'handlers': {
+                # FIXME: rotating
+
+                'request_file': {
+                    'level': 'INFO',
+                    'class': 'logging.FileHandler',
+                    'filename': join(BASE_DIR, 'logs', 'request.log'),
+                    'formatter': 'time',
+                },
+                'ctflex_file': {
+                    'level': 'WARNING',
+                    'class': 'logging.FileHandler',
+                    'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
+                    'formatter': 'detailed',
+                },
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'detailed',
+                },
+                'mail_admins': {
+                    'level': 'WARNING',
+                    'class': 'django.utils.log.AdminEmailHandler',
+                },
+                'null': {
+                    'class': 'logging.NullHandler',
+                },
             },
-            ctflex.constants.BASE_LOGGER_NAME: {
-                'handlers': [
-                    'console',
-                    'ctflex_file'
-                ],
-                'level': 'DEBUG',
-                'propagate': False,
+
+            'loggers': {
+                'django': {
+                    'level': cls.DJANGO_LOG_LEVEL,
+                    'handlers': ['console'],
+                    'propagate': True,
+                },
+                'django.template': {
+                    'handlers': ['mail_admins', 'console'],
+                    'propagate': True,
+                },
+                ctflex.constants.BASE_LOGGER_NAME: {
+                    'level': cls.CTFLEX_LOG_LEVEL,
+                    'handlers': ['console', 'ctflex_file'],
+                    'propagate': False,
+                },
+                ctflex.constants.IP_LOGGER_NAME: {
+                    'level': 'INFO',
+                    'handlers': ['console', 'request_file'],
+                }
             },
-        },
-    }
+        }
+
+    @classmethod
+    def setup(cls):
+        super().setup()
+        cls.set_logging()
 
 
 class _Security:
