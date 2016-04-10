@@ -100,6 +100,9 @@ class RequestLoggingMiddleware:
         info['is_secure'] = request.is_secure()
         info['is_ajax'] = request.is_ajax()
 
+        if info['path'] == '/api/unread_announcements/':
+            return response
+
         # User info
         info['ip'] = request.META.get('REMOTE_ADDR', '')
         info['referer'] = request.META.get('HTTP_REFERER', '')[:255]
