@@ -262,7 +262,7 @@ class _Django(Configuration):
                 },
                 ctflex.constants.IP_LOGGER_NAME: {
                     'level': 'INFO',
-                    'handlers': ['console', 'request_file'],
+                    'handlers': ['request_file'],
                 }
             },
         }
