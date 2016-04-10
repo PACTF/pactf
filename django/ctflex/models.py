@@ -473,6 +473,7 @@ class CtfProblem(models.Model):
     window = models.ForeignKey(Window)
 
     points = models.IntegerField()
+    sort_last = models.BooleanField(default=False)
 
     description_raw = models.TextField(default='', blank=True)
     hint_raw = models.TextField(default='', blank=True)
@@ -528,9 +529,9 @@ class CtfProblem(models.Model):
 
             if DEPS_THRESHOLD_FIELD in self.deps:
                 score = self.deps[DEPS_THRESHOLD_FIELD]
-                if type(score) != int or score <= 0:
+                if type(score) != int or score < 0:
                     raise ValidationError(
-                        "The field {} must be a positive integer".format(DEPS_THRESHOLD_FIELD),
+                        "The field {} must be a non-negative integer".format(DEPS_THRESHOLD_FIELD),
                         code='deps',
                     )
 
@@ -545,11 +546,11 @@ class CtfProblem(models.Model):
     def sync_empty_deps_fields(self):
         if self.deps is not None:
 
-            # A threshold of one means "at least one of the problems"
+            # A threshold of 0 means "all the problems listed, regardless of point value"
             if DEPS_THRESHOLD_FIELD not in self.deps:
-                self.deps[DEPS_THRESHOLD_FIELD] = 1
+                self.deps[DEPS_THRESHOLD_FIELD] = 0
 
-            # An empty tuple is interpreted as including all problems (per the spec)
+            # An empty tuple is interpreted as including all problems
             if DEPS_PROBS_FIELD not in self.deps:
                 self.deps[DEPS_PROBS_FIELD] = ()
 

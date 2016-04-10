@@ -87,6 +87,10 @@ def _is_unlocked(team, problem):
     if not solves.exists():
         return False
 
+    # (If the threshold is zero, make sure all of the listed problems were solved.)
+    if not threshold:
+        return solves.count() == len(problems)
+
     # Optimize for depending on solving at least one problem
     if threshold == 1:
         return True
@@ -103,7 +107,7 @@ def problem_list(*, team, window):
     unlocked_problems = (problem for problem in models.CtfProblem.objects.filter(window=window)
                          if _is_unlocked(team, problem))
     return sorted(unlocked_problems,
-                  key=lambda problem: (problem.points, problem.name.lower()))
+                  key=lambda problem: (problem.sort_last, problem.points, problem.name.lower()))
 
 
 # endregion

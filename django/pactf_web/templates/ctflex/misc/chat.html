@@ -1,0 +1,22 @@
+{% extends 'ctflex/base/headered.template.html' %}
+{% load static from staticfiles %}
+
+{# TODO(Yatharth): Include in CTFlex too #}
+
+{% block title %}
+  Chat - {{ block.super }}
+{% endblock %}
+
+{% block header %}
+  Chat
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link href="{% static "ctflex/css/chat.css" %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+  <iframe src="https://kiwiirc.com/client/irc.freenode.net/?nick=pactf_user|?#pactf"></iframe>
+{% endblock %}

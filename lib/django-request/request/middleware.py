@@ -31,10 +31,6 @@ class RequestMiddleware(object):
                 return response
 
         r = Request()
-        print('middleware')
-        print(request)
-        print(request.META)
-        print(response)
         r.from_http_request(request, response)
 
         return response

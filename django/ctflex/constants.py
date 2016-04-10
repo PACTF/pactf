@@ -15,6 +15,7 @@ VERBOSE_NAME = 'CTFlex'
 ''' Logging '''
 
 BASE_LOGGER_NAME = APP_NAME
+IP_LOGGER_NAME = 'requestlog'
 
 ''' URLs '''
 
