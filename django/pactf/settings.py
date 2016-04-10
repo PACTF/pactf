@@ -353,6 +353,7 @@ class _CTFlex(_Django, Configuration):
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
 
     ''' Problems and Staticfiles '''
+
     CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
     CTFLEX_PROBLEMS_STATIC_DIR = values.Value(join(BASE_DIR, 'ctfproblems', '_static'), environ_prefix=None)
     CTFLEX_PROBLEMS_STATIC_URL = 'ctfproblems'
