@@ -233,6 +233,7 @@ class _Django(Configuration):
                     'formatter': 'detailed',
                 },
                 'console': {
+                    'level': cls.DJANGO_LOG_LEVEL,
                     'class': 'logging.StreamHandler',
                     'formatter': 'detailed',
                 },
