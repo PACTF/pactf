@@ -3,8 +3,8 @@
   fields:
     codename: crypto
     verbose_name: Confounding Crypto
-    start: '2016-04-10T14:42:21+00:00'
-    end: '2016-04-17T14:42:24+00:00'
+    start: '2016-04-01T14:42:21+00:00'
+    end: '2016-04-05T14:42:24+00:00'
     personal_timer_duration: '48:00:00'
 
 - model: ctflex.window
@@ -13,8 +13,8 @@
 
     codename: binary
     verbose_name: Bamboozling Binaries
-    start: '2016-04-18T14:42:21+00:00'
-    end: '2016-04-19T14:42:24+00:00'
+    start: '2016-04-06T14:42:21+00:00'
+    end: '2016-04-16T14:42:24+00:00'
     personal_timer_duration: '48:00:00'
 
 - model: ctflex.window
@@ -22,6 +22,6 @@
   fields:
     codename: web
     verbose_name: Wicked Web
-    start: '2016-04-20T14:43:21+00:00'
-    end: '2016-04-21T14:42:24+00:00'
+    start: '2016-04-17T14:43:21+00:00'
+    end: '2016-04-24T14:42:24+00:00'
     personal_timer_duration: '48:00:00'
