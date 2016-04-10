@@ -41,7 +41,7 @@ class _Django(Configuration):
         'post_office',
 
         # Django 3rd-party (local)
-        'request',
+        # 'request',
 
         # Python 3rd-party
         'yaml',
