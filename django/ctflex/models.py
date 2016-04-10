@@ -751,7 +751,7 @@ class Announcement(models.Model):
 
     ''' Data Fields '''
 
-    date = models.DateTimeField()
+    date = models.DateTimeField(blank=True)
 
     title = models.CharField(max_length=100)
     title_html = models.CharField(max_length=100, editable=False, blank=True)
