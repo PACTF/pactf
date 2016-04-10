@@ -358,7 +358,7 @@ class Window(models.Model):
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
-        return "<Window #{} {!r} {} – {}>".format(self.id, self.codename, print_time(self.start), print_time(self.end))
+        return "<Window #{} {!r} {} - {}>".format(self.id, self.codename, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
 
@@ -427,7 +427,7 @@ class Timer(models.Model):
     end = models.DateTimeField(blank=True)
 
     def __str__(self):
-        return "<Timer #{} window=#{} team=#{} {} – {}>".format(
+        return "<Timer #{} window=#{} team=#{} {} - {}>".format(
             self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
