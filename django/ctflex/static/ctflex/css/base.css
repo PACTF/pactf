@@ -40,11 +40,6 @@ body {
 
 /* Footer */
 
-body {
-    /* Margin bottom by footer height */
-    margin-bottom: 130px;
-}
-
 html {
     position: relative;
     min-height: 100%;
@@ -58,14 +53,28 @@ footer {
     text-align: center;
 
     /* Set the fixed height of the footer here */
-    height: 130px;
+    height: 135px;
     background-color: #f5f5f5;
 }
 
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 135px;
+}
+
+#footer-sponsors {
+    height: 90px;
+    overflow: hidden;
+}
+
+#footer-text {
+    margin-top: 0.5em;
+}
+
 footer > .container {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
+    /*position: relative;*/
+    /*top: 50%;*/
+    /*transform: translateY(-50%);*/
 }
 
 footer > .container > p {
