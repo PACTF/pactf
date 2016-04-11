@@ -206,8 +206,12 @@ def defaulted_window():
         def decorated(request, *args, window_codename=None, **kwargs):
             if window_codename is None:
                 view_name = request.resolver_match.view_name
-                kwargs['window_codename'] = queries.get_window().codename
-                return HttpResponseRedirect(reverse(view_name, args=args, kwargs=kwargs))
+                try:
+                    kwargs['window_codename'] = queries.get_window().codename
+                except models.Window.DoesNotExist:
+                    raise Http404()
+                else:
+                    return HttpResponseRedirect(reverse(view_name, args=args, kwargs=kwargs))
 
             return view(request, *args, window_codename=window_codename, **kwargs)
 
