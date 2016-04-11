@@ -46,8 +46,11 @@ def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
-def solves(*, team, window):
-    return models.Solve.objects.filter(competitor__team=team, problem__window=window)
+def solves(*, team, window=None):
+    query = models.Solve.objects.filter(competitor__team=team)
+    if window is not None:
+        query = query.filter(problem__window=window)
+    return query
 
 
 def score(*, team, window):
