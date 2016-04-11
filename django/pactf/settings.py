@@ -194,7 +194,7 @@ class _Django(Configuration):
     ''' Logging '''
 
     CTFLEX_LOG_LEVEL = values.Value('INFO', environ_prefix=None)
-    DJANGO_LOG_LEVEL = values.Value('INFO', environ_prefix=None)
+    DJANGO_LOG_LEVEL = values.Value('WARNING', environ_prefix=None)
 
     @classmethod
     def set_logging(cls):
@@ -227,13 +227,13 @@ class _Django(Configuration):
                     'formatter': 'time',
                 },
                 'ctflex_file': {
-                    'level': 'WARNING',
+                    'level': 'INFO',
                     'class': 'logging.FileHandler',
                     'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
                     'formatter': 'detailed',
                 },
                 'console': {
-                    'level': cls.DJANGO_LOG_LEVEL,
+                    'level': 'DEBUG',
                     'class': 'logging.StreamHandler',
                     'formatter': 'detailed',
                 },
@@ -253,8 +253,14 @@ class _Django(Configuration):
                     'propagate': True,
                 },
                 'django.template': {
+                    'level': 'WARNING',
                     'handlers': ['mail_admins', 'console'],
                     'propagate': True,
+                },
+                'django.request': {
+                    'level': 'ERROR',
+                    'handlers': ['mail_admins', 'console'],
+                    'propagate': False,
                 },
                 ctflex.constants.BASE_LOGGER_NAME: {
                     'level': cls.CTFLEX_LOG_LEVEL,
@@ -264,6 +270,7 @@ class _Django(Configuration):
                 ctflex.constants.IP_LOGGER_NAME: {
                     'level': 'INFO',
                     'handlers': ['request_file'],
+                    'propogate': False,
                 }
             },
         }
