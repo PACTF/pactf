@@ -99,7 +99,8 @@ class TeamAdmin(AllFieldModelAdmin):
     date_hierarchy = 'created_at'
     actions = [ban, unban]
     list_filter = (EligibileFilter, 'banned',)
-    inlines=(CompetitorInline,)
+    inlines = (CompetitorInline,)
+    search_fields = ('name', 'school')
 
     def eligible(self, team):
         return queries.eligible(team)
@@ -119,11 +120,20 @@ class TimerAdmin(AllFieldModelAdmin):
 
 class CtfProblemAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'description_raw', 'hint_raw', 'grader')
+    search_fields = ('name', 'window__codename')
+    list_filter = ('window',)
 
 
 class SolveAdmin(AllFieldModelAdmin):
     EXCLUDE = ()
     date_hierarchy = 'date'
+    search_fields = (
+        'problem__name',
+        'competitor__user__username',
+        'competitor__team__name',
+        'date',
+        'flag',
+    )
 
 
 class SubmissionAdmin(AllFieldModelAdmin):
@@ -131,6 +141,14 @@ class SubmissionAdmin(AllFieldModelAdmin):
     date_hierarchy = 'date'
     readonly_fields = ('date',)
     list_display_links = ('date',)
+    list_filter = ('correct',)
+    search_fields = (
+        'problem__name',
+        'competitor__user__username',
+        'competitor__team__name',
+        'date',
+        'flag',
+    )
 
 
 class AnnouncementAdmin(admin.ModelAdmin):
@@ -138,6 +156,11 @@ class AnnouncementAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     list_display_links = ('title',)
     filter_horizontal = ('competitors', 'problems')
+    list_filter = ('window',)
+    search_fields = (
+        'title',
+        'body',
+    )
 
 
 # endregion

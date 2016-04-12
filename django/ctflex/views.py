@@ -29,9 +29,10 @@ from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex.constants import COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME
+from ctflex.constants import (COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME, IP_LOGGER_NAME)
 
 logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
+ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
 
 
 # region Context Processors
@@ -205,8 +206,12 @@ def defaulted_window():
         def decorated(request, *args, window_codename=None, **kwargs):
             if window_codename is None:
                 view_name = request.resolver_match.view_name
-                kwargs['window_codename'] = queries.get_window().codename
-                return HttpResponseRedirect(reverse(view_name, args=args, kwargs=kwargs))
+                try:
+                    kwargs['window_codename'] = queries.get_window().codename
+                except models.Window.DoesNotExist:
+                    raise Http404()
+                else:
+                    return HttpResponseRedirect(reverse(view_name, args=args, kwargs=kwargs))
 
             return view(request, *args, window_codename=window_codename, **kwargs)
 

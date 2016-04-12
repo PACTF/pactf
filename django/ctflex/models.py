@@ -5,11 +5,12 @@ Style Guidelines:
     Django’s admin panel not show the field by default and absolutely not be
     able to edit the field.
 """
-
+import logging
 import re
 import uuid
 
 import markdown2
+from django.contrib.auth import user_logged_in
 from django.contrib.postgres import fields as psql
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core import validators
@@ -21,10 +22,11 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from ctflex import settings
-from ctflex.constants import APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD, UUID_GENERATOR
-
+from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD, UUID_GENERATOR, IP_LOGGER_NAME)
 
 # region Helpers
+
+ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
 
 
 def print_time(time):
@@ -160,7 +162,6 @@ def link_static(text, *, static_prefix, text_prefix):
 
 
 # endregion
-
 
 # region User Models
 
@@ -319,7 +320,6 @@ def competitor_post_save_sync_to_user(sender, instance, **kwargs):
 
 # endregion
 
-
 # region Window Models
 
 class WindowManager(models.Manager):
@@ -457,7 +457,6 @@ class Timer(models.Model):
 
 
 # endregion
-
 
 # region Problem Models
 
@@ -736,6 +735,19 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 #         self.id = 1
 #         super().save(*args, **kwargs)
 
+@unique_receiver(user_logged_in)
+def log_login(sender, request, user, **kwargs):
+    """Log all logins"""
+
+    message = "login by <User #{} '{}'>".format(user.id, user.username)
+
+    competitor = getattr(user, 'competitor', None)
+    if competitor:
+        team = competitor.team
+        message += " AKA {} of {}".format(competitor, team)
+
+    ip_logger.warning(message)
+
 
 @cleaned
 class Announcement(models.Model):
@@ -751,7 +763,7 @@ class Announcement(models.Model):
 
     ''' Data Fields '''
 
-    date = models.DateTimeField()
+    date = models.DateTimeField(blank=True)
 
     title = models.CharField(max_length=100)
     title_html = models.CharField(max_length=100, editable=False, blank=True)
@@ -843,7 +855,6 @@ class Announcement(models.Model):
 #         instance.user.groups.remove(competitorGroup)
 #
 # endregion
-
 
 # region User Models (by substitution) (old)
 #

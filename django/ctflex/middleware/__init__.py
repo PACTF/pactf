@@ -118,7 +118,7 @@ class RequestLoggingMiddleware:
             if response.status_code in (301, 302):
                 info['redirect'] = response['Location']
 
-        message = str(info)[13:-2]
-        self.logger.info(message)
+        # message = str(info)[13:-2]
+        # self.logger.info(message)
 
         return response

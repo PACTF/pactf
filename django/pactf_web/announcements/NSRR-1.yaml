@@ -1,7 +1,0 @@
-id: 1
-title: Errors with Not-So-Random-Randomness
-window: crypto
-body: >
-   We're aware of a bug with the grader for the problem Not-So-Random-Randomness; we're working on a fix ASAP. Sorry for the inconvenience.
-problems:
-   - 6492169c-939c-405f-9476-7d02f6cf3a03
