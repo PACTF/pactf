@@ -456,6 +456,7 @@ def game(request, *, window_codename):
 
 @limited_http_methods('GET')
 @defaulted_window()
+@cache(59)
 def board(request, *, window_codename):
     """Displays rankings"""
 
