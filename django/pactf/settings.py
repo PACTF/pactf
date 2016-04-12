@@ -342,7 +342,7 @@ class _Gunicorn:
     GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
 
     # Number of worker processes Gunicorn should spawn
-    GUNICORN_NUM_WORKERS = values.IntegerValue(environ_prefix=None)
+    GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
 
 
 class _CTFlex(_Django, Configuration):
