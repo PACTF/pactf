@@ -24,8 +24,8 @@ class Command(BaseCommand):
         commands = (
             settings.GUNICORN_PATH,
             '{}:application'.format(DJANGO_WSGI_MODULE),
-            '--name {}'.format(constants.PROJECT_NAME),
-            '--workers {}'.format(settings.GUNICORN_NUM_WORKERS),
+            '--name={}'.format(constants.PROJECT_NAME),
+            '--workers={}'.format(settings.GUNICORN_NUM_WORKERS),
             '--user={}'.format(settings.GUNICORN_USER),
             '--group={}'.format(settings.GUNICORN_GROUP),
             '--log-level=debug',
