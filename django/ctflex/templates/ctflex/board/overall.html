@@ -1,4 +1,5 @@
 {% extends 'ctflex/board/board.template.html' %}
+{% load cache %}
 
 {% block header_window_name %}
   Overall
@@ -10,7 +11,8 @@
     <strong>There are the overall all-round rankings.</strong>
     For rankings just for the current round, {{ window.verbose_name }} use the dropdown above.
   </p>
-
+  {% cache 60 scoreboard %}
   {% include 'ctflex/board/rankings.snippet.html' %}
+  {% endcache %}
 
 {% endblock %}
