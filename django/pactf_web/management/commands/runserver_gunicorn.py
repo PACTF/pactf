@@ -32,5 +32,5 @@ class Command(BaseCommand):
             '--bind={}'.format(bind),
             '--log-file=-',
         )
-        print(commands)
+        print(commands, flush=True)
         os.execvp(commands[0], commands)
