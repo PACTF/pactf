@@ -31,7 +31,7 @@ _SETTINGS = (
     ('RATELIMIT_VIEW', None, 'RATELIMIT_VIEW'),
 
     # How long to cache scoreboard for
-    ('BOARD_CACHE_DURATION', 62, None),
+    ('BOARD_CACHE_DURATION', 32, None),
 
     ### Metadata
 
