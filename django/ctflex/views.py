@@ -262,7 +262,11 @@ def chat(request):
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
 
-    window = queries.get_window(window_codename)
+    try:
+        window = queries.get_window(window_codename)
+    except models.Window.DoesNotExist:
+        raise Http404()
+
     context = windowed_context(window)
     context['announcements'] = queries.announcements(window)
 
@@ -458,7 +462,6 @@ def game(request, *, window_codename):
 
 @limited_http_methods('GET')
 @defaulted_window()
-@cache_page(59)
 def board(request, *, window_codename):
     """Displays rankings"""
 
