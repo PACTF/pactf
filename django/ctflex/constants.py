@@ -22,6 +22,10 @@ IP_LOGGER_NAME = 'requestlog'
 UUID_REGEX = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 API_NAMESPACE = 'api'
 
+''' Caching '''
+
+BOARD_CACHE_KEY_PREFIX = 'ctflex_board_'
+
 ''' Problems '''
 
 UUID_GENERATOR = uuid.uuid4

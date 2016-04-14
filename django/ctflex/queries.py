@@ -7,6 +7,7 @@ from os.path import join
 
 from django.db.models import Sum
 from django.utils import timezone
+from django.core.cache import cache
 
 from ctflex import constants
 from ctflex import hashers
@@ -67,6 +68,8 @@ def unread_announcements_count(*, window, user):
         return 0
     return user.competitor.unread_announcements.filter(window=window).count()
 
+def window_name(window):
+    return window.codename if window is not None else settings.OVERALL_WINDOW_CODENAME
 
 # endregion
 
@@ -148,9 +151,11 @@ def problem_list(*, team, window):
 #
 # eligible = _get_eligible()
 
-eligible = lambda team: (not team.banned
-                         and team.country == team.US_COUNTRY
-                         and team.background == team.SCHOOL_BACKGROUND)
+eligible = lambda team: (
+    not team.banned
+    and team.country == team.US_COUNTRY
+    and team.background == team.SCHOOL_BACKGROUND
+)
 
 
 def _solves_in_timer(*, team, window):
@@ -233,15 +238,37 @@ def _team_ranking_key(window, team_with_score):
         team.name.lower(),
     )
 
+def _board_cache_key(window):
+    logger.debug("key for {} is {}".format(window_name(window), constants.BOARD_CACHE_KEY_PREFIX + window_name(window)))
+    return constants.BOARD_CACHE_KEY_PREFIX + window_name(window)
 
-def board(window=None):
+
+def _board_uncached(window):
     """Return sorted list of eligible teams with their scores"""
-    teams_with_score = ((team, _score_in_timer(team=team, window=window))
-                        for team in models.Team.objects.filter(banned=False).iterator()
-                        # if eligible(team)
-                        )
+
+    logger.debug("computing board for {}".format(window))
+
+    teams_with_score = (
+        (team, _score_in_timer(team=team, window=window))
+        for team in models.Team.objects.filter(banned=False).iterator()
+    )
     ranked = sorted(teams_with_score, key=partial(_team_ranking_key, window))
-    return ((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
+    return tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
+
+
+def _board_latest(window):
+    board = _board_uncached(window)
+    cache.set(_board_cache_key(window), board, settings.BOARD_CACHE_DURATION)
+    return board
+
+
+def board_cached(window=None):
+    board = cache.get(_board_cache_key(window))
+    if board is None:
+        board = _board_latest(window)
+    else:
+        logger.debug("fetched from cache board for {}".format(window))
+    return board
 
 
 # endregion

@@ -5,6 +5,7 @@ Also see: mail.py
 
 import importlib.machinery
 from os.path import join
+from itertools import chain
 
 from django.core.exceptions import ValidationError
 
@@ -36,6 +37,11 @@ def start_timer(*, team, window):
 def mark_announcements_read(user):
     if queries.is_competitor(user):
         user.competitor.unread_announcements.clear()
+
+
+def update_board():
+    for window in chain(queries.all_windows(), [None]):
+        queries._board_latest(window)
 
 
 # endregion

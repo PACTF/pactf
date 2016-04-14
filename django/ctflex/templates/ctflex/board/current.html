@@ -4,8 +4,6 @@
 {% block content %}
   <p>To look at other rounds’ scoreboards or the overall scoreboard, use the dropdown above.</p>
 
-  {% cache 59 scoreboard %}
   {% include 'ctflex/board/rankings.snippet.html' %}
-  {% endcache %}
 
 {% endblock %}

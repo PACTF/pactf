@@ -30,6 +30,9 @@ _SETTINGS = (
     # View to use for ratelimiting
     ('RATELIMIT_VIEW', None, 'RATELIMIT_VIEW'),
 
+    # How long to cache scoreboard for
+    ('BOARD_CACHE_DURATION', 62, None),
+
     ### Metadata
 
     # Name used for site in emails sent out
