@@ -189,6 +189,9 @@ class _Django(Configuration):
     EMAIL_BACKEND = values.Value('post_office.EmailBackend', environ_prefix=None)
     EMAIL_CRON = values.BooleanValue(False, environ_prefix=None)
 
+    EMAIL_RATELIMIT_NUMBER = values.IntegerValue(10, environ_prefix=None)
+    EMAIL_RATELIMIT_SECONDS = values.IntegerValue(60, environ_prefix=None)
+
     @property
     def POST_OFFICE(self):
         return {
@@ -245,8 +248,8 @@ class _Django(Configuration):
                     'formatter': 'detailed',
                 },
                 'mail_admins': {
-                    'level': 'WARNING',
-                    'class': 'django.utils.log.AdminEmailHandler',
+                    'level': 'ERROR',
+                    'class': 'pactf_web.logging.ThrottledAdminEmailHandler',
                 },
                 'null': {
                     'class': 'logging.NullHandler',
@@ -271,7 +274,7 @@ class _Django(Configuration):
                 },
                 ctflex.constants.BASE_LOGGER_NAME: {
                     'level': cls.CTFLEX_LOG_LEVEL,
-                    'handlers': ['console', 'ctflex_file'],
+                    'handlers': ['console', 'ctflex_file', 'mail_admins'],
                     'propagate': False,
                 },
                 ctflex.constants.IP_LOGGER_NAME: {
@@ -413,6 +416,14 @@ class Dev(_Base):
         },
     ]
 
+    ''' Convenience '''
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+
 
 class Prod(_Base):
     """Secure and quiet settings for production"""
@@ -436,7 +447,6 @@ class Prod(_Base):
         ('Tony', 'tony@tonytan.io'),
         # ('PACTF Errors', _Django.SERVER_EMAIL.value)
     ])
-    MANAGERS = ADMINS.value
 
     IGNORABLE_404_URLS = values.ListValue([
         re.compile(r'^/apple-touch-icon.*\.png$'),
@@ -466,5 +476,18 @@ class Prod(_Base):
 
 
 class FakeProd(Prod):
-    ADMINS = values.ListValue([])
-    MANAGERS = ADMINS.value
+    """Fake Prod during development"""
+
+    ''' Logging '''
+
+    ADMINS = values.ListValue([
+        ('Yatharth', 'yatharth999+pactf@gmail.com'),
+    ])
+
+    ''' Convenience '''
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
