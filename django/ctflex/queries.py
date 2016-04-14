@@ -265,6 +265,8 @@ def board_cached(window=None):
     board = cache.get(_board_cache_key(window))
     if board is None:
         board = _board_latest(window)
+    else:
+        logger.debug("using cache for board for {}".format(window_name(window)))
     return board
 
 
