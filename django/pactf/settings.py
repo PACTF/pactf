@@ -237,7 +237,7 @@ class _Django(Configuration):
                     'formatter': 'time',
                 },
                 'ctflex_file': {
-                    'level': 'INFO',
+                    'level': cls.CTFLEX_LOG_LEVEL,
                     'class': 'logging.FileHandler',
                     'filename': join(BASE_DIR, 'logs', 'ctflex.log'),
                     'formatter': 'detailed',
