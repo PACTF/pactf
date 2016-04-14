@@ -248,7 +248,7 @@ class _Django(Configuration):
                     'formatter': 'detailed',
                 },
                 'mail_admins': {
-                    'level': 'WARNING',
+                    'level': 'ERROR',
                     'class': 'pactf_web.logging.ThrottledAdminEmailHandler',
                 },
                 'null': {
