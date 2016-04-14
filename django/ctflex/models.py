@@ -22,7 +22,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from ctflex import settings
-from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD, UUID_GENERATOR, IP_LOGGER_NAME)
+from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD,
+                              UUID_GENERATOR, IP_LOGGER_NAME, MAX_FLAG_SIZE)
 
 # region Helpers
 
@@ -605,7 +606,7 @@ class Solve(models.Model):
     competitor = models.ForeignKey(Competitor)
 
     date = models.DateTimeField()
-    flag = models.CharField(max_length=100, blank=False)
+    flag = models.CharField(max_length=MAX_FLAG_SIZE, blank=False)
 
     def __str__(self):
         return "<Solve prob={} team={} date={}>".format(self.problem, self.competitor.team, self.date)
@@ -674,7 +675,7 @@ class Submission(models.Model):
     competitor = models.ForeignKey(Competitor, on_delete=models.SET_NULL, null=True)
 
     date = models.DateTimeField(auto_now_add=True)
-    flag = models.CharField(max_length=100, blank=True)
+    flag = models.CharField(max_length=MAX_FLAG_SIZE, blank=True)
     correct = models.NullBooleanField()
 
     def __str__(self):

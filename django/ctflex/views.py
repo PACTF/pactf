@@ -29,7 +29,8 @@ from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex.constants import (COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY, BASE_LOGGER_NAME, IP_LOGGER_NAME)
+from ctflex.constants import (COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY,
+                              BASE_LOGGER_NAME, IP_LOGGER_NAME, MAX_FLAG_SIZE)
 
 logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
@@ -408,6 +409,7 @@ def game(request, *, window_codename):
     # Initialize context
     context = windowed_context(window)
     context['prob_list'] = queries.problem_list(team=team, window=window)
+    context['max_flag_size'] = MAX_FLAG_SIZE
     js_context = {}
 
     if not window.started() and not superuser:

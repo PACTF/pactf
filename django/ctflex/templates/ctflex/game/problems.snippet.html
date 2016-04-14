@@ -54,7 +54,7 @@
             <label class="sr-only" for="flag-{{ prob.id }}">Flag: </label>
             <div class="input-group">
               <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
-                     required/>
+                     maxlength="{{ max_flag_size }}" required/>
              <span class="input-group-btn">
 
                {# Setting onclick changes the behaviour for hitting enter in a text input too. #}
