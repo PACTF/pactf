@@ -479,7 +479,6 @@ def board(request, *, window_codename):
     context = windowed_context(window)
     context['board'] = queries.board_cached(window)
     context['overall_window_codename'] = settings.OVERALL_WINDOW_CODENAME
-    logger.debug('view for {} with {}'.format(window, context['board']))
 
     # Select correct template
     if window is None:

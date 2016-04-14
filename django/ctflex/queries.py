@@ -239,7 +239,6 @@ def _team_ranking_key(window, team_with_score):
     )
 
 def _board_cache_key(window):
-    logger.debug("key for {} is {}".format(window_name(window), constants.BOARD_CACHE_KEY_PREFIX + window_name(window)))
     return constants.BOARD_CACHE_KEY_PREFIX + window_name(window)
 
 
@@ -266,8 +265,6 @@ def board_cached(window=None):
     board = cache.get(_board_cache_key(window))
     if board is None:
         board = _board_latest(window)
-    else:
-        logger.debug("fetched from cache board for {}".format(window))
     return board
 
 
