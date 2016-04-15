@@ -1,4 +1,4 @@
-"""Define models
+"""Actually define models
 
 Style Guidelines:
   - You SHOULD not use auto_now_add=True on DateTimeFields because it makes
@@ -7,58 +7,28 @@ Style Guidelines:
 """
 import logging
 import re
-import uuid
 
 import markdown2
-from django.contrib.auth import user_logged_in
 from django.contrib.postgres import fields as psql
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver as _receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 from ctflex import settings
+from ctflex.signals import unique_receiver
 from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD,
-                              UUID_GENERATOR, IP_LOGGER_NAME, MAX_FLAG_SIZE)
+                              UUID_GENERATOR, MAX_FLAG_SIZE)
+
 
 # region Helpers
-
-ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
-
 
 def print_time(time):
     """Format a datetime object to be human-readable"""
     return time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
-
-
-def unique_receiver(*args, **kwargs):
-    """Decorate by wrapping `django.dispatch.receiver` to set `dispatch_uid` automatically
-
-    Purpose:
-        This decorator eliminates the need to set `dispatch_uid` for a Django
-        receiver manually. You would want to set `dispatch_uid` to prevent a
-        receiver from being run twice.
-
-    Usage:
-        Simply substitute this decorator for `django.dispatch.receiver`. If
-        you define `dispatch_uid` yourself, this decorator will use that
-        supplied value instead of the receiver function's name.
-
-    Implementation Notes:
-        - The default value for `dispatch_uid` (if you do not provide it
-          yourself) is ‘ctflex’ composed with the receiver function’s name.
-    """
-
-    def decorator(function):
-        default_dispatch_uid = '{}.{}'.format(APP_NAME, function.__name__)
-        kwargs.setdefault('dispatch_uid', default_dispatch_uid)
-        return _receiver(*args, **kwargs)(function)
-
-    return decorator
 
 
 def cleaned(cls):
@@ -205,7 +175,7 @@ class Team(models.Model):
                                   choices=BACKGROUND_CHOICES, default=SCHOOL_BACKGROUND)
 
     def __str__(self):
-        return "<Team #{} {!r}>".format(self.id, self.name)
+        return "#{} {!r}".format(self.id, self.name)
 
     ''' Properties '''
 
@@ -274,7 +244,7 @@ class Competitor(models.Model):
     #                               choices=BACKGROUND_CHOICES, default=HIGHSCHOOL)
 
     def __str__(self):
-        return "<Competitor #{} {!r} team=#{}>".format(self.id, self.user.username, self.team.id)
+        return "#{} {!r} team=#{}".format(self.id, self.user.username, self.team.id)
 
     ''' Cleaning '''
 
@@ -309,7 +279,7 @@ class Competitor(models.Model):
 
 
 @unique_receiver(post_save, sender=Competitor)
-def competitor_post_save_sync_to_user(sender, instance, **kwargs):
+def competitor_post_save_sync_to_user_handler(sender, instance, **kwargs):
     """Update User fields based on Competitor fields"""
 
     instance.user.first_name = instance.first_name
@@ -359,7 +329,7 @@ class Window(models.Model):
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
-        return "<Window #{} {!r} {} - {}>".format(self.id, self.codename, print_time(self.start), print_time(self.end))
+        return "#{} {!r} {} - {}".format(self.id, self.codename, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
 
@@ -428,7 +398,7 @@ class Timer(models.Model):
     end = models.DateTimeField(blank=True)
 
     def __str__(self):
-        return "<Timer #{} window=#{} team=#{} {} - {}>".format(
+        return "#{} window=#{} team=#{} {} - {}".format(
             self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
@@ -492,7 +462,7 @@ class CtfProblem(models.Model):
     deps = psql.JSONField(blank=True, null=True)
 
     def __str__(self):
-        return "<Problem #{} {!r}>".format(self.id, self.name)
+        return "#{} {!r}".format(self.id, self.name)
 
     ''' Helpers '''
 
@@ -609,7 +579,7 @@ class Solve(models.Model):
     flag = models.CharField(max_length=MAX_FLAG_SIZE, blank=False)
 
     def __str__(self):
-        return "<Solve prob={} team={} date={}>".format(self.problem, self.competitor.team, self.date)
+        return "prob={} team={} date={}".format(self.problem, self.competitor.team, self.date)
 
     ''' Cleaning '''
 
@@ -679,7 +649,7 @@ class Submission(models.Model):
     correct = models.NullBooleanField()
 
     def __str__(self):
-        return "<Submission @{} problem={} competitor={}>".format(self.date, self.problem, self.competitor)
+        return "@{} problem={} competitor={}".format(self.date, self.problem, self.competitor)
 
     ''' Cleaning '''
 
@@ -698,9 +668,8 @@ class Submission(models.Model):
 
 # region Miscellaneous
 
-
 @unique_receiver(pre_save)
-def pre_save_validate(sender, instance, *args, **kwargs):
+def pre_save_validate_handler(sender, instance, *args, **kwargs):
     """Full clean an object before saving it
 
     Purpose:
@@ -736,19 +705,6 @@ def pre_save_validate(sender, instance, *args, **kwargs):
 #         self.id = 1
 #         super().save(*args, **kwargs)
 
-@unique_receiver(user_logged_in)
-def log_login(sender, request, user, **kwargs):
-    """Log all logins"""
-
-    message = "login by <User #{} '{}'>".format(user.id, user.username)
-
-    competitor = getattr(user, 'competitor', None)
-    if competitor:
-        team = competitor.team
-        message += " AKA {} of {}".format(competitor, team)
-
-    ip_logger.warning(message)
-
 
 @cleaned
 class Announcement(models.Model):
@@ -772,7 +728,7 @@ class Announcement(models.Model):
     body_html = models.TextField(editable=False, default='', blank=True)
 
     def __str__(self):
-        return "<Announcement #{} window={!r} {}>".format(self.id, self.window, print_time(self.date))
+        return "#{} window={!r} {}".format(self.id, self.window, print_time(self.date))
 
     ''' Cleaning '''
 
