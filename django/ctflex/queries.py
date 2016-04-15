@@ -255,6 +255,7 @@ def _board_uncached(window):
     return tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
 
+
 def _board_latest(window):
     board = _board_uncached(window)
     cache.set(_board_cache_key(window), board, settings.BOARD_CACHE_DURATION)

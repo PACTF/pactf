@@ -52,7 +52,8 @@ def log_request(request, response):
 
 
 def log_solve(request, solve):
-    ip_logger.info("solve of {}: {}".format(solve.problem, _format_request(request)))
+    # ip_logger.info("solve of {}: {}".format(solve.problem, _format_request(request)))
+    pass
 
 
 def log_login(sender, request, user, **kwargs):
