@@ -287,7 +287,8 @@ def team_public_detail(request, *, team_id):
     context = {
         'windows': queries.all_windows().reverse(),
         'other_team': other_team,
-        'total_score': queries.score(team=other_team, window=None)
+        'total_score': queries.score(team=other_team, window=None),
+        'score_normalization': settings.SCORE_NORMALIZATION,
     }
     return render(request, 'ctflex/misc/team.html', context)
 
@@ -485,6 +486,7 @@ def board(request, *, window_codename):
     # Select correct template
     if window is None:
         context['score_normalization'] = settings.SCORE_NORMALIZATION
+        context['current_window'] = queries.get_window()
         template_name = 'ctflex/board/overall.html'
     elif not window.started():
         template_name = 'ctflex/board/waiting.html'
