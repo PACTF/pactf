@@ -25,10 +25,10 @@ from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
 from ctflex import forms
-from ctflex import mail
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
+from ctflex import loggers
 from ctflex.constants import (COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY,
                               BASE_LOGGER_NAME, IP_LOGGER_NAME, MAX_FLAG_SIZE)
 
@@ -352,7 +352,7 @@ def submit_flag(request, *, prob_id):
 
     # Grade, catching errors
     try:
-        correct, message = commands.submit_flag(
+        correct, message, solve = commands.submit_flag(
             prob_id=prob_id, competitor=competitor, flag=flag)
     except models.CtfProblem.DoesNotExist:
         raise Http404()
@@ -374,6 +374,7 @@ def submit_flag(request, *, prob_id):
         message = "Something went wrong; please report this to us if it persists."
     else:
         status = CORRECT_STATUS if correct else INCORRECT_STATUS
+        loggers.log_solve(request, solve)
 
     return JsonResponse({
         STATUS_FIELD: status,
@@ -634,7 +635,10 @@ def register(request,
             else:
 
                 # Email user
-                mail.confirm_registration(user)
+                commands.confirm_registration(user)
+
+                # Log registration
+                loggers.log_registration(request, team, team_status==TEAM_STATUS_NEW)
 
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:

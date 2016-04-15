@@ -65,7 +65,7 @@ class _Django(Configuration):
         'django.middleware.security.SecurityMiddleware',
 
         # Local
-        'ctflex.middleware.RequestLoggingMiddleware',
+        # 'ctflex.middleware.RequestLoggingMiddleware',
         'ctflex.middleware.CloudflareRemoteAddrMiddleware',
 
         # Django Extensions

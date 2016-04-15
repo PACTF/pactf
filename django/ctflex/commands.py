@@ -1,18 +1,50 @@
-"""Proxy manipulation of models by views
-
-Also see: mail.py
-"""
+"""Proxy manipulation of models and other actions by views"""
 
 import importlib.machinery
+from collections import OrderedDict
 from os.path import join
 from itertools import chain
 
 from django.core.exceptions import ValidationError
+from django.template.loader import render_to_string
+
+from post_office import mail
 
 from ctflex import settings
 from ctflex import hashers
 from ctflex import models
 from ctflex import queries
+
+
+# region Email
+
+
+def confirm_registration(user):
+    """Confirm registration with user"""
+
+    # Don’t do anything if the email host isn’t defined
+    if not settings.EMAIL_HOST:
+        return
+
+    context = {
+        'user': user,
+        'support_email': settings.SUPPORT_EMAIL,
+        'sitename': settings.SITENAME,
+    }
+
+    message = render_to_string('ctflex/email/registration.txt', context)
+    subject = render_to_string('ctflex/email/registration.subject.txt', context)
+
+    mail.send(
+        user.email,
+        settings.DEFAULT_FROM_EMAIL,
+
+        subject=subject,
+        message=message,
+    )
+
+
+# endregion
 
 
 # region Misc
@@ -87,31 +119,32 @@ def submit_flag(*, prob_id, competitor, flag):
 
     # Check if the problem has already been solved
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already solved problem ' + problem.id + '.')
         raise ProblemAlreadySolvedException()
 
     # Grade
     correct, message = _grade(problem=problem, flag=flag, team=competitor.team)
 
+    # If correct, create solve, effectively updating the score too
     if correct:
-        # This effectively updates the score too
-        models.Solve(problem=problem, competitor=competitor, flag=flag).save()
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' solved problem ' + problem.id + '.')
+        solve = models.Solve(problem=problem, competitor=competitor, flag=flag)
+        solve.save()
 
     elif not flag:
-        # logger.info("empty flag for {} and {}".format(problem, team))
         raise EmptyFlagException()
 
     # Inform the user if they had already tried the same flag
     # (This check must come after actually grading as a team might have submitted a flag
     # that later becomes correct on a problem's being updated. It must also come after the check for emptiness of flag.)
     elif models.Submission.objects.filter(problem_id=prob_id, competitor__team=competitor.team, flag=flag).exists():
-        # logger.info('submit_flag: Team ' + competitor.team.id + ' has already tried incorrect flag "' + flag + '" for problem ' + problem.id + '.')
         raise FlagAlreadyTriedException()
 
-    # For logging purposes, mainly
+    # Else, incorrect
+    else:
+        solve = None
+
+    # Log submission
     models.Submission(p_id=problem.id, competitor=competitor, flag=flag, correct=correct).save()
 
-    return correct, message
+    return correct, message, solve
 
 # endregion

@@ -1,7 +1,6 @@
 """Define middleware"""
 
 import logging
-from collections import OrderedDict
 from importlib import import_module
 
 from ratelimit.exceptions import Ratelimited
@@ -10,6 +9,8 @@ from ctflex.middleware.utils import browsers
 from ctflex import constants
 from ctflex import settings
 from ctflex import views
+from ctflex import commands
+from ctflex import loggers
 
 logger = logging.getLogger(constants.BASE_LOGGER_NAME + '.' + __name__)
 
@@ -91,34 +92,5 @@ class RequestLoggingMiddleware:
     logger = logging.getLogger(constants.IP_LOGGER_NAME)
 
     def process_response(self, request, response):
-
-        info = OrderedDict()
-
-        # Request info
-        info['method'] = request.method
-        info['path'] = request.path[:255]
-        info['is_secure'] = request.is_secure()
-        info['is_ajax'] = request.is_ajax()
-
-        if info['path'] == '/api/unread_announcements/':
-            return response
-
-        # User info
-        info['ip'] = request.META.get('REMOTE_ADDR', '')
-        info['referer'] = request.META.get('HTTP_REFERER', '')[:255]
-        info['user_agent'] = request.META.get('HTTP_USER_AGENT', '')[:255]
-        info['language'] = request.META.get('HTTP_ACCEPT_LANGUAGE', '')[:255]
-        info['user'] = request.user if getattr(request, 'user', False) and request.user.is_authenticated() else None
-
-        # Redirect info
-        info['status_code'] = None
-        info['redirect'] = None
-        if response:
-            info['status_code'] = response.status_code
-            if response.status_code in (301, 302):
-                info['redirect'] = response['Location']
-
-        # message = str(info)[13:-2]
-        # self.logger.info(message)
-
+        loggers.log_request(request, response)
         return response
