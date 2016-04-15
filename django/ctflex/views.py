@@ -374,7 +374,8 @@ def submit_flag(request, *, prob_id):
         message = "Something went wrong; please report this to us if it persists."
     else:
         status = CORRECT_STATUS if correct else INCORRECT_STATUS
-        loggers.log_solve(request, solve)
+        if correct:
+            loggers.log_solve(request, solve)
 
     return JsonResponse({
         STATUS_FIELD: status,
@@ -638,7 +639,7 @@ def register(request,
                 commands.confirm_registration(user)
 
                 # Log registration
-                loggers.log_registration(request, team, team_status==TEAM_STATUS_NEW)
+                loggers.log_registration(request, team, team_status == TEAM_STATUS_NEW)
 
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:
