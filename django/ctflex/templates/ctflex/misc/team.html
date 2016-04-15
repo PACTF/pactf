@@ -17,14 +17,22 @@
       For information about your personal account (or to add competitors to your team), go to your <a
         href="{% url 'ctflex:account' %}">Account</a> page.
     </p>
-    <br/>
   {% endif %}
 
-  {% if other_team.banned %}
+  {% if other_team.banned and team != other_team %}
     <p>
       This team’s information cannot be displayed.
     </p>
   {% else %}
+
+    {% if other_team.banned %} {# and team == other_team #}
+      <p>
+        Your team has been banned from appearing on the scoreboard and is ineligible for prizes.
+        Please contact <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> if you have questions.
+      </p>
+    {% endif %}
+
+    <br/>
 
     <div class="panel-group">
       <div class="panel panel-primary">
