@@ -125,15 +125,21 @@ class CtfProblemAdmin(AllFieldModelAdmin):
 
 
 class SolveAdmin(AllFieldModelAdmin):
+    INCLUDE = ('window',)
     EXCLUDE = ()
+    list_filter = ('problem__window',)
     date_hierarchy = 'date'
     search_fields = (
         'problem__name',
+        'problem__window__codename',
         'competitor__user__username',
         'competitor__team__name',
         'date',
         'flag',
     )
+
+    def window(self, solve):
+        return solve.problem.window
 
 
 class SubmissionAdmin(AllFieldModelAdmin):
