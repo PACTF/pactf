@@ -1,14 +1,8 @@
-"""Define Django signal-related functionality"""
+"""Define helpers for Django signals"""
 
-import logging
-
-from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver as _receiver
 
-from ctflex.constants import IP_LOGGER_NAME, APP_NAME
-from ctflex import loggers
-
-ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
+from ctflex.constants import APP_NAME
 
 
 def _default_dispatch_uid(receiver):
@@ -41,12 +35,7 @@ def unique_receiver(*args, **kwargs):
     return decorator
 
 
-def _unique_connect(signal, receiver, *args, **kwargs):
+def unique_connect(signal, receiver, *args, **kwargs):
     default_dispatch_uid = _default_dispatch_uid(receiver)
     kwargs.setdefault('dispatch_uid', default_dispatch_uid)
     signal.connect(receiver, *args, **kwargs)
-
-
-def connect_signals():
-    """Connect non-model signals (called in apps.py)"""
-

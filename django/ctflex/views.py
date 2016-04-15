@@ -17,7 +17,7 @@ from django.http.response import HttpResponseNotAllowed
 from django.shortcuts import render, redirect, render_to_response
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache, cache_page
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from ratelimit.decorators import ratelimit
@@ -25,10 +25,10 @@ from ratelimit.utils import is_ratelimited
 
 from ctflex import commands
 from ctflex import forms
+from ctflex import loggers
 from ctflex import models
 from ctflex import queries
 from ctflex import settings
-from ctflex import loggers
 from ctflex.constants import (COUNTDOWN_ENDTIME_KEY, COUNTDOWN_MAX_MICROSECONDS_KEY,
                               BASE_LOGGER_NAME, IP_LOGGER_NAME, MAX_FLAG_SIZE)
 

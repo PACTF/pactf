@@ -9,7 +9,6 @@ from ctflex.middleware.utils import browsers
 from ctflex import constants
 from ctflex import settings
 from ctflex import views
-from ctflex import commands
 from ctflex import loggers
 
 logger = logging.getLogger(constants.BASE_LOGGER_NAME + '.' + __name__)
@@ -89,8 +88,9 @@ class CloudflareRemoteAddrMiddleware:
 
 
 class RequestLoggingMiddleware:
-    logger = logging.getLogger(constants.IP_LOGGER_NAME)
-
     def process_response(self, request, response):
-        loggers.log_request(request, response)
+        try:
+            loggers.log_request(request, response)
+        except:
+            logger.error("could not log request", exc_info=True)
         return response

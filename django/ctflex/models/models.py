@@ -21,12 +21,10 @@ from django.utils.functional import cached_property
 from ctflex import settings
 from ctflex.signals import unique_receiver
 from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD,
-                              UUID_GENERATOR, IP_LOGGER_NAME, MAX_FLAG_SIZE)
+                              UUID_GENERATOR, MAX_FLAG_SIZE)
+
 
 # region Helpers
-
-ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
-
 
 def print_time(time):
     """Format a datetime object to be human-readable"""

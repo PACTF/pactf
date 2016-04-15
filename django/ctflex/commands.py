@@ -1,23 +1,20 @@
 """Proxy manipulation of models and other actions by views"""
 
 import importlib.machinery
-from collections import OrderedDict
-from os.path import join
 from itertools import chain
+from os.path import join
 
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-
 from post_office import mail
 
-from ctflex import settings
 from ctflex import hashers
 from ctflex import models
 from ctflex import queries
+from ctflex import settings
 
 
 # region Email
-
 
 def confirm_registration(user):
     """Confirm registration with user"""
