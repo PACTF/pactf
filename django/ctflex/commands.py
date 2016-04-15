@@ -68,9 +68,9 @@ def mark_announcements_read(user):
         user.competitor.unread_announcements.clear()
 
 
-def update_board():
+def refresh_boards():
     for window in chain(queries.all_windows(), [None]):
-        queries._board_latest(window)
+        queries._board_uncached(window)
 
 
 # endregion

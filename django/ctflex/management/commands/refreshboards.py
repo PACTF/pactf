@@ -7,4 +7,4 @@ class Command(BaseCommand):
     help = "Refresh all scoreboards"
 
     def handle(self, *args, **options):
-        commands.update_board()
+        commands.refresh_boards()

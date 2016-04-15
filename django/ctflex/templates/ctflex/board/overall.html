@@ -9,9 +9,17 @@
 {% block content %}
   <p>
     <strong>There are the overall all-round rankings.</strong>
-    For rankings just for the current round, {{ window.verbose_name }} use the dropdown above.
+    For rankings just for the current round, {{ current_window.verbose_name }}, use the dropdown above.
+  </p>
+  <p>
+    <strong>Overall scores are weighted sums of the individual rounds.</strong>
+    They will not be equal to the sum of scores in the individual rounds.<sup>*</sup>
   </p>
 
   {% include 'ctflex/board/rankings.snippet.html' %}
+
+  <p>
+    <sup>*</sup> {% include 'ctflex/board/overall_explanation.snippet.html' %}
+  </p>
 
 {% endblock %}

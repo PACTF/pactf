@@ -84,7 +84,7 @@
         <ul class="list-group">
           <li class="list-group-item list-group-item-info">
             <span class="bold">
-              Overall
+              Overall <sup>*</sup>
             </span>
             <span class="pull-right">
               {{ total_score }}
@@ -104,6 +104,10 @@
         </ul>
       </div>
     </div>
+
+    <p>
+      <sup>*</sup> {% include 'ctflex/board/overall_explanation.snippet.html' %}
+    </p>
 
   {% endif %}
 

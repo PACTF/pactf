@@ -3,7 +3,6 @@
 This file uses django-configurations.
 """
 
-import os
 import re
 import socket
 from os.path import join
@@ -369,6 +368,7 @@ class _CTFlex(_Django, Configuration):
     # CTFLEX_ELIGIBILITY_FUNCTION = 'pactf_web.ctflex_helpers.eligible'
 
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
+    CTFLEX_BOARD_CACHE_DURATION = values.IntegerValue(100, environ_prefix=None)
 
     ''' Problems and Staticfiles '''
 
