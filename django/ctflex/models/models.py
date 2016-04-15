@@ -5,7 +5,6 @@ Style Guidelines:
     Django’s admin panel not show the field by default and absolutely not be
     able to edit the field.
 """
-import logging
 import re
 
 import markdown2
@@ -19,16 +18,16 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from ctflex import settings
-from ctflex.signals import unique_receiver
 from ctflex.constants import (APP_NAME, DEPS_PROBS_FIELD, DEPS_THRESHOLD_FIELD,
                               UUID_GENERATOR, MAX_FLAG_SIZE)
+from ctflex.signals import unique_receiver
 
 
 # region Helpers
 
 def print_time(time):
     """Format a datetime object to be human-readable"""
-    return time.astimezone(tz=None).strftime('%m-%d@%H:%M:%S')
+    return time.astimezone(tz=None).strftime('%m/%d')
 
 
 def cleaned(cls):
@@ -329,7 +328,7 @@ class Window(models.Model):
     personal_timer_duration = models.DurationField()
 
     def __str__(self):
-        return "#{} {!r} {} - {}".format(self.id, self.codename, print_time(self.start), print_time(self.end))
+        return "#{} {!r} @{}-{}".format(self.id, self.codename, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
 
@@ -398,7 +397,7 @@ class Timer(models.Model):
     end = models.DateTimeField(blank=True)
 
     def __str__(self):
-        return "#{} window=#{} team=#{} {} - {}".format(
+        return "#{} window=#{} team=#{} @{}-{}".format(
             self.id, self.window_id, self.team_id, print_time(self.start), print_time(self.end))
 
     ''' Properties '''
@@ -728,7 +727,7 @@ class Announcement(models.Model):
     body_html = models.TextField(editable=False, default='', blank=True)
 
     def __str__(self):
-        return "#{} window={!r} {}".format(self.id, self.window, print_time(self.date))
+        return "#{} {!r} @{}".format(self.id, self.title, print_time(self.date))
 
     ''' Cleaning '''
 

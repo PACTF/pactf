@@ -5,9 +5,9 @@ from copy import copy
 from functools import partial
 from os.path import join
 
+from django.core.cache import cache
 from django.db.models import Sum
 from django.utils import timezone
-from django.core.cache import cache
 
 from ctflex import constants
 from ctflex import hashers
@@ -68,8 +68,10 @@ def unread_announcements_count(*, window, user):
         return 0
     return user.competitor.unread_announcements.filter(window=window).count()
 
+
 def window_name(window):
     return window.codename if window is not None else settings.OVERALL_WINDOW_CODENAME
+
 
 # endregion
 
@@ -119,8 +121,7 @@ def problem_list(*, team, window):
 # endregion
 
 
-# region Board
-
+# region Eligibility
 
 # def _eligible_default(team):
 #     """Determine whether a team is eligible
@@ -158,24 +159,18 @@ eligible = lambda team: (
 )
 
 
+# endregion
+
+
+# region Board
+
+
 def _solves_in_timer(*, team, window):
     """Return 1+ solves within the team’s timer
 
     Implementation Notes:
       - If there was no timer, None will be returned.
-      - If `window` is None, all solves within the timer of any window of the
-        team’s will be returned.
     """
-
-    if window is None:
-        solves = None
-        for window in all_windows():
-            window_solves = _solves_in_timer(team=team, window=window)
-            if solves is None:
-                solves = window_solves
-            if window_solves is not None:
-                solves |= window_solves
-        return solves
 
     if not team.has_timer(window):
         return None
@@ -199,6 +194,13 @@ def _score_in_timer(*, team, window):
     if solves is None:
         return 0
     return solves.aggregate(score=Sum('problem__points'))['score'] or 0
+
+
+def _max_score(window):
+    problems = window.ctfproblem_set
+    if not problems.exists():
+        return 0
+    return problems.aggregate(score=Sum('points'))['score'] or 0
 
 
 def _last_solve_in_timer_time(*, team, window):
@@ -238,8 +240,35 @@ def _team_ranking_key(window, team_with_score):
         team.name.lower(),
     )
 
+
 def _board_cache_key(window):
     return constants.BOARD_CACHE_KEY_PREFIX + window_name(window)
+
+
+def _teams_with_score_window(window):
+    return (
+        (team, _score_in_timer(team=team, window=window))
+        for team in models.Team.objects.filter(banned=False).iterator()
+    )
+
+
+def _teams_with_score_overall():
+    """Return teams with overall scores
+
+    Overall scores are the sum of the normalized scores for each round.
+    The normalized score for a round is 1000*(regular score)/(max possible score).
+    """
+    windows_with_points = [(window, _max_score(window)) for window in all_windows()]
+    return (
+        (
+            team,
+            int(settings.SCORE_NORMALIZATION * sum(
+                _score_in_timer(team=team, window=window) / max_points
+                for window, max_points in windows_with_points
+            ))
+        )
+        for team in models.Team.objects.filter(banned=False).iterator()
+    )
 
 
 def _board_uncached(window):
@@ -247,17 +276,10 @@ def _board_uncached(window):
 
     logger.debug("computing board for {}".format(window))
 
-    teams_with_score = (
-        (team, _score_in_timer(team=team, window=window))
-        for team in models.Team.objects.filter(banned=False).iterator()
-    )
+    teams_with_score = _teams_with_score_window(window) if window is not None else _teams_with_score_overall()
     ranked = sorted(teams_with_score, key=partial(_team_ranking_key, window))
-    return tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
+    board = tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
-
-
-def _board_latest(window):
-    board = _board_uncached(window)
     cache.set(_board_cache_key(window), board, settings.BOARD_CACHE_DURATION)
     return board
 
@@ -265,7 +287,7 @@ def _board_latest(window):
 def board_cached(window=None):
     board = cache.get(_board_cache_key(window))
     if board is None:
-        board = _board_latest(window)
+        board = _board_uncached(window)
     else:
         logger.debug("using cache for board for {}".format(window_name(window)))
     return board

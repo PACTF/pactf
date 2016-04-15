@@ -33,6 +33,9 @@ _SETTINGS = (
     # How long to cache scoreboard for
     ('BOARD_CACHE_DURATION', 100, None),
 
+    # Out of how many points to normalize each round’s score
+    ('SCORE_NORMALIZATION', 1000, None),
+
     ### Metadata
 
     # Name used for site in emails sent out
