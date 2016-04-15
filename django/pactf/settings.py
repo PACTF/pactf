@@ -249,7 +249,7 @@ class _Django(Configuration):
                 },
                 'mail_admins': {
                     'level': 'ERROR',
-                    'class': 'pactf_web.logging.ThrottledAdminEmailHandler',
+                    'class': 'pactf_web.loggers.ThrottledAdminEmailHandler',
                 },
                 'null': {
                     'class': 'logging.NullHandler',
