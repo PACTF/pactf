@@ -251,7 +251,7 @@ def _windows_with_points():
 
 def _normalize(*, team, score_function, windows_with_points):
     return int(settings.SCORE_NORMALIZATION * sum(
-        score_function(team=team, window=window) / max_points
+        score_function(team=team, window=window) / (max_points or 1)
         for window, max_points in windows_with_points
     ))
 
