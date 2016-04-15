@@ -89,8 +89,5 @@ class CloudflareRemoteAddrMiddleware:
 
 class RequestLoggingMiddleware:
     def process_response(self, request, response):
-        try:
-            loggers.log_request(request, response)
-        except:
-            logger.error("could not log request", exc_info=True)
+        loggers.log_request(request, response)
         return response

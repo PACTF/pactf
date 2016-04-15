@@ -2,6 +2,7 @@
 
 import logging
 from collections import OrderedDict
+from functools import wraps
 
 from ctflex.constants import IP_LOGGER_NAME, BASE_LOGGER_NAME
 from ctflex import queries
@@ -9,6 +10,8 @@ from ctflex import queries
 logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 ip_logger = logging.getLogger(IP_LOGGER_NAME + '.' + __name__)
 
+
+# region Helpers
 
 def _format_request(request, response=None):
     info = OrderedDict()
@@ -45,33 +48,56 @@ def _format_request(request, response=None):
     return message
 
 
+def _catch_errors(function):
+    """Decorate loggers to never raise an exception"""
+
+    @wraps(function)
+    def decorated(*args, **kwargs):
+        try:
+            value = function(*args, **kwargs)
+        except:
+            logger.error("could not log", exc_info=True)
+        else:
+            return value
+
+    return decorated
+
+
+# endregion
+
+
+# region Loggers
+
+@_catch_errors
 def log_request(request, response):
     message = _format_request(request, response)
     if message:
         ip_logger.info("request: {}".format(message))
 
 
+@_catch_errors
 def log_solve(request, solve):
     ip_logger.info("solve of {!r}: {}".format(solve.problem, _format_request(request)))
 
 
+@_catch_errors
 def log_login(sender, request, user, **kwargs):
     ip_logger.info("login: {}".format(_format_request(request)))
 
 
+@_catch_errors
 def log_logout(sender, request, user, **kwargs):
     ip_logger.info("logout: {}".format(_format_request(request)))
 
 
+@_catch_errors
 def log_registration(request, team, new):
-    try:
-        eligible = "eligible" if queries.eligible(team) else "ineligible"
-    except:
-        logger.error("couldn't determine team eligibility while logging registration", exc_info=True)
-        eligible = "<eligibility unavailable>"
+    eligible = "eligible" if queries.eligible(team) else "ineligible"
     message = _format_request(request)
 
     if new:
         ip_logger.info("register new {} team: {}".format(eligible, message))
     else:
         ip_logger.info("join old {} team: {}".format(eligible, message))
+
+# endregion
