@@ -264,8 +264,9 @@ class Competitor(models.Model):
         except Team.DoesNotExist:
             pass
         else:
-            if not team.has_space():
-                raise ValidationError("The team is already full.")
+            if not self.pk or not team.competitor_set.filter(pk=self.pk).exists():
+                if not team.has_space():
+                    raise ValidationError("The team is already full.")
 
     FIELD_CLEANERS = {
         # 'state': [validate_state_is_given_for_us],
