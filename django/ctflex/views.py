@@ -484,6 +484,7 @@ def board(request, *, window_codename):
 
     # Select correct template
     if window is None:
+        context['score_normalization'] = settings.SCORE_NORMALIZATION
         template_name = 'ctflex/board/overall.html'
     elif not window.started():
         template_name = 'ctflex/board/waiting.html'

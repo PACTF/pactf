@@ -47,16 +47,8 @@ def solved(problem, team):
     return models.Solve.objects.filter(problem=problem, competitor__team=team).exists()
 
 
-def solves(*, team, window=None):
-    query = models.Solve.objects.filter(competitor__team=team)
-    if window is not None:
-        query = query.filter(problem__window=window)
-    return query
-
-
-def score(*, team, window):
-    return (solves(team=team, window=window)
-            .aggregate(score=Sum('problem__points'))['score'] or 0)
+def solves(*, team, window):
+    return models.Solve.objects.filter(competitor__team=team, problem__window=window)
 
 
 def announcements(window):
@@ -74,6 +66,7 @@ def window_name(window):
 
 
 # endregion
+
 
 # region Problems List
 
@@ -162,7 +155,7 @@ eligible = lambda team: (
 # endregion
 
 
-# region Board
+# region Scores
 
 
 def _solves_in_timer(*, team, window):
@@ -252,20 +245,28 @@ def _teams_with_score_window(window):
     )
 
 
+def _windows_with_points():
+    return tuple((window, _max_score(window)) for window in all_windows())
+
+
+def _normalize(*, team, score_function, windows_with_points):
+    return int(settings.SCORE_NORMALIZATION * sum(
+        score_function(team=team, window=window) / max_points
+        for window, max_points in windows_with_points
+    ))
+
+
 def _teams_with_score_overall():
     """Return teams with overall scores
 
     Overall scores are the sum of the normalized scores for each round.
     The normalized score for a round is 1000*(regular score)/(max possible score).
     """
-    windows_with_points = [(window, _max_score(window)) for window in all_windows()]
+    windows_with_points = _windows_with_points()
     return (
         (
             team,
-            int(settings.SCORE_NORMALIZATION * sum(
-                _score_in_timer(team=team, window=window) / max_points
-                for window, max_points in windows_with_points
-            ))
+            _normalize(team=team, score_function=_score_in_timer, windows_with_points=windows_with_points),
         )
         for team in models.Team.objects.filter(banned=False).iterator()
     )
@@ -291,6 +292,22 @@ def board_cached(window=None):
     else:
         logger.debug("using cache for board for {}".format(window_name(window)))
     return board
+
+
+def _score_window(*, team, window):
+    return (solves(team=team, window=window)
+            .aggregate(score=Sum('problem__points'))['score'] or 0)
+
+
+def score(*, team, window=None):
+    if window is not None:
+        return _score_window(team=team, window=window)
+    else:
+        return _normalize(
+            team=team,
+            score_function=_score_window,
+            windows_with_points=_windows_with_points()
+        )
 
 
 # endregion

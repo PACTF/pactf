@@ -8,12 +8,17 @@
 
 {% block content %}
   <p>
-    <strong>There are the overall all-round rankings.</strong> Scores are computed as a weighted average of the individual rounds.
+    <strong>There are the overall all-round rankings.</strong> For rankings just for the current round, {{ window.verbose_name }}, use the dropdown above.
   </p>
   <p>
-    For rankings just for the current round, {{ window.verbose_name }}, use the dropdown above.
+    <strong>Overall scores are weighted sums of the individual rounds.<sup>*</sup></strong>
+    They will not be equal to the sum of scores in the individual rounds.
   </p>
 
   {% include 'ctflex/board/rankings.snippet.html' %}
+
+  <p>
+    <sup>*</sup> The formula used is the sum of {{ score_normalization }} * (your score) / (maximum possible score) for each round.
+  </p>
 
 {% endblock %}
