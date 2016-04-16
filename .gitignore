@@ -7,6 +7,7 @@
 /ctfproblems/_static
 /django/ctflex/fixtures/dump.yaml
 /logs/
+/scripts/*.out
 
 # Python
 *.pyc
