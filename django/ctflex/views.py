@@ -322,6 +322,8 @@ def start_timer(request):
     if not success:
         messages.error(request, "Your timer could not be started.")
 
+    loggers.log_timer(request, success)
+
     return redirect(reverse('ctflex:game'))
 
 

@@ -81,6 +81,13 @@ def log_solve(request, solve):
 
 
 @_catch_errors
+def log_timer(request, success):
+    success_message = "started" if success else "failed"
+    message = _format_request(request)
+    ip_logger.info("timer {}: {}".format(success_message, message))
+
+
+@_catch_errors
 def log_login(sender, request, user, **kwargs):
     ip_logger.info("login: {}".format(_format_request(request)))
 
