@@ -271,7 +271,7 @@ class Command(BaseCommand):
         write("Collecting static files to final location")
         management.call_command('collectstatic', *helpers.filter_dict({
             '--no-input': not options['interactive'],
-            '--clear': options['clear'],
+            # '--clear': options['clear'],
         }))
 
 
