@@ -23,7 +23,7 @@
   fields:
     password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
     last_login: null
-    is_superuser: false
+    is_superuser: true
     username: "user11"
     is_staff: true
     is_active: true

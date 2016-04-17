@@ -491,3 +491,5 @@ class FakeProd(Prod):
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
+
+    TEMPLATE_STRING_IF_INVALID = 'DEBUG WARNING: undefined template variable [%s] not found'
