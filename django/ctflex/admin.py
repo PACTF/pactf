@@ -115,6 +115,7 @@ class WindowAdmin(AllFieldModelAdmin):
 class TimerAdmin(AllFieldModelAdmin):
     EXCLUDE = ()
     readonly_fields = ('end',)
+    search_fields = ('team__name', 'team__id', 'window__codename')
     date_hierarchy = 'start'
 
 
