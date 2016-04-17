@@ -118,6 +118,10 @@ def submit_flag(*, prob_id, competitor, flag):
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
         raise ProblemAlreadySolvedException()
 
+    # Confirm non-empty
+    if not flag:
+        raise EmptyFlagException()
+
     # Grade
     correct, message = _grade(problem=problem, flag=flag, team=competitor.team)
 
@@ -125,9 +129,6 @@ def submit_flag(*, prob_id, competitor, flag):
     if correct:
         solve = models.Solve(problem=problem, competitor=competitor, flag=flag)
         solve.save()
-
-    elif not flag:
-        raise EmptyFlagException()
 
     # Inform the user if they had already tried the same flag
     # (This check must come after actually grading as a team might have submitted a flag
