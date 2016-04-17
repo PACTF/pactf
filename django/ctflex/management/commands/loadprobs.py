@@ -78,7 +78,7 @@ class Command(BaseCommand):
         try:
             with open(problem_filename) as problem_file:
                 data = yaml.load(problem_file)
-        except (IsADirectoryError, FileNotFoundError) as err:
+        except (IsADirectoryError, FileNotFoundError):
             self.stderr.write("Skipping '{}': No problems file found".format(prob_identifier))
             # self.handle_error(err)
             return
