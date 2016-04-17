@@ -641,9 +641,6 @@ def register(request,
                 # Email user
                 commands.confirm_registration(user)
 
-                # Log registration
-                loggers.log_registration(request, team, team_status == TEAM_STATUS_NEW)
-
                 # Only log the user in if not incubating
                 if not settings.INCUBATING:
                     auth_user = authenticate(
@@ -651,6 +648,9 @@ def register(request,
                         password=user_form.cleaned_data['password1'],
                     )
                     auth_login(request, auth_user)
+
+                # Log registration
+                loggers.log_registration(request, team, team_status == TEAM_STATUS_NEW)
 
                 return HttpResponseRedirect(reverse(post_change_redirect))
 
