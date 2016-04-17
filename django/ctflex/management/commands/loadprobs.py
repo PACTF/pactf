@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 data = yaml.load(problem_file)
         except (IsADirectoryError, FileNotFoundError) as err:
             self.stderr.write("Skipping '{}': No problems file found".format(prob_identifier))
-            self.handle_error(err)
+            # self.handle_error(err)
             return
         except yaml.parser.ParserError as err:
             self.stderr.write("Skipping '{}': Parser error".format(prob_identifier))
