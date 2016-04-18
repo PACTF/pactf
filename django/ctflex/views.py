@@ -371,8 +371,8 @@ def submit_flag(request, *, prob_id):
     except commands.EmptyFlagException:
         status = ERROR_STATUS
         message = "The flag was empty."
-    except Exception as err:
-        logger.error("queries.submit_flag: " + str(err), exc_info=True)
+    except:
+        logger.warning("could not grade flag for {}".format(prob_id), exc_info=True)
         status = ERROR_STATUS
         message = "Something went wrong; please report this to us if it persists."
     else:
