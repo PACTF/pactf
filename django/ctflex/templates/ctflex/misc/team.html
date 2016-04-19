@@ -87,12 +87,12 @@
     <div class="panel-group">
       <div class="panel panel-primary">
         <div class="panel-heading">
-          Scores
+          Scores<sup>†</sup>
         </div>
         <ul class="list-group">
           <li class="list-group-item list-group-item-info">
             <span class="bold">
-              Overall <sup>*</sup>
+              Overall <sup>‡</sup>
             </span>
             <span class="pull-right">
               {{ total_score }}
@@ -114,7 +114,10 @@
     </div>
 
     <p>
-      <sup>*</sup> {% include 'ctflex/board/overall_explanation.snippet.html' %}
+      <sup>†</sup> Scores on this page are updated even after rounds have officially ended. Prizes will be awarded based on the scores displayed on the relevant scoreboard.
+    </p>
+    <p>
+      <sup>‡</sup> {% include 'ctflex/board/overall_explanation.snippet.html' %}
     </p>
 
   {% endif %}
