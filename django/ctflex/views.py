@@ -375,7 +375,7 @@ def submit_flag(request, *, prob_id):
         status = ERROR_STATUS
         message = "The flag was too long."
     except:
-        logger.error("could not grade flag for {}".format(prob_id), exc_info=True)
+        logger.error("could not grade {!r}'s flag for {!r}".format(competitor, prob_id), exc_info=True)
         status = ERROR_STATUS
         message = "Something went wrong; please report this to us if it persists."
     else:
