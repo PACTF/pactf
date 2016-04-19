@@ -15,6 +15,8 @@ from ctflex import settings
 
 
 # region Email
+from ctflex.constants import MAX_FLAG_SIZE
+
 
 def confirm_registration(user):
     """Confirm registration with user"""
@@ -89,19 +91,23 @@ def _grade(*, problem, flag, team):
     return correct, message
 
 
-class FlagSubmissionNotAllowedException(Exception):
+class FlagSubmissionNotAllowedException(ValueError):
     pass
 
 
-class ProblemAlreadySolvedException(Exception):
+class ProblemAlreadySolvedException(ValueError):
     pass
 
 
-class FlagAlreadyTriedException(Exception):
+class FlagAlreadyTriedException(ValueError):
     pass
 
 
-class EmptyFlagException(Exception):
+class EmptyFlagException(ValueError):
+    pass
+
+
+class FlagTooLongException(ValueError):
     pass
 
 
@@ -118,9 +124,11 @@ def submit_flag(*, prob_id, competitor, flag):
     if models.Solve.objects.filter(problem=problem, competitor__team=competitor.team).exists():
         raise ProblemAlreadySolvedException()
 
-    # Confirm non-empty
+    # Validate some basic things
     if not flag:
         raise EmptyFlagException()
+    elif len(flag) > MAX_FLAG_SIZE:
+        raise FlagTooLongException()
 
     # Grade
     correct, message = _grade(problem=problem, flag=flag, team=competitor.team)

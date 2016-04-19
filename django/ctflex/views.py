@@ -371,6 +371,9 @@ def submit_flag(request, *, prob_id):
     except commands.EmptyFlagException:
         status = ERROR_STATUS
         message = "The flag was empty."
+    except commands.FlagTooLongException:
+        status = ERROR_STATUS
+        message = "The flag was too long."
     except:
         logger.error("could not grade flag for {}".format(prob_id), exc_info=True)
         status = ERROR_STATUS
