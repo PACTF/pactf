@@ -134,7 +134,7 @@ class _Django(Configuration):
     # (Point your server (nginx, Apache etc.) to serve from this folder directly.)
     STATIC_ROOT = join(BASE_DIR, 'static')
 
-    RATELIMIT_VIEW = values.Value('ctflex.views.ratelimited')
+    RATELIMIT_VIEW = values.Value('ctflex.views.ratelimited_view')
 
     # For Boostrap Alerts
     MESSAGE_TAGS = {

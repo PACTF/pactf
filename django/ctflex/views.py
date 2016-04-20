@@ -65,7 +65,7 @@ def windowed_context(window):
 
 # region Indirectly-called Views
 
-def ratelimited(request, err=None):
+def ratelimited_view(request, err=None):
     """Render template for when the user has been rate limited
 
     Usage:
@@ -342,11 +342,17 @@ def submit_flag(request, *, prob_id):
     ERROR_STATUS = 2
 
     # Rate-limit
-    if is_ratelimited(request, fn=submit_flag,
-                      key=queries.competitor_key, rate='2/s', increment=True):
+    if is_ratelimited(request, fn=submit_flag, increment=True,
+                      key=queries.competitor_key, rate='2/s'):
         return JsonResponse({
             STATUS_FIELD: ERROR_STATUS,
             MESSAGE_FIELD: "You are submitting flags too fast. Slow down!"
+        })
+    elif is_ratelimited(request, fn=submit_flag, increment=True,
+                        key=queries.competitor_key, rate='1000/d'):
+        return JsonResponse({
+            STATUS_FIELD: ERROR_STATUS,
+            MESSAGE_FIELD: "You have submitted too many flags today; try again tomorrow."
         })
 
     # Process data from the request
