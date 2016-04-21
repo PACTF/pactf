@@ -482,6 +482,11 @@ class Prod(_Base):
 class FakeProd(Prod):
     """Fake Prod during development"""
 
+    ''' Security '''
+
+    NORECAPTCHA_SITE_KEY = None
+    NORECAPTCHA_SECRET_KEY = None
+
     ''' Logging '''
 
     ADMINS = values.ListValue([
