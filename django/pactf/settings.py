@@ -149,8 +149,8 @@ class _Django(Configuration):
     ''' Warnings '''
 
     WARNINGS_TO_SUPPRESS = values.ListValue([
-        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
-        'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.'
+        # 'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
+        # 'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.',
     ])
 
     CACHES = {
@@ -165,7 +165,7 @@ class _Django(Configuration):
         import logging
         warn_logger = logging.getLogger('py.warnings')
         warn_logger.addFilter(lambda record: not any(
-            warning in record.getMessage() for warning in cls.WARNINGS_TO_SUPPRESS))
+            (warning in record.getMessage(), print("test", warning, record.getMessage(), warning in record.getMessage()))[0] for warning in cls.WARNINGS_TO_SUPPRESS))
 
     # Setup
     @classmethod
@@ -485,6 +485,8 @@ class FakeProd(Prod):
 
     ''' Security '''
 
+    ALLOWED_HOSTS = values.ListValue(['*'])
+
     NORECAPTCHA_SITE_KEY = None
     NORECAPTCHA_SECRET_KEY = None
 
@@ -501,5 +503,7 @@ class FakeProd(Prod):
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
+
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
     TEMPLATE_STRING_IF_INVALID = 'DEBUG WARNING: undefined template variable [%s] not found'
