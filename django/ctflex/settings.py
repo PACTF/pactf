@@ -94,7 +94,9 @@ for local_name, default, settings_name in _SETTINGS:
         settings_name = _PREFIX + local_name
 
     # Get setting, defaulting if appropriate
-    value = getattr(settings, settings_name, default)
+    value = getattr(settings, settings_name, None)
+    if value is None:
+        value = default
 
     # Set setting on this module
     globals()[local_name] = value
