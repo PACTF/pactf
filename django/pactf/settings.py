@@ -165,7 +165,7 @@ class _Django(Configuration):
         import logging
         warn_logger = logging.getLogger('py.warnings')
         warn_logger.addFilter(lambda record: not any(
-            (warning in record.getMessage(), print("test", warning, record.getMessage(), warning in record.getMessage()))[0] for warning in cls.WARNINGS_TO_SUPPRESS))
+            (warning in record.getMessage() for warning in cls.WARNINGS_TO_SUPPRESS))
 
     # Setup
     @classmethod
