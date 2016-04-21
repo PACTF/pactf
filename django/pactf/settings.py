@@ -484,8 +484,8 @@ class FakeProd(Prod):
 
     ''' Security '''
 
-    NORECAPTCHA_SITE_KEY = '6LeF8h0TAAAAAMJrdcK8g7nn1lGVCNbgzskXHj5S'
-    NORECAPTCHA_SECRET_KEY = '6LeF8h0TAAAAAP_U_TIChL_6y8cTiu2jhTg1cdzG'
+    NORECAPTCHA_SITE_KEY = None
+    NORECAPTCHA_SECRET_KEY = None
 
     ''' Logging '''
 
