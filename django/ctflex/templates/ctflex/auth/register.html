@@ -16,6 +16,8 @@
 
 {% block extra_js %}
   <script src="{% static 'ctflex/js/register.js' %}" type="text/javascript"></script>
+
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock %}
 
 
@@ -93,26 +95,29 @@
             </div>
             <div class="panel-footer">
 
-          <p class="text-muted">
-            Teams are eligible (to win prizes) if all of its competitors are middle-schoolers or high-schoolers studying in the United States of America.
-          </p>
+              <p class="text-muted">
+                Teams are eligible (to win prizes) if all of their competitors are middle-schoolers or high-schoolers studying in the United States of America.
+              </p>
             </div>
           </div>
         </div>
+        <div class="clearfix"></div>
+
       </div>
 
       <div id="existing-team-container" class="form-horizontal">
 
         {% formfield existing_team_form.name %}{% endformfield %}
         {% formfield existing_team_form.passphrase %}{% endformfield %}
+        <div class="clearfix hidden-xs"></div>
 
       </div>
 
-      <div id="common-team-container" class="form-horizontal">
+      <div id="common-team-container" class="form-horizontal text-center">
 
-        <div class="text-center">
-          <input class="btn btn-primary" type="submit" value="Register"/>
-        </div>
+        {{ competitor_form.captcha }}
+
+        <input class="btn btn-primary" type="submit" value="Register"/>
 
       </div>
 

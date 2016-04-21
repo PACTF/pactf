@@ -38,6 +38,7 @@ class _Django(Configuration):
         'widget_tweaks',
         'django_print_settings',
         'post_office',
+        'nocaptcha_recaptcha',
 
         # Django 3rd-party (local)
         # 'request',
@@ -369,6 +370,9 @@ class _CTFlex(_Django, Configuration):
 
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
     CTFLEX_BOARD_CACHE_DURATION = values.IntegerValue(100, environ_prefix=None)
+
+    NORECAPTCHA_SITE_KEY = values.Value('6Lf57x0TAAAAAH8qVHlGeuwLmf9vaDsdpnrJLSqA', environ_prefix=None)
+    NORECAPTCHA_SECRET_KEY = values.SecretValue(environ_prefix=None)
 
     ''' Problems and Staticfiles '''
 

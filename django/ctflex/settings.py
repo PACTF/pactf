@@ -8,6 +8,7 @@ This file enables:
 
 from django.conf import settings
 
+# TODO(Yatharth): Change meaning of None to same, and add sentinel value for prefixing with CTFLEX
 _PREFIX = 'CTFLEX_'
 _SETTINGS = (
 
@@ -35,6 +36,10 @@ _SETTINGS = (
 
     # Out of how many points to normalize each round’s score
     ('SCORE_NORMALIZATION', 1000, None),
+
+    # Google Captcha
+    ('NORECAPTCHA_SITE_KEY', '', 'NORECAPTCHA_SITE_KEY'),
+    ('NORECAPTCHA_SECRET_KEY', '', 'NORECAPTCHA_SECRET_KEY'),
 
     ### Metadata
 

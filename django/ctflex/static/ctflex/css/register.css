@@ -15,11 +15,12 @@
     padding-right: 0;
 }
 
-/* Eligibility */
-
-#eligible-container {
-    margin-bottom: 15px;
+.g-recaptcha {
+    display: inline-block;
+    margin-bottom: 21px;
 }
+
+/* Eligibility */
 
 #eligible-glyph {
     vertical-align: middle;
