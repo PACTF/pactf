@@ -17,7 +17,10 @@
 
 .g-recaptcha {
     display: inline-block;
-    margin-bottom: 21px;
+}
+
+.captcha-container .form-control-feedback {
+    display: none;
 }
 
 /* Eligibility */

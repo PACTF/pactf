@@ -114,9 +114,14 @@
       </div>
 
       <div id="common-team-container" class="form-horizontal text-center">
-        {{ competitor_form.captcha }}
+
+        {% with extra_group_class='captcha-container col-sm-12' extra_label_class='display-none' extra_input_class='col-sm-12' extra_help_class='col-sm-6 col-sm-push-3' %}
+          {% formfield competitor_form.captcha %}{% endformfield %}
+        {% endwith %}
         <div class="clearfix"></div>
+
         <input class="btn btn-primary" type="submit" value="Register"/>
+
       </div>
 
       {# To keep track of which sub-form is/should be open #}
