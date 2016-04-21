@@ -4,7 +4,10 @@ from django import forms
 from django.db import models as django_models
 from django.contrib.auth import forms as auth_forms
 
+from nocaptcha_recaptcha import NoReCaptchaField
+
 from ctflex import models
+from ctflex import settings
 
 
 # region Helpers
@@ -78,6 +81,10 @@ class CompetitorCreationForm(forms.ModelForm):
         model = models.Competitor
         fields = ('email', 'first_name', 'last_name')
 
+    captcha = NoReCaptchaField(
+        site_key=settings.NORECAPTCHA_SITE_KEY,
+        secret_key=settings.NORECAPTCHA_SECRET_KEY)
+
 
 class UserCreationForm(auth_forms.UserCreationForm):
     """Subclass UserCreationForm and monkey-patch some fields
@@ -110,12 +117,15 @@ class TeamCreationForm(forms.ModelForm):
         model = models.Team
         fields = ('name', 'passphrase', 'school', 'country', 'background')
 
+    pass
+
     # ELIGIBLE_HELP_TEXT = ("All of your team's competitors must be middle-schoolers "
     #                       "or high-schoolers living in the United States to be "
     #                       "displayed on the scoreboard and be eligible for prizes.")
     # eligible = forms.BooleanField(initial=True,
     #                               label="My team is eligible to win prizes.",
     #                               help_text=ELIGIBLE_HELP_TEXT)
+
 
 @model_generated(models.Team)
 class TeamJoiningForm(forms.Form):

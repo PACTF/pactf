@@ -38,6 +38,7 @@ class _Django(Configuration):
         'widget_tweaks',
         'django_print_settings',
         'post_office',
+        'nocaptcha_recaptcha',
 
         # Django 3rd-party (local)
         # 'request',
@@ -148,8 +149,8 @@ class _Django(Configuration):
     ''' Warnings '''
 
     WARNINGS_TO_SUPPRESS = values.ListValue([
-        'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
-        'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.'
+        # 'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
+        # 'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.',
     ])
 
     CACHES = {
@@ -351,7 +352,7 @@ class _Gunicorn:
     GUNICORN_PORT = values.IntegerValue(8001, environ_prefix=None)
 
     # Number of worker processes Gunicorn should spawn
-    GUNICORN_NUM_WORKERS = values.IntegerValue(3, environ_prefix=None)
+    GUNICORN_NUM_WORKERS = values.IntegerValue(1, environ_prefix=None)
 
 
 class _CTFlex(_Django, Configuration):
@@ -440,6 +441,10 @@ class Prod(_Base):
     https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
 
+    NORECAPTCHA_SITE_KEY = values.Value('6Ldt_h0TAAAAAHZi1Mk455UT0-XNmDkyKoJMH3wW', environ_prefix=None)
+    NORECAPTCHA_SECRET_KEY = values.SecretValue(environ_prefix=None)
+    NORECAPTCHA_VERIFY_URL = values.Value('https://www.google.com:61561/recaptcha/api/siteverify', environ_prefix=None)
+
     ''' Logging '''
 
     ADMINS = values.ListValue([
@@ -478,6 +483,14 @@ class Prod(_Base):
 class FakeProd(Prod):
     """Fake Prod during development"""
 
+    ''' Security '''
+
+    ALLOWED_HOSTS = values.ListValue(['*'])
+
+    NORECAPTCHA_SITE_KEY = None
+    NORECAPTCHA_SECRET_KEY = None
+    NORECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+
     ''' Logging '''
 
     ADMINS = values.ListValue([
@@ -491,5 +504,7 @@ class FakeProd(Prod):
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
+
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
     TEMPLATE_STRING_IF_INVALID = 'DEBUG WARNING: undefined template variable [%s] not found'
