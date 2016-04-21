@@ -371,9 +371,6 @@ class _CTFlex(_Django, Configuration):
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
     CTFLEX_BOARD_CACHE_DURATION = values.IntegerValue(100, environ_prefix=None)
 
-    NORECAPTCHA_SITE_KEY = values.Value('6Lf57x0TAAAAAH8qVHlGeuwLmf9vaDsdpnrJLSqA', environ_prefix=None)
-    NORECAPTCHA_SECRET_KEY = values.SecretValue(environ_prefix=None)
-
     ''' Problems and Staticfiles '''
 
     CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
@@ -420,6 +417,9 @@ class Dev(_Base):
         },
     ]
 
+    NORECAPTCHA_SITE_KEY = values.Value('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', environ_prefix=None)
+    NORECAPTCHA_SECRET_KEY = values.Value('6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', environ_prefix=None)
+
     ''' Convenience '''
 
     CACHES = {
@@ -443,6 +443,9 @@ class Prod(_Base):
 
     https_headers = values.Value(True)  # Only enable this if nginx is properly configured with HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if https_headers else None
+
+    NORECAPTCHA_SITE_KEY = values.Value('6Lf57x0TAAAAAH8qVHlGeuwLmf9vaDsdpnrJLSqA', environ_prefix=None)
+    NORECAPTCHA_SECRET_KEY = values.SecretValue(environ_prefix=None)
 
     ''' Logging '''
 
@@ -481,6 +484,11 @@ class Prod(_Base):
 
 class FakeProd(Prod):
     """Fake Prod during development"""
+
+    ''' Security '''
+
+    NORECAPTCHA_SITE_KEY = values.Value('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', environ_prefix=None)
+    NORECAPTCHA_SECRET_KEY = values.Value('6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', environ_prefix=None)
 
     ''' Logging '''
 
