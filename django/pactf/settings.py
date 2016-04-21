@@ -417,9 +417,6 @@ class Dev(_Base):
         },
     ]
 
-    NORECAPTCHA_SITE_KEY = values.Value('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', environ_prefix=None)
-    NORECAPTCHA_SECRET_KEY = values.Value('6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', environ_prefix=None)
-
     ''' Convenience '''
 
     CACHES = {
@@ -484,11 +481,6 @@ class Prod(_Base):
 
 class FakeProd(Prod):
     """Fake Prod during development"""
-
-    ''' Security '''
-
-    NORECAPTCHA_SITE_KEY = values.Value('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', environ_prefix=None)
-    NORECAPTCHA_SECRET_KEY = values.Value('6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', environ_prefix=None)
 
     ''' Logging '''
 
