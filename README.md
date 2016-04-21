@@ -6,7 +6,7 @@
 This repository (currently) houses two projects:
 
 - **CTFlex**, short for ‘CTF-lexible’: a reusable CTF framework written as a [Django][django] app.
-- **PACTF Web**: a website for [PACTF][https://pactf.com/] that uses CTFlex.
+- **PACTF Web**: a website for [PACTF][pactf] that uses CTFlex.
 
 **PACTF** itself, short for ‘Phillips Academy CTF’, is a PvE CTF targeted at high schoolers.
 
