@@ -242,6 +242,10 @@ body.modal-open div.modal-backdrop {
     display: none;
 }
 
+.italics {
+    font-style: italic;
+}
+
 /* Account page */
 
 #team-members .user-container .user-username {

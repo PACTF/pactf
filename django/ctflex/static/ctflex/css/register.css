@@ -23,6 +23,12 @@
     display: none;
 }
 
+/* Contact */
+
+#helptext {
+    margin-bottom: 1.5em;
+}
+
 /* Eligibility */
 
 #eligible-glyph {

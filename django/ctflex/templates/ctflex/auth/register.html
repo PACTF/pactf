@@ -70,8 +70,11 @@
         <p>
           You can add new members to your team at any time, even after the competition starts.
         </p>
-        <p class="text-muted">
-          <em>The preceding help text was adapted from <a href="https://picoctf.com" target="_blank">PicoCTF</a>.</em>
+
+        <p id="helptext" class="text-muted italics">
+          The preceding help text was adapted from <a href="https://picoctf.com" target="_blank">PicoCTF</a>.<br>
+          If this registration form does not work for you, please email
+          <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
         </p>
 
         {% formfield new_team_form.name %}{% endformfield %}
@@ -121,12 +124,6 @@
         <div class="clearfix"></div>
 
         <input class="btn btn-primary" type="submit" value="Register"/>
-
-        <p class="text-muted">
-          <br>
-          If this registration form does not work for you, please email
-          <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
-        </p>
 
       </div>
 
