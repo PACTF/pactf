@@ -489,6 +489,7 @@ class FakeProd(Prod):
 
     NORECAPTCHA_SITE_KEY = None
     NORECAPTCHA_SECRET_KEY = None
+    NORECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
     ''' Logging '''
 
