@@ -85,6 +85,18 @@ class CompetitorCreationForm(forms.ModelForm):
         site_key=settings.NORECAPTCHA_SITE_KEY,
         secret_key=settings.NORECAPTCHA_SECRET_KEY)
 
+    def is_valid(self):
+        is_valid = super().is_valid()
+        if not is_valid:
+            for field in self.errors.keys():
+                print("ValidationError: %s[%s] <- \"%s\" %s" % (
+                    type(self),
+                    field,
+                    self.data[field],
+                    self.errors[field].as_text()
+                ))
+        return is_valid
+
 
 class UserCreationForm(auth_forms.UserCreationForm):
     """Subclass UserCreationForm and monkey-patch some fields
