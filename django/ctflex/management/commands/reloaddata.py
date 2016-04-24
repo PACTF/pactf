@@ -41,7 +41,6 @@ class Command(BaseCommand):
                 management.call_command('flush', *helpers.filter_dict({
                     '--no-input': not options['interactive'],
                 }))
-                management.call_command('makemigrations')
                 management.call_command('migrate')
 
                 for fixture in PRE_PROBLEMS_FIXTURES:
