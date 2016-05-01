@@ -52,7 +52,7 @@ class EligibileFilter(admin.SimpleListFilter):
 
 def requalify(modeladmin, request, queryset):
     for object in queryset:
-        object.banned = models.Team.GOOD_STANDING
+        object.standing = models.Team.GOOD_STANDING
         object.save()
 
 
