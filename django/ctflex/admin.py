@@ -49,15 +49,22 @@ class EligibileFilter(admin.SimpleListFilter):
 
 # region Admin Actions
 
-def ban(modeladmin, request, queryset):
+
+def requalify(modeladmin, request, queryset):
     for object in queryset:
-        object.banned = True
+        object.banned = models.Team.GOOD_STANDING
         object.save()
 
 
-def unban(modeladmin, request, queryset):
+def disqualify(modeladmin, request, queryset):
     for object in queryset:
-        object.banned = False
+        object.standing = models.Team.DISQUALIFIED_STANDING
+        object.save()
+
+
+def make_invisible(modeladmin, request, queryset):
+    for object in queryset:
+        object.standing = models.Team.INVISIBLE_STANDING
         object.save()
 
 
@@ -94,11 +101,12 @@ class UserAdmin(BaseUserAdmin):
 
 
 class TeamAdmin(AllFieldModelAdmin):
-    EXCLUDE = ('id', 'passphrase',)
-    INCLUDE = ('size', 'eligible')
+    # FIXME: Remove banned
+    EXCLUDE = ('id', 'passphrase', 'banned',)
+    INCLUDE = ('size', 'eligible',)
     date_hierarchy = 'created_at'
-    actions = [ban, unban]
-    list_filter = (EligibileFilter, 'banned',)
+    actions = [requalify, disqualify, make_invisible]
+    list_filter = (EligibileFilter, 'standing')
     inlines = (CompetitorInline,)
     search_fields = ('name', 'school')
 

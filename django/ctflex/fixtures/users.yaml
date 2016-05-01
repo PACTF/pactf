@@ -62,3 +62,48 @@
     user_permissions: []
     first_name: "User 1"
     last_name: "Team 2"
+
+- model: "auth.user"
+  pk: 31
+  fields:
+    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
+    last_login: null
+    is_superuser: false
+    username: "user31"
+    is_staff: true
+    is_active: true
+    date_joined: "2015-12-30T07:32:56.341Z"
+    groups: []
+    user_permissions: []
+    first_name: "User 1"
+    last_name: "Team 3"
+
+- model: "auth.user"
+  pk: 41
+  fields:
+    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
+    last_login: null
+    is_superuser: false
+    username: "user41"
+    is_staff: true
+    is_active: true
+    date_joined: "2015-12-30T07:32:56.341Z"
+    groups: []
+    user_permissions: []
+    first_name: "User 1"
+    last_name: "Team 4"
+
+- model: "auth.user"
+  pk: 51
+  fields:
+    password: "pbkdf2_sha256$24000$nLJcDMSWLxzW$MZyFDZtuhCB13o8gQNBjCDSkwIVMml4WNjKJPmhZP5o="
+    last_login: null
+    is_superuser: false
+    username: "user51"
+    is_staff: true
+    is_active: true
+    date_joined: "2015-12-30T07:32:56.341Z"
+    groups: []
+    user_permissions: []
+    first_name: "User 1"
+    last_name: "Team 5"

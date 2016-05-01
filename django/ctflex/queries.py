@@ -122,7 +122,7 @@ def problem_list(*, team, window):
 #     This is the function provided as a default for determining eligibility, and may be
 #     overridden if the `CTFLEX_ELIGIBILITY_FUNCTION` setting is set.
 #     """
-#     return not team.banned
+#     return not team.standing == team.GOOD_STANDING
 #
 #
 # def _get_eligible():
@@ -146,7 +146,7 @@ def problem_list(*, team, window):
 # eligible = _get_eligible()
 
 eligible = lambda team: (
-    not team.banned
+    team.standing == team.GOOD_STANDING
     and team.country == team.US_COUNTRY
     and team.background == team.SCHOOL_BACKGROUND
 )
@@ -241,7 +241,9 @@ def _board_cache_key(window):
 def _teams_with_score_window(window):
     return (
         (team, _score_in_timer(team=team, window=window))
-        for team in models.Team.objects.filter(banned=False).iterator()
+        for team in (models.Team.objects
+                     .exclude(standing=models.Team.INVISIBLE_STANDING)
+                     .iterator())
     )
 
 
@@ -268,7 +270,9 @@ def _teams_with_score_overall():
             team,
             _normalize(team=team, score_function=_score_in_timer, windows_with_points=windows_with_points),
         )
-        for team in models.Team.objects.filter(banned=False).iterator()
+        for team in (models.Team.objects
+                     .exclude(standing=models.Team.INVISIBLE_STANDING)
+                     .iterator())
     )
 
 
