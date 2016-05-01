@@ -228,7 +228,7 @@ class _Django(Configuration):
             },
 
             'handlers': {
-                # FIXME: rotating
+                # TODO(Yatharth): rotating
 
                 'request_file': {
                     'level': 'INFO',
