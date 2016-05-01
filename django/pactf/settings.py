@@ -432,7 +432,7 @@ class Prod(_Base):
     ''' Security '''
 
     DEBUG = False
-    ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf.cf'])
+    ALLOWED_HOSTS = values.ListValue(['.pactf.com', '.pactf2.cf'])
 
     https = values.Value(True)  # For settings that should only be true when using HTTPS
     SESSION_COOKIE_SECURE = https.value
