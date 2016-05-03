@@ -24,3 +24,30 @@
     email: example21@example.com
     first_name: DefaultFirst
     last_name: DefaultLast
+
+- model: ctflex.Competitor
+  pk: 31
+  fields:
+    user: 31
+    team: 3
+    email: example31@example.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
+
+- model: ctflex.Competitor
+  pk: 41
+  fields:
+    user: 41
+    team: 4
+    email: example41@example.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
+
+- model: ctflex.Competitor
+  pk: 51
+  fields:
+    user: 51
+    team: 5
+    email: example51@example.com
+    first_name: DefaultFirst
+    last_name: DefaultLast
