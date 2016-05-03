@@ -23,11 +23,11 @@
       <p>
 
         {% if other_team.standing == other_team.DISQUALIFIED_STANDING %}
-          Your team has been disqualified; as such, it is ineligible for prizes.
+          <strong>Your team has been disqualified;</strong> as such, it is ineligible for prizes.
         {% endif %}
 
         {% if other_team.standing == other_team.INVISIBLE_STANDING %}
-          Your team has been disqualified; as such, it is ineligible for prizes
+          <strong>Your team has been disqualified;</strong> as such, it is ineligible for prizes
           and does not appear on any scoreboards.
         {% endif %}
 

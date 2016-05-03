@@ -47,10 +47,14 @@
       {% endif %}
 
       <p class="text-center">
-        {% if team %}
-          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go to the Game!</a>
+        {% if windows.last.ended %}
+          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:announcements' %}">Get the Latest News!</a>
         {% else %}
-          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+          {% if team %}
+            <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go to the Game!</a>
+          {% else %}
+            <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+          {% endif %}
         {% endif %}
       </p>
 
