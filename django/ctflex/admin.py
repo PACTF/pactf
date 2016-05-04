@@ -119,8 +119,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class TeamAdmin(AllFieldModelAdmin):
-    # FIXME: Remove banned
-    EXCLUDE = ('id', 'passphrase', 'banned',)
+    EXCLUDE = ('id', 'passphrase',)
     INCLUDE = ('size', 'eligible',)
     date_hierarchy = 'created_at'
     actions = [requalify, disqualify, make_invisible]

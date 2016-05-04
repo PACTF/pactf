@@ -146,9 +146,6 @@ class Team(models.Model):
 
     ''' Data Fields '''
 
-    # FIXME: Remove banned and make migration
-    banned = models.BooleanField(default=False)
-
     GOOD_STANDING = 'G'
     DISQUALIFIED_STANDING = 'D'
     INVISIBLE_STANDING = 'I'
