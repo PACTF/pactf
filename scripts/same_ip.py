@@ -9,7 +9,7 @@ OUTFILE = 'same_ip.out'
 LINEPAT = re.compile(r'''
     .*? 'ip', \s '(?P<ip>.+?)'
     .*? <Competitor: \s \#(?P<competitor>\d+)
-    .*? <Team: \s (?P<team>\#\d+ \s (['"]).+?\1)
+    .*? <Team: \s (?P<team>\#\d+ \s (?P<quote>['"]).+?\g<quote>)
     .*?
     ''', re.VERBOSE)
 
