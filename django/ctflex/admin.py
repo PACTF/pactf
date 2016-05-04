@@ -44,20 +44,46 @@ class EligibileFilter(admin.SimpleListFilter):
             return queryset.filter(id__in=result)
 
 
+# TODO(Yatharth): Speed up
+# class ParticipationFilter(admin.SimpleListFilter):
+#     title = 'participation'
+#     parameter_name = 'participation'
+#
+#     def lookups(self, request, model_admin):
+#         return (
+#             ('1', 'Participated'),
+#             ('0', 'Only Registered'),
+#         )
+#
+#     def queryset(self, request, queryset):
+#         if self.value() in ('0', '1'):
+#             result = [team.id for team in queryset
+#                       if bool(queries.score(team=team, window=None))
+#                       == (self.value() == '1')]
+#             return queryset.filter(id__in=result)
+
+
 # endregion
 
 
 # region Admin Actions
 
-def ban(modeladmin, request, queryset):
+
+def requalify(modeladmin, request, queryset):
     for object in queryset:
-        object.banned = True
+        object.standing = models.Team.GOOD_STANDING
         object.save()
 
 
-def unban(modeladmin, request, queryset):
+def disqualify(modeladmin, request, queryset):
     for object in queryset:
-        object.banned = False
+        object.standing = models.Team.DISQUALIFIED_STANDING
+        object.save()
+
+
+def make_invisible(modeladmin, request, queryset):
+    for object in queryset:
+        object.standing = models.Team.INVISIBLE_STANDING
         object.save()
 
 
@@ -95,15 +121,18 @@ class UserAdmin(BaseUserAdmin):
 
 class TeamAdmin(AllFieldModelAdmin):
     EXCLUDE = ('id', 'passphrase',)
-    INCLUDE = ('size', 'eligible')
+    INCLUDE = ('size', 'eligible',)
     date_hierarchy = 'created_at'
-    actions = [ban, unban]
-    list_filter = (EligibileFilter, 'banned',)
+    actions = [requalify, disqualify, make_invisible]
+    list_filter = (EligibileFilter, 'standing')
     inlines = (CompetitorInline,)
     search_fields = ('name', 'school')
 
     def eligible(self, team):
         return queries.eligible(team)
+
+    def score(self, team):
+        return queries.score(team=team, window=None)
 
     eligible.boolean = True
 

@@ -6,6 +6,6 @@
 #
 #     This function is used by CTFlex.
 #     """
-#     return (not team.banned
+#     return (team.standing == team.GOOD_STANDING
 #             and team.country == team.US_COUNTRY
 #             and team.background == team.SCHOOL_BACKGROUND)

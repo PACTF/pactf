@@ -146,14 +146,22 @@ class Team(models.Model):
 
     ''' Data Fields '''
 
+    GOOD_STANDING = 'G'
+    DISQUALIFIED_STANDING = 'D'
+    INVISIBLE_STANDING = 'I'
+    STANDING_CHOICES = (
+        (GOOD_STANDING, "Good"),
+        (DISQUALIFIED_STANDING, "Disqualified"),
+        (INVISIBLE_STANDING, "Invisible"),
+    )
+    standing = models.CharField(max_length=1,
+                                choices=STANDING_CHOICES, default=GOOD_STANDING)
+
     created_at = models.DateTimeField(default=timezone.now, editable=False)
-    banned = models.BooleanField(default=False)
     passphrase = models.CharField(max_length=30,
                                   verbose_name="Passphrase")
     school = models.CharField(max_length=60, blank=True,
                               verbose_name="School")
-
-    # FIXME: Change fixtures
 
     US_COUNTRY = 'U'
     OTHER_COUNTRY = 'O'

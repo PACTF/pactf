@@ -12,27 +12,36 @@
 {% block content %}
 
   {% if team == other_team %}
+
     <p>
       <strong>You are viewing your team’s public profile.</strong>
-      For information about your personal account (or to add competitors to your team), go to your <a
-        href="{% url 'ctflex:account' %}">Account</a> page.
+      For information about your personal account (or to add competitors to your team),
+      go to your <a href="{% url 'ctflex:account' %}">Account</a> page.
     </p>
-  {% endif %}
 
-  {% if other_team.banned and team != other_team %}
-    <p>
-      This team’s information cannot be displayed.
-    </p>
-  {% else %}
-
-    {% if other_team.banned %} {# and team == other_team #}
+    {% if other_team.standing != other_team.GOOD_STANDING %}
       <p>
-        <strong>Your team has been banned from appearing on the scoreboard and is ineligible for prizes.</strong>
-        Please contact <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> if you have any questions.
+
+        {% if other_team.standing == other_team.DISQUALIFIED_STANDING %}
+          <strong>Your team has been disqualified;</strong> as such, it is ineligible for prizes.
+        {% endif %}
+
+        {% if other_team.standing == other_team.INVISIBLE_STANDING %}
+          <strong>Your team has been disqualified;</strong> as such, it is ineligible for prizes
+          and does not appear on any scoreboards.
+        {% endif %}
+
+        Please email <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+        if you have any questions.
+
       </p>
     {% endif %}
 
-    <br/>
+    <br>
+
+  {% endif %}
+
+  {% if team == other_team or other_team.standing != other_team.INVISIBLE_STANDING %}
 
     <div class="panel-group">
       <div class="panel panel-primary">
@@ -119,6 +128,12 @@
     </p>
     <p>
       <sup>‡</sup> {% include 'ctflex/board/overall_explanation.snippet.html' %}
+    </p>
+
+  {% else %}
+
+    <p>
+      This team’s information cannot be displayed.
     </p>
 
   {% endif %}
