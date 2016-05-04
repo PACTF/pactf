@@ -44,22 +44,23 @@ class EligibileFilter(admin.SimpleListFilter):
             return queryset.filter(id__in=result)
 
 
-class ParticipationFilter(admin.SimpleListFilter):
-    title = 'participation'
-    parameter_name = 'participation'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('1', 'Participated'),
-            ('0', 'Only Registered'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() in ('0', '1'):
-            result = [team.id for team in queryset
-                      if bool(queries.score(team=team, window=None))
-                      == (self.value() == '1')]
-            return queryset.filter(id__in=result)
+# TODO(Yatharth): Speed up
+# class ParticipationFilter(admin.SimpleListFilter):
+#     title = 'participation'
+#     parameter_name = 'participation'
+#
+#     def lookups(self, request, model_admin):
+#         return (
+#             ('1', 'Participated'),
+#             ('0', 'Only Registered'),
+#         )
+#
+#     def queryset(self, request, queryset):
+#         if self.value() in ('0', '1'):
+#             result = [team.id for team in queryset
+#                       if bool(queries.score(team=team, window=None))
+#                       == (self.value() == '1')]
+#             return queryset.filter(id__in=result)
 
 
 # endregion
@@ -123,7 +124,7 @@ class TeamAdmin(AllFieldModelAdmin):
     INCLUDE = ('size', 'eligible',)
     date_hierarchy = 'created_at'
     actions = [requalify, disqualify, make_invisible]
-    list_filter = (EligibileFilter, ParticipationFilter, 'standing')
+    list_filter = (EligibileFilter, 'standing')
     inlines = (CompetitorInline,)
     search_fields = ('name', 'school')
 
