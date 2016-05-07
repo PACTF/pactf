@@ -40,5 +40,5 @@ with open(OUTFILE, 'w') as outfile:
         for team, data in value.items():
             competitors, uas = data['competitors'], data['uas']
             message += "{}({}) ; ".format(team, ','.join(competitors))
-            message2 += "{}: {} ; ".format(team, '(' + '),('.join(uas) + ')')
+            message2 += "{}: {} ; ".format(team, '[' + '],['.join(uas) + ']')
         outfile.write(message + "\n" + message2 + "\n\n")
