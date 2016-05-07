@@ -1,9 +1,11 @@
 jQuery(document).ready(function () {
-   makeTableClickable(); 
+    makeTableClickable();
 });
 
 function makeTableClickable() {
-    $(".clickable-row").click(function() {
-        window.document.location = $(this).data("href");
+    $(".clickable-row").click(function () {
+        var url = $(this).data("href");
+        var win = window.open(url, '_blank');
+        win.focus();
     })
 }

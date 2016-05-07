@@ -1,7 +1,7 @@
 - model: "ctflex.Team"
   pk: 1
   fields:
-    name: "Team 1"
+    name: "Alpha"
     passphrase: password
     school: Phillips Academy
     country: U
@@ -10,7 +10,7 @@
 - model: "ctflex.Team"
   pk: 2
   fields:
-    name: "Team 2"
+    name: "Beta"
     passphrase: password
     school: Abbot Academy
     country: U
@@ -20,7 +20,27 @@
 - model: "ctflex.Team"
   pk: 3
   fields:
-    name: "Team 3 (should be ineligible)"
+    name: "Gamma/Inel"
+    passphrase: password
+    country: O
+    background: S
+
+
+- model: "ctflex.Team"
+  pk: 4
+  fields:
+    name: "Delta/Disqualified"
+    standing: D
+    passphrase: password
+    country: U
+    background: S
+
+
+- model: "ctflex.Team"
+  pk: 5
+  fields:
+    name: "Epsilon/Invisible"
+    standing: I
     passphrase: password
     country: O
     background: S

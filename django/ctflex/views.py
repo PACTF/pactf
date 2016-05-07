@@ -613,7 +613,7 @@ def register(request,
             existing_team_form = forms.TeamJoiningForm()
             active_team_form = new_team_form
 
-        # FIXME(Yatharth): Shorten view by extracting a command
+        # XXX(Yatharth): Shorten view by extracting a command
         # If valid, begin a transaction
         if user_form.is_valid() and active_team_form.is_valid() and competitor_form.is_valid():
 

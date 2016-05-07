@@ -1,4 +1,4 @@
-// FIXME: Poll for not just unread announcements
+// TODO: Poll for not just unread announcements
 // but count of problems solved (in case some other member solved) and count of problems displayed
 
 jQuery(document).ready(function () {
