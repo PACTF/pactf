@@ -20,5 +20,5 @@ class Command(BaseCommand):
         write = self.stdout.write
         for team in open(options['team_list']):
             write(team)
-            for member in Team.objects.get(name=team).competitor_set:
+            for member in Team.objects.get(name=team).competitor_set.all():
                 write(member.user.email)
