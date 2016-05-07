@@ -16,7 +16,6 @@ from ctflex import settings
 
 OUTFILE = 'andover_teams.out'
 file = open(OUTFILE, 'w')
-print = lambda *args: file.write(' '.join(args) + '\n')
 
 data = {}
 
@@ -30,7 +29,9 @@ teams |= models.Team.objects.filter(school__contains='Phillips')
 for team in teams:
     team_data = {}
 
-    overall_score = queries._score_in_timer(team=team, window=None)
+    team_overall_score = queries._normalize(team=team,
+                                            score_function=queries._score_in_timer,
+                                            windows_with_points=windows_with_points)
 
 
     def score_function(*, team, window):
@@ -55,36 +56,40 @@ for team in teams:
             competitor_data[window] = score
 
         team_data[competitor] = competitor_data
-    data[(overall_score, team)] = team_data
 
+    print(team_overall_score, team)
+    data[(team_overall_score, team)] = team_data
+
+print(data)
 items = sorted(data.items(), key=lambda item: item[0][0])
+print(items)
 
-print("")
-print("Date: {}".format(datetime.datetime.now()))
-print("Note: Overall score is not merely the sum of individual rounds’ scores.")
-print("Note: Only solves submitted during a timer are counted.")
-print()
+file.write('\n')
+file.write("Date: {}\n".format(datetime.datetime.now()))
+file.write("Note: Overall score is not merely the sum of individual rounds’ scores.\n")
+file.write("Note: Only solves submitted during a timer are counted.\n")
+file.write('\n')
 
-for (overall_score, team), competitor_data in items:
+for (team_overall_score, team), competitor_data in items:
 
     message = "Team #{} {!r} with {}pts from {!r} (Standing: {}, Country: {}, Background: {})".format(
-        team.id, team.name, overall_score, team.school,
+        team.id, team.name, team_overall_score, team.school,
         "Good" if team.standing == team.GOOD_STANDING else "Banned",
         team.country, team.background)
-    print(message)
-    print('=' * len(message))
-    print()
+    file.write(message + '\n')
+    file.write('=' * len(message) + '\n')
+    file.write('\n')
 
     for competitor, window_data in competitor_data.items():
-        print("Competitor #{} '{} {}' <{}>:".format(
+        file.write("Competitor #{} '{} {}' <{}>:\n".format(
             competitor.id, competitor.first_name, competitor.last_name, competitor.email))
 
         for window, score in window_data.items():
-            print("\t{}: {}/{}".format(
+            file.write("\t{}: {}/{}\n".format(
                 window.codename.title() if window else "Overall", score,
                 dict(windows_with_points)[window] if window else settings.SCORE_NORMALIZATION))
 
-        print()
-    print()
+        file.write('\n')
+    file.write('\n')
 
 file.close()
