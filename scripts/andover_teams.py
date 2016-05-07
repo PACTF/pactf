@@ -57,12 +57,9 @@ for team in teams:
 
         team_data[competitor] = competitor_data
 
-    print(team_overall_score, team)
     data[(team_overall_score, team)] = team_data
 
-print(data)
-items = sorted(data.items(), key=lambda item: item[0][0])
-print(items)
+items = sorted(data.items(), key=lambda item: item[0][0], reversed=True)
 
 file.write('\n')
 file.write("Date: {}\n".format(datetime.datetime.now()))
