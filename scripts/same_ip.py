@@ -36,7 +36,9 @@ with open(INFILE) as infile:
 with open(OUTFILE, 'w') as outfile:
     for ip, value in map.items():
         message = "{}: ".format(ip)
-        for team, competitors in value.items():
+        message2 = ""
+        for team, data in value.items():
+            competitors, uas = data['competitors'], data['uas']
             message += "{}({}) ; ".format(team, ','.join(competitors))
-        message += "\n"
-        outfile.write(message)
+            message2 += "{}: {} ; ".format(team, '(' + '),('.join(uas) + ')')
+        outfile.write(message + "\n" + message2 + "\n\n")
