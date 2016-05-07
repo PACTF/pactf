@@ -8,8 +8,9 @@ INFILE = '../logs/request.log'
 OUTFILE = 'same_ip.out'
 LINEPAT = re.compile(r'''
     .*? 'ip', \s '(?P<ip>.+?)'
+    .*? 'user_agent', \s (?P<quote1>['"]) (?P<ua>.+?) (?P=quote1)
     .*? <Competitor: \s \#(?P<competitor>\d+)
-    .*? <Team: \s (?P<team>\#\d+ \s (?P<quote>['"]) .+? (?P=quote))
+    .*? <Team: \s (?P<team>\#\d+ \s (?P<quote2>['"]) .+? (?P=quote2))
     .*?
     ''', re.VERBOSE)
 
@@ -20,16 +21,17 @@ with open(INFILE) as infile:
         match = LINEPAT.match(line)
         if match:
             info = match.groupdict()
-            info['team'] = info['team']
-            info['competitor'] = info['competitor']
 
             if info['ip'] not in map:
                 map[info['ip']] = {}
 
             if info['team'] not in map[info['ip']]:
-                map[info['ip']][info['team']] = set()
+                map[info['ip']][info['team']] = {}
+                map[info['ip']][info['team']]['competitors'] = set()
+                map[info['ip']][info['team']]['uas'] = set()
 
-            map[info['ip']][info['team']].add(info['competitor'])
+            map[info['ip']][info['team']]['competitors'].add(info['competitor'])
+            map[info['ip']][info['team']]['uas'].add(info['ua'])
 
 with open(OUTFILE, 'w') as outfile:
     for ip, value in map.items():
