@@ -59,7 +59,7 @@ for team in teams:
 
     data[(team_overall_score, team)] = team_data
 
-items = sorted(data.items(), key=lambda item: item[0][0], reversed=True)
+items = sorted(data.items(), key=lambda item: item[0][0], reverse=True)
 
 file.write('\n')
 file.write("Date: {}\n".format(datetime.datetime.now()))
