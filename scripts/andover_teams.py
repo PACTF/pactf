@@ -22,9 +22,9 @@ data = {}
 windows_with_points = queries._windows_with_points()
 
 teams = (models.Team.objects
-         .filter(school__contains='Andover')
-         .exclude(school__contains='High').all())
-teams |= models.Team.objects.filter(school__contains='Phillips')
+         .filter(school__icontains='Andover')
+         .exclude(school__icontains='High').all())
+teams |= models.Team.objects.filter(school__icontains='Phillips')
 
 for team in teams:
     team_data = {}
