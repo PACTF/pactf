@@ -18,3 +18,4 @@ for team in open('ips.txt'):
         print('Team(s) %s did not access server.' % team)
         continue
     print('Team(s) %s solved problems %s' % (team, ips[ip]))
+

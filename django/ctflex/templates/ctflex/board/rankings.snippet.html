@@ -1,8 +1,17 @@
 {% load ctflex_ctf %}
 
+
+<div class="filter-container">
+  <div class="checkbox">
+    <input type="checkbox" id="filter-btn" class="styled">
+    <label for="checkbox1">
+      Show only eligible teams
+    </label>
+  </div>
+</div>
+
 <div class="panel-group">
   <div class="panel panel-default">
-
     <table class="table table-hover">
       <thead>
       <tr>
@@ -16,7 +25,7 @@
       <tbody>
       {% for rank, team, score in board %}
         {% eligible team as is_eligible %}
-        <tr class="clickable-row {% if is_eligible %}team-ineligible{% endif %}"
+        <tr class="team clickable-row {% if not is_eligible %}team-ineligible{% endif %}"
             data-href="{% url 'ctflex:team' team_id=team.id %}">
           <td class="text-center">{{ rank }}.</td>
           <td class="text-center">

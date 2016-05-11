@@ -1,5 +1,6 @@
 jQuery(document).ready(function () {
     makeTableClickable();
+    bindFilter();
 });
 
 function makeTableClickable() {
@@ -8,4 +9,16 @@ function makeTableClickable() {
         var win = window.open(url, '_blank');
         win.focus();
     })
+}
+
+function bindFilter() {
+    $("#filter-btn").click(function () {
+        var teams = $('.team-ineligible');
+        var CLASS = 'team-hidden';
+        if (this.checked) {
+            teams.addClass(CLASS)
+        } else {
+            teams.removeClass(CLASS);
+        }
+    });
 }

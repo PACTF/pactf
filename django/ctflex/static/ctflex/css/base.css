@@ -256,17 +256,6 @@ body.modal-open div.modal-backdrop {
     margin-right: 0.25em;
 }
 
-/* Scoreboard */
-
-.clickable-row {
-    cursor: pointer;
-}
-
-.team-ineligible {
-    /*background-color: #ccc;*/
-    /*color: #333;*/
-}
-
 /* About Page */
 
 a.link-undercover {
