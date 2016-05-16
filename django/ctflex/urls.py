@@ -33,6 +33,7 @@ misc_urls = [
     url(r'^about/$', views.about, name='about'),
     url(r'^prizes/$', views.prizes, name='prizes'),
     url(r'^chat/$', views.chat, name='chat'),
+    url(r'^winners/$', views.winners, name='winners'),
 ]
 
 auth_urls = [

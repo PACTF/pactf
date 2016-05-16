@@ -258,6 +258,11 @@ def chat(request):
 
 
 @limited_http_methods('GET')
+def winners(request):
+    return render(request, 'ctflex/misc/winners.html')
+
+
+@limited_http_methods('GET')
 @defaulted_window()
 def announcements(request, *, window_codename):
     """List all announcements of window and mark them as read"""
