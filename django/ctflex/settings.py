@@ -14,6 +14,8 @@ _SETTINGS = (
 
     ### General
 
+    ('DEBUG', False, 'DEBUG'),
+
     ('AUTH_USER_MODEL', None, 'AUTH_USER_MODEL'),
 
     ('SECRET_KEY', None, 'SECRET_KEY'),

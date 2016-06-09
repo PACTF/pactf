@@ -1,0 +1,26 @@
+{% load static from staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tee</title>
+  <link href="{% static "ctflex/css/logo.css" %}" rel="stylesheet">
+  <style>
+    .logo-tee .outline {
+{#      stroke: black;#}
+    }
+
+    .logo-tee .fill {
+{#      fill: white;#}
+    }
+  </style>
+</head>
+<body style="background: #afcdf3;">
+
+<div class="logo logo-inverted logo-tee" style="padding: 5em; max-width: 30em;">
+  {% include 'ctflex/logo.svg' %}
+</div>
+
+</body>
+</html>

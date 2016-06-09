@@ -258,6 +258,13 @@ def chat(request):
 
 
 @limited_http_methods('GET')
+def tee(request):
+    if not settings.DEBUG:
+        raise Http404()
+    return render(request, 'ctflex/misc/tee.html')
+
+
+@limited_http_methods('GET')
 def winners(request):
     return render(request, 'ctflex/misc/winners.html')
 
