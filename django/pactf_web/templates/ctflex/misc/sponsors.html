@@ -68,6 +68,13 @@
 
   <h2>Silver Sponsors</h2>
 
+  {% with title='Information Networking Institute' link='https://www.ini.cmu.edu' image='pactf_web/img/sponsors/ini.png' %}
+    {% sponsor %}
+      <a target="_blank" href="{{ link }}">The Information Networking Institute (INI)</a>
+      at Carnegie Mellon educates and develops engineers through technical, interdisciplinary master’s degree programs in information networking, security and mobility that incorporate business and policy perspectives. Our graduates pioneer technological advancements, engineer solutions, and lead enterprises in the global economy.​​
+    {% endsponsor %}
+  {% endwith %}
+
   {% with title='The Nest' link='http://www.noblenet.org/owhl/make/' image='pactf_web/img/sponsors/nest.png' %}
     {% sponsor %}
       <a target="_blank" href="{{ link }}">The Nest</a>,
