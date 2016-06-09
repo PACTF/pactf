@@ -259,6 +259,7 @@ def chat(request):
 
 @limited_http_methods('GET')
 def tee(request):
+    """Privately render logo for t-shirt-related purposes"""
     if not settings.DEBUG:
         raise Http404()
     return render(request, 'ctflex/misc/tee.html')
