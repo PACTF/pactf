@@ -153,12 +153,12 @@ class _Django(Configuration):
         # 'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.',
     ])
 
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': '/var/run/memcached/memcached2.sock',
-        }
-    }
+    # CACHES = {
+    #     'default': {
+    #         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+    #         'LOCATION': '/var/run/memcached/memcached2.sock',
+    #     }
+    # }
 
     @classmethod
     def suppress_warnings_to_suppress(cls):
