@@ -2,9 +2,9 @@
 
 Hi {{ user.first_name }},
 
-You have successfully registered for PACTF! Your username is {{ user.username }}, and your team name is {{ user.competitor.team.name }}.
+You have successfully registered for {{ sitename }}! Your username is {{ user.username }}, and your team name is {{ user.competitor.team.name }}.
 
-If you didn't register for PACTF, just ignore this email. Please email {{ support_email }} with questions.
+If you didn't register for {{ sitename }}, just ignore this email. Please email {{ support_email }} with questions.
 
 Thanks,
 The {{ sitename }} team
