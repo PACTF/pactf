@@ -23,7 +23,7 @@
       </div>
       <h3>
         <strong>{% include 'ctflex/text/title.txt' %}</strong> is
-        a <strong>multi-round</strong> online <strong>computer security</strong> competition
+        an online <strong>computer security</strong> competition
         for <strong>middle</strong> and <strong>high school students.</strong>
       </h3>
 
@@ -34,7 +34,6 @@
           {% for window in windows %}
             <h3>
               <span class="window-name col-md-6"><strong>
-                {{ window.codename|title }}:&nbsp;
                 Round {{ window.number }}
               </strong></span>
               <br class="visible-sm-block visible-xs-block"/>
@@ -47,16 +46,16 @@
       {% endif %}
 
       <p class="text-center">
-        {# {% if team %}#}
         {% if windows.last.ended %}
           {# <a class="btn btn-lg btn-primary" href="{% url 'ctflex:announcements' %}">Get the Latest News!</a>#}
           <a class="btn btn-lg btn-primary" href="{% url 'ctflex:winners' %}">Check out the Winning Teams!</a>
         {% else %}
-          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go to the Game!</a>
+          {% if team %}
+            <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go to the Game!</a>
+          {% else %}
+            <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>
+          {% endif %}
         {% endif %}
-        {# {% else %}#}
-        {#   <a class="btn btn-lg btn-primary" href="{% url 'ctflex:register' %}">Register Now!</a>#}
-        {# {% endif %}#}
       </p>
 
     </div>
@@ -129,7 +128,8 @@
             Check out our
             <a href="{% url 'ctflex:prizes' %}" target="_blank">prizes page</a>
             for details, and learn about
-            <a href="{% url 'ctflex:sponsors' %}" target="_blank">the sponsors</a> who helped make {% include 'ctflex/text/title.txt' %} possible!
+            <a href="{% url 'ctflex:sponsors' %}"
+               target="_blank">the sponsors</a> who helped make {% include 'ctflex/text/title.txt' %} possible!
           </p>
         </div>
       </div>
