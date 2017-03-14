@@ -34,6 +34,7 @@
           {% for window in windows %}
             <h3>
               <span class="window-name col-md-6"><strong>
+                {{ window.codename|title }}:&nbsp;
                 Round {{ window.number }}
               </strong></span>
               <br class="visible-sm-block visible-xs-block"/>
