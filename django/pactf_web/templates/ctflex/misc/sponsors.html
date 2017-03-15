@@ -15,18 +15,52 @@
   <link href="{% static "ctflex/css/sponsors.css" %}" rel="stylesheet">
 {% endblock %}
 
+{% block extra_header %}
+
+  <div id="window-dropdown-container">
+    <div id="window-dropdown" class="dropdown ">
+
+      <button class="btn btn-default dropdown-toggle" type="button" id="window-dropdown-menu" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+        Switch Year
+        <span class="caret"></span>
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="window-dropdown-menu">
+
+        <li class="disabled"><a href="#">
+          PACTF 2017
+        </a></li>
+
+        <li><a href="https://2016.pactf.com/sponsors">
+          PACTF 2016
+        </a></li>
+
+      </ul>
+
+    </div>
+  </div>
+
+{% endblock %}
+
 
 {% block content %}
 
-  <p>
-    Check out
-    <a href="https://2016.pactf.com/sponsors">the sponsors</a>
-    for PACTF 2016! Watch this page for more updates on sponsors for PACTF 2017.
-  </p>
+  <div class="text-center">
 
-  <p>
-    PACTF 2017 is proud to be sponsored by the following entities:
-  </p>
+    <p>
+      Check out
+      <a href="https://2016.pactf.com/sponsors">the inaugural sponsors</a>
+      for PACTF 2016!
+    </p>
+
+    <p>
+      PACTF 2017 is proud to be sponsored by the following entities:
+      <br>
+      (more sponsors and information coming soon)
+    </p>
+
+  </div>
 
   {##}
   {#  <h2>Diamond Sponsors</h2>#}
