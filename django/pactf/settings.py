@@ -443,7 +443,6 @@ class Prod(_Base):
 
     NORECAPTCHA_SITE_KEY = values.Value('6Ldt_h0TAAAAAHZi1Mk455UT0-XNmDkyKoJMH3wW', environ_prefix=None)
     NORECAPTCHA_SECRET_KEY = values.SecretValue(environ_prefix=None)
-    NORECAPTCHA_VERIFY_URL = values.Value('https://www.google.com:61561/recaptcha/api/siteverify', environ_prefix=None)
 
     ''' Logging '''
 
