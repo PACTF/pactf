@@ -371,6 +371,8 @@ class _CTFlex(_Django, Configuration):
     CTFLEX_INCUBATING = values.BooleanValue(False, environ_prefix=None)
     CTFLEX_BOARD_CACHE_DURATION = values.IntegerValue(100, environ_prefix=None)
 
+    NORECAPTCHA_VERIFY_URL = values.Value('https://www.google.com/recaptcha/api/siteverify', environ_prefix=None)
+
     ''' Problems and Staticfiles '''
 
     CTFLEX_PROBLEMS_DIR = values.Value(join(BASE_DIR, 'ctfproblems'), environ_prefix=None)
