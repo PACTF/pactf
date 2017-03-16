@@ -10,7 +10,10 @@
   <a target="_blank" href="https://www.andover.edu/">Phillips Academy</a>
 </p>
 
-{#<div id="footer-sponsors" class="row">#}
+<div id="footer-sponsors" class="row">
+  <a href="{% url 'ctflex:sponsors' %}">
+    <img src="{% static 'pactf_web/img/sponsors/protonmail.small.png' %}"/>
+  </a>
 {#  <a href="{% url 'ctflex:sponsors' %}">#}
 {#    <img src="{% static 'pactf_web/img/sponsors/abbot.png' %}"/>#}
 {#  </a>#}
@@ -26,4 +29,4 @@
 {#  <a href="{% url 'ctflex:sponsors' %}">#}
 {#    <img src="{% static 'pactf_web/img/sponsors/bu.png' %}"/>#}
 {#  </a>#}
-{#</div>#}
+</div>
