@@ -1,8 +1,9 @@
 """Define forms to be used by views"""
 
-from django import forms
+from django.forms import fields, models as form_models, forms
 from django.db import models as django_models
 from django.contrib.auth import forms as auth_forms
+from django.core import exceptions
 
 from nocaptcha_recaptcha import NoReCaptchaField
 
@@ -36,7 +37,7 @@ def model_generated(model):
 
             model_field_type = type(model_field)
             if model_field_type == django_models.CharField:
-                form_field_type = forms.CharField
+                form_field_type = fields.CharField
                 attributes = {
                     ('label', 'verbose_name', None),
                     ('max_length', None, None),
@@ -74,7 +75,7 @@ def model_generated(model):
 
 # region Registration
 
-class CompetitorCreationForm(forms.ModelForm):
+class CompetitorCreationForm(form_models.ModelForm):
     prefix = 'competitor'
 
     class Meta:
@@ -110,7 +111,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
         self.fields['username'].help_text = ''
 
 
-class TeamCreationForm(forms.ModelForm):
+class TeamCreationForm(form_models.ModelForm):
     prefix = 'new_team'
 
     class Meta:
@@ -137,7 +138,7 @@ class TeamJoiningForm(forms.Form):
         data = self.cleaned_data['name']
 
         if not models.Team.objects.filter(name=data).exists():
-            raise forms.ValidationError("No team with this name exists.")
+            raise exceptions.ValidationError("No team with this name exists.")
 
         return data
 
