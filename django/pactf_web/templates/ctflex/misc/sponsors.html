@@ -75,7 +75,7 @@
 
   <h2>Gold Sponsors</h2>
 
-  {% with title='ProtonMail' link='https://protonmail.com/' image='pactf_web/img/sponsors/protonmail.png' %}
+  {% with title='ProtonMail' link='https://protonmail.com/' image='pactf_web/img/sponsors/protonmail/purple.png' %}
     {% sponsor %}
       <a href="{{ link }}"
          target="_blank">ProtonMail</a>
@@ -113,9 +113,9 @@
   {##}
   {#    {% endsponsor %}#}
   {#  {% endwith %}#}
-  {##}
-  {#  <h2>Silver Sponsors</h2>#}
-  {##}
+
+    <h2>Silver Sponsors</h2>
+
   {#  {% with title='Information Networking Institute' link='https://www.ini.cmu.edu' image='pactf_web/img/sponsors/ini.png' %}#}
   {#    {% sponsor %}#}
   {#      <a target="_blank" href="{{ link }}">The Information Networking Institute (INI)</a>#}
@@ -123,12 +123,26 @@
   {#    {% endsponsor %}#}
   {#  {% endwith %}#}
 
+    {% with title='DigitalOcean' link='https://www.digitalocean.com' image='pactf_web/img/sponsors/digitalocean/blue.png' %}
+      {% sponsor %}
+        <a target="_blank" href="{{ link }}">DigitalOcean</a>
+        is a simple and robust cloud computing platform, designed for developers.
+      {% endsponsor %}
+    {% endwith %}
+
   <h2>Bronze Sponsors</h2>
 
-  {% with title='The Nest' link='http://www.noblenet.org/owhl/make/' image='pactf_web/img/sponsors/nest.png' %}
+  {% with title='The Nest' link='http://www.noblenet.org/owhl/make/' image='pactf_web/img/sponsors/nest/nest.png' %}
     {% sponsor %}
       <a target="_blank" href="{{ link }}">The Nest</a>,
       the makerspace at Phillips Academy, is where innovation and community intersect. Located in the basement of the OWHL, this space is designed for the entire PA community to create, explore, and innovate with one another. It doesn’t matter if your interest is making a new dress or developing new technology. You are invited.
+    {% endsponsor %}
+  {% endwith %}
+
+  {% with title='Cloudflare' link='https://www.cloudflare.com/' image='pactf_web/img/sponsors/cloudflare.png' %}
+    {% sponsor %}
+      Here at <a target="_blank" href="{{ link }}">Cloudflare</a>,
+      we make the Internet work the way it should. Offering CDN, DNS, DDoS protection and security, find out how we can help your site.
     {% endsponsor %}
   {% endwith %}
 
