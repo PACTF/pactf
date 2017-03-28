@@ -83,13 +83,6 @@
     {% endsponsor %}
   {% endwith %}
 
-  {#  {% with title='CyLab Institute' link='https://www.cylab.cmu.edu/' image='pactf_web/img/sponsors/cylab.png' %}#}
-  {#    {% sponsor %}#}
-  {#      <a href="{{ link }}"#}
-  {#         target="_blank">Carnegie Mellon CyLab</a>#}
-  {#      is a bold and visionary effort, which establishes public-private partnerships to develop new technologies for measurable, secure, available, trustworthy, and sustainable computing and communications systems.#}
-  {#    {% endsponsor %}#}
-  {#  {% endwith %}#}
   {##}
   {#  {% with title='Massachusetts Open Cloud' link='https://www.bu.edu/hic/research/massachusetts-open-cloud/' image='pactf_web/img/sponsors/moc.large.png' %}#}
   {#    {% sponsor %}#}
@@ -116,12 +109,20 @@
 
   <h2>Silver Sponsors</h2>
 
-  {#  {% with title='Information Networking Institute' link='https://www.ini.cmu.edu' image='pactf_web/img/sponsors/ini.png' %}#}
-  {#    {% sponsor %}#}
-  {#      <a target="_blank" href="{{ link }}">The Information Networking Institute (INI)</a>#}
-  {#      at Carnegie Mellon educates and develops engineers through technical, interdisciplinary master’s degree programs in information networking, security and mobility that incorporate business and policy perspectives. Our graduates pioneer technological advancements, engineer solutions, and lead enterprises in the global economy.​​#}
-  {#    {% endsponsor %}#}
-  {#  {% endwith %}#}
+  {% with title='CyLab Institute' link='https://www.cylab.cmu.edu/' image='pactf_web/img/sponsors/cylab/big.png' %}
+    {% sponsor %}
+      <a href="{{ link }}"
+         target="_blank">Carnegie Mellon CyLab</a>
+      is a bold and visionary effort, which establishes public-private partnerships to develop new technologies for measurable, secure, available, trustworthy, and sustainable computing and communications systems.
+    {% endsponsor %}
+  {% endwith %}
+
+  {% with title='Information Networking Institute' link='https://www.ini.cmu.edu' image='pactf_web/img/sponsors/ini/big.png' %}
+    {% sponsor %}
+      <a target="_blank" href="{{ link }}">The Information Networking Institute (INI)</a>
+      at Carnegie Mellon educates and develops engineers through technical, interdisciplinary master’s degree programs in information networking, security and mobility that incorporate business and policy perspectives. Our graduates pioneer technological advancements, engineer solutions, and lead enterprises in the global economy.​​
+    {% endsponsor %}
+  {% endwith %}
 
   {% with title='DigitalOcean' link='https://www.digitalocean.com' image='pactf_web/img/sponsors/digitalocean/blue.png' %}
     {% sponsor %}

@@ -138,3 +138,9 @@
   </div>
 
 {% endblock %}
+
+{% block footer_wrapper %}
+  {% with extra_footer_sponsors="true" %}
+    {{ block.super }}
+  {% endwith %}
+{% endblock %}

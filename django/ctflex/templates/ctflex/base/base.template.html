@@ -110,11 +110,13 @@
 
 <!-- Footer -->
 
-<footer>
-  <div class="container">
-    {% include 'ctflex/base/footer.snippet.html' %}
-  </div>
-</footer>
+{% block footer_wrapper %}
+  <footer>
+    <div class="container">
+      {% include 'ctflex/base/footer.snippet.html' %}
+    </div>
+  </footer>
+{% endblock %}
 
 <!-- JS Context -->
 {% comment %}{#
