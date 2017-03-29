@@ -62,16 +62,15 @@
 
   </div>
 
-  {##}
-  {#  <h2>Diamond Sponsors</h2>#}
-  {##}
-  {#  {% with title='Abbot Academy Association' link='https://www.andover.edu/About/AbbotAcademyAssociation/Pages/default.aspx' image='pactf_web/img/sponsors/abbot.png' %}#}
-  {#    {% sponsor %}#}
-  {#      PACTF is made possible in part by a grant from the#}
-  {#      <a target="_blank" href="{{ link }}">Abbot Academy Association</a>#}
-  {#      at Phillips Academy, continuing Abbot's tradition of boldness, innovation, and caring.#}
-  {#    {% endsponsor %}#}
-  {#  {% endwith %}#}
+
+  <h2>Diamond Sponsors</h2>
+
+  {% with title='DigitalOcean' link='https://www.digitalocean.com' image='pactf_web/img/sponsors/digitalocean/blue.png' %}
+    {% sponsor %}
+      <a target="_blank" href="{{ link }}">DigitalOcean</a>
+      is a simple and robust cloud computing platform, designed for developers.
+    {% endsponsor %}
+  {% endwith %}
 
   <h2>Gold Sponsors</h2>
 
@@ -83,7 +82,6 @@
     {% endsponsor %}
   {% endwith %}
 
-  {##}
   {#  {% with title='Massachusetts Open Cloud' link='https://www.bu.edu/hic/research/massachusetts-open-cloud/' image='pactf_web/img/sponsors/moc.large.png' %}#}
   {#    {% sponsor %}#}
   {#      <a href="{{ link }}"#}
@@ -121,13 +119,6 @@
     {% sponsor %}
       <a target="_blank" href="{{ link }}">The Information Networking Institute (INI)</a>
       at Carnegie Mellon educates and develops engineers through technical, interdisciplinary master’s degree programs in information networking, security and mobility that incorporate business and policy perspectives. Our graduates pioneer technological advancements, engineer solutions, and lead enterprises in the global economy.​​
-    {% endsponsor %}
-  {% endwith %}
-
-  {% with title='DigitalOcean' link='https://www.digitalocean.com' image='pactf_web/img/sponsors/digitalocean/blue.png' %}
-    {% sponsor %}
-      <a target="_blank" href="{{ link }}">DigitalOcean</a>
-      is a simple and robust cloud computing platform, designed for developers.
     {% endsponsor %}
   {% endwith %}
 
