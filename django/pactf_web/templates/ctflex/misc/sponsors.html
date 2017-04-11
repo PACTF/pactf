@@ -107,6 +107,13 @@
 
   <h2>Silver Sponsors</h2>
 
+  {% with title='Cloudflare' link='https://www.cloudflare.com/' image='pactf_web/img/sponsors/cloudflare.png' %}
+    {% sponsor %}
+      Here at <a target="_blank" href="{{ link }}">Cloudflare</a>,
+      we make the Internet work the way it should. Offering CDN, DNS, DDoS protection and security, find out how we can help your site.
+    {% endsponsor %}
+  {% endwith %}
+
   {% with title='CyLab Institute' link='https://www.cylab.cmu.edu/' image='pactf_web/img/sponsors/cylab/big.png' %}
     {% sponsor %}
       <a href="{{ link }}"
@@ -149,13 +156,6 @@
     {% sponsor %}
       <a target="_blank" href="{{ link }}">The Nest</a>,
       the makerspace at Phillips Academy, is where innovation and community intersect. Located in the basement of the OWHL, this space is designed for the entire PA community to create, explore, and innovate with one another. It doesn’t matter if your interest is making a new dress or developing new technology. You are invited.
-    {% endsponsor %}
-  {% endwith %}
-
-  {% with title='Cloudflare' link='https://www.cloudflare.com/' image='pactf_web/img/sponsors/cloudflare.png' %}
-    {% sponsor %}
-      Here at <a target="_blank" href="{{ link }}">Cloudflare</a>,
-      we make the Internet work the way it should. Offering CDN, DNS, DDoS protection and security, find out how we can help your site.
     {% endsponsor %}
   {% endwith %}
 
