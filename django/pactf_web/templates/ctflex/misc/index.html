@@ -16,7 +16,7 @@
 
       <div id="jumbotron-padding" class="visible-md visible-lg">&nbsp;</div>
 
-      <div id="jumbotron-img">
+      <div class="jumbotron-img">
         <div class="logo logo-inverted">
           {% include 'ctflex/logo.svg' %}
         </div>
@@ -58,6 +58,14 @@
           {% endif %}
         {% endif %}
       </p>
+
+      <h4>Brought to you by:</h4>
+
+      <div class="jumbotron-img">
+        <a href="{% url 'ctflex:sponsors' %}">
+          <img src="{% static 'pactf_web/img/sponsors/diamond_sponsors/two.png' %}"/>
+        </a>
+      </div>
 
     </div>
   </div>

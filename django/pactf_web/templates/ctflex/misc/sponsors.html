@@ -65,6 +65,13 @@
 
   <h2>Diamond Sponsors</h2>
 
+  {% with title='Amazon Web Services' link='https://aws.amazon.com/' image='pactf_web/img/sponsors/amazon/awseducate.transparent.png' %}
+    {% sponsor %}
+      <a target="_blank" href="{{ link }}">Amazon Web Services</a>
+      offers reliable, scalable, and inexpensive cloud computing services. Free to join, pay only for what you use.
+    {% endsponsor %}
+  {% endwith %}
+
   {% with title='DigitalOcean' link='https://www.digitalocean.com' image='pactf_web/img/sponsors/digitalocean/blue.png' %}
     {% sponsor %}
       <a target="_blank" href="{{ link }}">DigitalOcean</a>

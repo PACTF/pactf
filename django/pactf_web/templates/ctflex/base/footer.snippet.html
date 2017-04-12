@@ -12,8 +12,20 @@
 
 <div id="footer-sponsors" class="row">
 
+  {% if extra_footer_sponsors != "true" %}
+
+    <a href="{% url 'ctflex:sponsors' %}">
+      <img src="{% static 'pactf_web/img/sponsors/amazon/awseducate.small.transparent.png' %}"/>
+    </a>
+
+    <a href="{% url 'ctflex:sponsors' %}">
+      <img src="{% static 'pactf_web/img/sponsors/digitalocean/blue.smaller.png' %}"/>
+    </a>
+
+  {% endif %}
+
   <a href="{% url 'ctflex:sponsors' %}">
-    <img src="{% static 'pactf_web/img/sponsors/digitalocean/blue.padded.png' %}"/>
+    <img src="{% static 'pactf_web/img/sponsors/protonmail/purple.small.png' %}"/>
   </a>
 
   {% if extra_footer_sponsors == "true" %}
@@ -28,8 +40,5 @@
 
   {% endif %}
 
-  <a href="{% url 'ctflex:sponsors' %}">
-    <img src="{% static 'pactf_web/img/sponsors/protonmail/purple.padded.png' %}"/>
-  </a>
 
 </div>

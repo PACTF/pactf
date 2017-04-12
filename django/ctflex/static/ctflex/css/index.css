@@ -59,7 +59,7 @@
     margin-bottom: 0.25em;
 }
 
-#jumbotron-img {
+.jumbotron-img svg, .jumbotron-img img {
     width: 100%;
     max-width: 30em;
     padding-left: 1em;
