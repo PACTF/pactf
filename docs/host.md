@@ -230,7 +230,7 @@ The `grader.py` file must have a `_grade(key, submission)` function. The paramet
 
 If a `.uuid` file exists, then if a problem with the same UUID already exists, that problem will be updated; else, a new problem will be created with the gien UUID. If a `.uuid` file does not exist, one will be created on running `manage.py loadprobs`.
 
-Static files can be linked to in the description and hint using the `{% ctfstatic '<basename>' %}` tag. Any files in the `static` folder (if it exists) to the `ctfproblems/<problem-uuid>` deployment static folder, though this implementation is irrelevant to using the feature and may change.
+Static files can be linked to in the description and hint using the `{% ctflexstatic '<basename>' %}` tag. Any files in the `static` folder (if it exists) to the `ctfproblems/<problem-uuid>` deployment static folder, though this implementation is irrelevant to using the feature and may change.
 
 Run `manage.py loadprobs` to create or update problems. To delete problems not in `PROBLEMS_DIR` anymore, pass the `--clear` option.
 
