@@ -17,96 +17,81 @@
 
 {% block content %}
 
-  <p class="text-center">
+  <h3 class="text-center">
     PACTF is run by
     <a target="_blank" href="https://patechmasters.com">Techmasters</a>,
     an independent student organization at
     <a target="_blank" href="https://www.andover.edu">Phillips Academy, Andover</a>.
-  </p>
+  </h3>
 
 
   <h2>Project Team</h2>
 
-  <div class="text-center">
+  <div class="about-section about row text-center">
 
-  <p><em>Coming soon…</em> See <a href="https://2016.pactf.com/about">the team</a> from PACTF 2016.</p>
-  <br>
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">
+          <img src="{% static 'pactf_web/img/about/yagarwal.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">
+          Yatharth Agarwal ‘17
+        </a>
+      </div>
+      <div class="person-pos">
+        Project Mentor
+      </div>
+    </div>
+
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <a href="https://tonytan.io/about/" target="_blank">
+          <img src="{% static 'pactf_web/img/about/ztan.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        <a class="link-undercover" href="https://tonytan.io/about/" target="_blank">
+          Tony Zhaocheng Tan ‘17
+        </a>
+      </div>
+      <div class="person-pos">
+        Project Mentor
+      </div>
+    </div>
+
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <a href="https://rmrm.io/" target="_blank">
+          <img src="{% static 'pactf_web/img/about/mmccain.jpg' %}">
+        </a>
+      </div>
+      <div class="person-name">
+        Miles McCain ‘16
+      </div>
+      <div class="person-pos">
+        Project Lead
+      </div>
+    </div>
+
+    <div class="person col-xs-6">
+      <div class="person-img">
+        <img src="{% static 'pactf_web/img/about/areich.jpg' %}">
+      </div>
+      <div class="person-name">
+        Alex Reichenbach ‘18
+      </div>
+      <div class="person-pos">
+        Project Lead
+      </div>
+    </div>
 
   </div>
 
-{#  <div class="about-section about row text-center">#}
-{##}
-{#    <div class="person col-xs-6 col-md-4">#}
-{#      <div class="person-img">#}
-{#        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">#}
-{#          <img src="{% static 'pactf_web/img/about/yagarwal3.jpg' %}">#}
-{#        </a>#}
-{#      </div>#}
-{#      <div class="person-name">#}
-{#        <a class="link-undercover" href="mailto:yagarwal@andover.edu" target="_blank">#}
-{#          Yatharth Agarwal#}
-{#        </a>#}
-{#      </div>#}
-{#      <div class="person-pos">#}
-{#        Class of 2017#}
-{#      </div>#}
-{#    </div>#}
-{##}
-{#    <div class="person col-xs-6 col-md-4">#}
-{#      <div class="person-img">#}
-{#        <a href="https://tonytan.io/about/" target="_blank">#}
-{#          <img src="{% static 'pactf_web/img/about/ztan.jpg' %}">#}
-{#        </a>#}
-{#      </div>#}
-{#      <div class="person-name">#}
-{#        <a class="link-undercover" href="https://tonytan.io/about/" target="_blank">#}
-{#          Tony Zhaocheng Tan#}
-{#        </a>#}
-{#      </div>#}
-{#      <div class="person-pos">#}
-{#        Class of 2017#}
-{#      </div>#}
-{#    </div>#}
-{##}
-{##}
-{#    <div class="person col-xs-6 col-md-4">#}
-{#      <div class="person-img">#}
-{#        <img src="{% static 'pactf_web/img/about/cwong.jpg' %}">#}
-{#      </div>#}
-{#      <div class="person-name">#}
-{#        Cameron Wong#}
-{#      </div>#}
-{#      <div class="person-pos">#}
-{#        Class of 2016#}
-{#      </div>#}
-{#    </div>#}
-{##}
-{#    <div class="person col-xs-6 col-md-4 col-md-push-2">#}
-{#      <div class="person-img">#}
-{#        <img src="{% static 'pactf_web/img/about/sorgul.jpg' %}">#}
-{#      </div>#}
-{#      <div class="person-name">#}
-{#        Sarp Orgul#}
-{#      </div>#}
-{#      <div class="person-pos">#}
-{#        Class of 2016#}
-{#      </div>#}
-{#    </div>#}
-{##}
-{#    <div class="person col-xs-pull-3 col-xs-6 col-xs-push-0 col-md-4 col-md-push-2">#}
-{#      <div class="person-img">#}
-{#        <img src="{% static 'pactf_web/img/about/areich.jpg' %}">#}
-{#      </div>#}
-{#      <div class="person-name">#}
-{#        Alex Reichenbach#}
-{#      </div>#}
-{#      <div class="person-pos">#}
-{#        Class of 2018#}
-{#      </div>#}
-{#    </div>#}
-{##}
-{#  </div>#}
+  <h4 class="text-center"><em>More team member bios coming soon…</em></h4>
 
+  <br>
 
   <h2>Faculty Mentors</h2>
 
@@ -119,7 +104,7 @@
         </a>
       </div>
       <div class="person-name">
-        <a href="http://skylit.com/maria.html" target="_blank">Ms. Maria Litvin</a>
+        Ms. Maria Litvin
       </div>
       <div class="person-pos">
         Project Mentor
@@ -136,7 +121,7 @@
         </a>
       </div>
       <div class="person-name">
-        <a href="http://jadrian.org/" target="_blank">Dr. Jadrian Miles</a>
+        Dr. Jadrian Miles
       </div>
       <div class="person-pos">
         Technical Mentor
