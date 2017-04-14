@@ -1,5 +1,13 @@
 {% extends 'ctflex/base/navbar.snippet.html' %}
 
 {% block navbar_right_more %}
-  <li><a href="https://2016.pactf.com" target="_blank">PACTF 2016</a></li>
+
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+       aria-expanded="false">PACTF 2017<span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="https://2016.pactf.com" target="_blank">PACTF 2016</a></li>
+    </ul>
+  </li>
+
 {% endblock %}
