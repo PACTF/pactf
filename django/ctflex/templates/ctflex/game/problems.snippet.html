@@ -1,5 +1,7 @@
 {% load ctflex_ctf %}
 
+<p><em>Something seem amiss? Shoot us an email at <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</em></p>
+
 <div id="problems">
   {% for raw_prob in prob_list %}
     {% format_problem raw_prob team as prob %}
@@ -55,7 +57,7 @@
             <div class="input-group">
               <input id="flag-{{ prob.id }}" type="text" class="form-control" placeholder="Flag" name="flag"
                      maxlength="{{ max_flag_size }}" required/>
-             <span class="input-group-btn">
+              <span class="input-group-btn">
 
                {# Setting onclick changes the behaviour for hitting enter in a text input too. #}
                {# False is returned to prevent non-AJAX form submission. #}
@@ -75,5 +77,5 @@
   {% endfor %}
   {% if not prob_list %}
     <p>There are no problems in this round.</p>
-{% endif %}
+  {% endif %}
 </div>
