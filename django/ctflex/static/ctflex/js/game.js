@@ -33,18 +33,24 @@ function submit_flag(problem_id) {
 
             // XXX(Yatharth): Review
             success: function (response) {
-                var style = "error";
                 if (response.status <= 0) {
                     jQuery("#" + problem_id + " .problem-body").toggle('show');
                     jQuery("#" + problem_id + " .problem-header").html(function (index, html) {
                         return html.replace(/Unsolved/, 'Solved');
                     });
+                    jQuery("#" + problem_id + " .problem-form").html(function (index, html) {
+                        return "<p>Your team has already solved this problem!</p>";
+                    })
+                }
+
+                if (response.status === 0) {
                     jQuery("#navbar-score").text(function (i, value) {
                         return parseInt(value) + parseInt(jQuery("#" + problem_id + " .problem-points").text());
                     });
-                    style = "success";
                 }
-                var prefix = response.status == 0 ? "Success! " : response.status == 1 ? "Incorrect! " : "";
+
+                var prefix = response.status === 0 ? "Success! " : response.status === 1 ? "Incorrect! " : "";
+                var style = response.status === -1 ? "info" : response.status === 0 ? "success" : "error";
                 jQuery.notify(prefix + response.message, style);
             },
 
