@@ -24,7 +24,7 @@
       <h3>
         <strong>{% include 'ctflex/text/title.txt' %}</strong> is
         a <strong>multi-round</strong> online <strong>computer security</strong> competition
-        for <strong>middle</strong> and <strong>high school students.</strong>
+        for <strong>middle</strong> and <strong>high school students, happening again this year!</strong>
       </h3>
 
       {% if incubating %}
@@ -39,7 +39,7 @@
               </strong></span>
               <br class="visible-sm-block visible-xs-block"/>
               <span
-                  class="window-date col-md-6">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }}</span>
+                  class="window-date col-md-6">{{ window.start|date:'F j' }}&nbsp;—&nbsp;{{ window.end|date:'F j' }} 2017</span>
             </h3>
             <br>
           {% endfor %}
@@ -50,7 +50,7 @@
         {# {% if team %}#}
         {% if windows.last.ended %}
           {# <a class="btn btn-lg btn-primary" href="{% url 'ctflex:announcements' %}">Get the Latest News!</a>#}
-          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:winners' %}">Check out the Winning Teams!</a>
+          <a class="btn btn-lg btn-primary" href="{% url 'ctflex:winners' %}">Check out last years winners!</a>
         {% else %}
           <a class="btn btn-lg btn-primary" href="{% url 'ctflex:game' %}">Go to the Game!</a>
         {% endif %}
