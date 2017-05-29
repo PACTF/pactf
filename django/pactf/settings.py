@@ -146,19 +146,18 @@ class _Django(Configuration):
     # Admin URL
     ADMIN_URL_PATH = values.Value('admin')
 
+    CACHES = values.DictValue({
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    })
+
     ''' Warnings '''
 
     WARNINGS_TO_SUPPRESS = values.ListValue([
         # 'RemovedInDjango110Warning: SubfieldBase has been deprecated. Use Field.from_db_value instead.',
         # 'RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.',
     ])
-
-    # CACHES = {
-    #     'default': {
-    #         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-    #         'LOCATION': '/var/run/memcached/memcached2.sock',
-    #     }
-    # }
 
     @classmethod
     def suppress_warnings_to_suppress(cls):
@@ -419,14 +418,6 @@ class Dev(_Base):
         },
     ]
 
-    ''' Convenience '''
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
-    }
-
 
 class Prod(_Base):
     """Secure and quiet settings for production"""
@@ -498,12 +489,6 @@ class FakeProd(Prod):
     ])
 
     ''' Convenience '''
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
-    }
 
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
