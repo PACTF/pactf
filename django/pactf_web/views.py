@@ -85,10 +85,8 @@ def board(request, *, window_codename):
     """Render board post-competition incorporating tiebreaker results"""
 
     # Get window
-    if window_codename == OVERALL_WINDOW_CODENAME:
+    if window_codename in (OVERALL_WINDOW_CODENAME, TIEBREAKER_WINDOW_CODENAME):
         window = None
-    elif window_codename == TIEBREAKER_WINDOW_CODENAME:
-        window = TIEBREAKER_WINDOW_CODENAME
     else:
         try:
             window = queries.get_window(window_codename)
