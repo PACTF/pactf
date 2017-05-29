@@ -44,10 +44,11 @@ def _teams_with_score_tiebreaker():
         return board
 
     teams_with_score = (
-        (team, _TIEBREAKER_SCORES.get(team.name, 0))
+        (team, _TIEBREAKER_SCORES[team.name])
         for i, team in enumerate(models.Team.objects
                                  .exclude(standing=models.Team.INVISIBLE_STANDING)
                                  .iterator())
+        if team.name in _TIEBREAKER_SCORES
     )
     ranked = sorted(teams_with_score, key=partial(_team_ranking_key, None))
     board = tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
