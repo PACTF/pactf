@@ -1,0 +1,19 @@
+{% extends 'ctflex/board/board.template.html' %}
+
+{% block header_window_name %}
+  Tiebreaker
+{% endblock %}
+
+{% block extra_window_switcher %}
+  {% include 'pactf_web/board/window_switcher_tiebreaker.snippet.html' %}
+{% endblock %}
+
+{% block content %}
+  <p>
+    A tiebreaker was held for teams with perfect scores in the overall contest. The results are below.
+  </p>
+  <p>To look at other rounds’ scoreboards or the overall scoreboard, use the dropdown above.</p>
+
+  {% include 'ctflex/board/rankings.snippet.html' %}
+
+{% endblock %}

@@ -1,0 +1,4 @@
+<li class="{% if is_tiebreaker %}disabled{% endif %}">
+  <a href="{% url request.resolver_match.view_name window_codename=tiebreaker_window_codename %}">
+    Tiebreaker
+  </a></li>
