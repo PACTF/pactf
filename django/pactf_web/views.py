@@ -40,7 +40,7 @@ def _teams_with_score_tiebreaker():
 
     board = cache.get(BOARD_CACHE_KEY_PREFIX + TIEBREAKER_WINDOW_CODENAME)
     if board:
-        logger.debug("using cache")
+        logger.debug("using cache for board tiebreaker")
         return board
 
     teams_with_score = (
@@ -53,7 +53,7 @@ def _teams_with_score_tiebreaker():
     ranked = sorted(teams_with_score, key=partial(_team_ranking_key, None))
     board = tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
-    logger.debug("computing")
+    logger.debug("computing board for tiebreaker")
     cache.set(BOARD_CACHE_KEY_PREFIX + TIEBREAKER_WINDOW_CODENAME, board, BOARD_CACHE_DURATION)
     return board
 
@@ -62,7 +62,7 @@ def _teams_with_score_overall_tiebreaker():
 
     board = cache.get(BOARD_CACHE_KEY_PREFIX + OVERALL_WINDOW_CODENAME + TIEBREAKER_WINDOW_CODENAME)
     if board:
-        logger.debug("using cache")
+        logger.debug("using cache for board overall tiebreaker")
         return board
 
     teams_with_score = (
@@ -73,7 +73,7 @@ def _teams_with_score_overall_tiebreaker():
     ranked = sorted(teams_with_score, key=partial(_team_ranking_key, None))
     board = tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
-    logger.debug("computing")
+    logger.debug("computing board for overall tiebreaker")
     cache.set(BOARD_CACHE_KEY_PREFIX + OVERALL_WINDOW_CODENAME + TIEBREAKER_WINDOW_CODENAME, board, BOARD_CACHE_DURATION)
     return board
 
