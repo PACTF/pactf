@@ -31,6 +31,7 @@ _TIEBREAKER_SCORES = {
     'BS and the Big Boys': 307,  # 306502.026282,
     'SFHS Team C': 37,  # 36971.5204705,
     'GO GO MUSTANGS': 4,  # 4121.27172823
+    'AT-Fun': 928,  # 927829
 }
 
 _TIEBREAKER_MAX = 4000  # arbitrary
