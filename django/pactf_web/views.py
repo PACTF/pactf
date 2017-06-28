@@ -18,6 +18,49 @@ from pactf_web.constants import TIEBREAKER_WINDOW_CODENAME
 
 logger = logging.getLogger(BASE_LOGGER_NAME + '.' + __name__)
 
+# TODO: Move data out of views
+
+# region Misc
+
+WINNERS = {
+    'top_overall_count': '3',
+    'top_window_count': '5',
+    'winners_overall': (
+        421, 145, 162, 508, 238, 196, 418, 234, 62, 489, 567, 576, 231, 243,
+        505, 253, 250, 163, 542, 747, 422, 689, 235, 551, 302, 510, 581, 406,
+        376, 386, 158, 272, 730, 38, 399, 664, 86, 437, 289, 323, 412, 67,
+        319, 144, 72, 28, 654, 251, 404, 143, 246, 649, 646, 706, 743, 255,
+        233, 750, 77, 476, 504, 377, 308, 411, 686, 741, 676, 681, 236, 310,
+        631, 95, 70, 501, 817, 398, 636, 603, 771, 136, 87, 721, 799, 808,
+        662, 573, 407, 477, 349, 798, 331, 651, 650, 550, 232, 129, 320,
+        644, 641, 68
+    ),
+    'winners_window': (
+        ("Bartik", (
+            421, 234, 323, 576, 542, 551, 162, 418, 422, 508, 406, 238, 747,
+            231, 489, 145, 62, 386, 567, 243, 250, 196, 41, 689
+        )),
+        ("Boole", (
+            162, 576, 421, 145, 231, 234, 62, 418, 243, 253, 508, 489, 196,
+            505, 567, 238
+        )),
+    )
+}
+
+
+@limited_http_methods('GET')
+def winners(request):
+    context = {
+        'windows': queries.all_windows()
+    }
+    context.update(WINNERS)
+    return render(request, 'ctflex/misc/winners.html', context=context)
+
+
+# endregion
+
+# region Tie Breaker
+
 _TIEBREAKER_SCORES = {
     'Th3g3ntl3man': 3103,  # 3102699.34844,
     'phsst': 886,  # 886421.793368,
@@ -38,7 +81,6 @@ _TIEBREAKER_MAX = 4000  # arbitrary
 
 
 def _teams_with_score_tiebreaker():
-
     board = cache.get(BOARD_CACHE_KEY_PREFIX + TIEBREAKER_WINDOW_CODENAME)
     if board:
         logger.debug("using cache for board tiebreaker")
@@ -60,7 +102,6 @@ def _teams_with_score_tiebreaker():
 
 
 def _teams_with_score_overall_tiebreaker():
-
     board = cache.get(BOARD_CACHE_KEY_PREFIX + OVERALL_WINDOW_CODENAME + TIEBREAKER_WINDOW_CODENAME)
     if board:
         logger.debug("using cache for board overall tiebreaker")
@@ -75,7 +116,9 @@ def _teams_with_score_overall_tiebreaker():
     board = tuple((i + 1, team, score_) for i, (team, score_) in enumerate(ranked))
 
     logger.debug("computing board for overall tiebreaker")
-    cache.set(BOARD_CACHE_KEY_PREFIX + OVERALL_WINDOW_CODENAME + TIEBREAKER_WINDOW_CODENAME, board, BOARD_CACHE_DURATION)
+    cache.set(BOARD_CACHE_KEY_PREFIX + OVERALL_WINDOW_CODENAME + TIEBREAKER_WINDOW_CODENAME,
+              board,
+              BOARD_CACHE_DURATION)
     return board
 
 
@@ -119,3 +162,5 @@ def board(request, *, window_codename):
         template_name = 'pactf_web/board/ended.html'
 
     return render(request, template_name, context)
+
+# endregion

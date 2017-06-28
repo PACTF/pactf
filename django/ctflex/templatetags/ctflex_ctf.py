@@ -34,5 +34,4 @@ def solves(context, team):
     window = context.get('window', queries.get_window())
     return queries.solves(team=team, window=window).order_by('-date')
 
-
 # endregion
