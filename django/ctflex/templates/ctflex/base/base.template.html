@@ -84,13 +84,6 @@
     <script src="{% static "ctflex/js/announcements.js" %}" type="text/javascript"></script>
   {% endif %}
 
-  <script type="text/javascript">
-    var _bftn_options = {
-      theme: 'money'
-    };
-  </script>
-  <script src="https://widget.battleforthenet.com/widget.js" async></script>
-
   {% block extra_js %}{% endblock %}
 
 </head>
@@ -155,20 +148,17 @@
       safe to evaluate.
 
 #}{% endcomment %}
-
+  
 <script src="//static.getclicky.com/js" type="text/javascript"></script>
-<script type="text/javascript">try {
-    clicky.init(101031819);
-} catch (e) {
-}</script>
-<noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101031819ns.gif"/></p></noscript>
-
+<script type="text/javascript">try{ clicky.init(101031819); }catch(e){}</script>
+<noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101031819ns.gif" /></p></noscript>
+  
 {% if js_context %}
   <script type="text/javascript">
-      (function () {
-          window.js_context = {{ js_context|safe }};
-          document.dispatchEvent(new Event('js_context'));
-      })();
+    (function () {
+      window.js_context = {{ js_context|safe }};
+      document.dispatchEvent(new Event('js_context'));
+    })();
   </script>
 {% endif %}
 
