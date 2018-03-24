@@ -236,7 +236,7 @@ Run `manage.py loadprobs` to create or update problems. To delete problems not i
 
 #### Dynamic problems
 
-The `dynamic` field is a boolean that defaults to False. If true, a Python script called `generator.py` will be looked for in the problem directory. This file must contain a `gen(key)` function that returns a 2-tuple of a description and a hint. `key` will be a hash of the team ID. The function should be deterministic upon the `key` so that users don't get different problems every time. Currently, the output is not even cached to the database for (admittedly untested) performance reasons, but problem writers do not need to worry about this. 
+The `dynamic` field is a boolean that defaults to False. If true, a Python script called `generator.py` will be looked for in the problem directory. This file must contain a `generate(key)` function that returns a 2-tuple of a description and a hint. `key` will be a hash of the team ID. The function should be deterministic upon the `key` so that users don't get different problems every time. Currently, the output is not even cached to the database for (admittedly untested) performance reasons, but problem writers do not need to worry about this. 
 
 **If you want to use a dynamic problem but have the user login to an external website,** CTFlex and the external website need to co-ordinate. You can achieve this by giving the user a login name like `userX` where `X` is the `key`  or something generated from it, and then make the password a hash of `X` and a salt that is hardcoded in the generator and in the external system. Now the external system can behave like `grader()`.
 
