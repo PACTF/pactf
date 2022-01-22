@@ -17,7 +17,7 @@ envdir==0.7
 gunicorn==19.4.1
 ipython==7.16.3
 ipython-genutils==0.1.0
-Jinja2==2.8
+Jinja2==2.11.3
 jsonfield==1.0.3
 markdown2==2.4.0
 MarkupSafe==0.23
