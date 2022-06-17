@@ -24,7 +24,7 @@ MarkupSafe==0.23
 path.py==8.1.2
 pexpect==4.0.1
 pickleshare==0.5
-psycopg2-binary==2.8.6
+psycopg2==2.8.6
 ptyprocess==0.5
 pylibmc==1.5.1
 PyYAML==3.11
